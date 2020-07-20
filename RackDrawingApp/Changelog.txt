@@ -1,0 +1,734 @@
+﻿RackDrawingApp Master.433
+[internal] Update DocumentTemplate.rda
+[internal] Horizontal\vertical sheet elevations development. Commit 8.
+[internal] Horizontal\vertical sheet elevations development. Commit 7.
+[internal] Horizontal\vertical sheet elevations development. Commit 6.
+[internal] Horizontal\vertical sheet elevations development. Commit 5.
+[internal] Horizontal\vertical sheet elevations development. Commit 4. Check SheetElevationGeometry when sheet size changes.
+[internal] Horizontal\vertical sheet elevations development. Commit 3
+[internal] Horizontal\vertical sheet elevations development. Commit 2
+[internal #86] Incorrect stiffeners count in exported TXT file
+[internal] Export enabled MHE configurations to TXT file
+[internal] Horizontal\vertical sheet elevations development.
+
+RackDrawingApp Master.432
+[fixed] PDF export. Rack statistics table is empty.
+[fixed] Edit sheet length - press "Tab" - select any geometry - Ctrl+C - Ctrl+V - focus is placed in sheet depth textbox. If user clicks mouse left button in DrawingControl then try to move keyboard focus to DrawingControl.
+[internal] Drawing area scale development. Commit 21. Copy-paste command. Display non initialized geometry over initialized.
+[internal] Drawing area scale development. Commit 20. Copy-paste command.
+[internal] Drawing area scale development. Commit 19. Move command works incorrect when user moves racks.
+[internal] Drawing area scale development. Commit 18.
+[internal] Drawing area scale development. Commit 17. Bound sheet view, sheet preview and export images\pdf commands are fixed.
+[internal] Drawing area scale development. Commit 16. DrawingControl tries to keep sheet length\width ratio, but it should take all available size.
+[internal] Drawing area scale development. Commit 15. DrawingControl tries to keep sheet length\width ratio, but it should take all available size.
+[internal] Drawing area scale development. Commit 14. Set 1 as CameraScale if user changes sheet size and some geometry will be deleted.
+[internal] Drawing area scale development. Commit 13.
+[internal] Drawing area scale development. Commit 12.
+[internal] Drawing area scale development. Commit 11. Draw sheet content optimization.
+[internal] Drawing area scale development. Commit 10.
+
+RackDrawingApp Master.431
+[internal] Drawing area scale development. Commit 9. Sheet minimap control.
+[internal] Drawing area scale development. Commit 8. Zoom All and Zoom window commands.
+[internal] Drawing area scale development. Commit 7. Add DrawingControl.SheetBackgroundBrush property. Add sheet background color.
+[internal] Drawing area scale development. Commit 6. Dont display distance from selected geometry top left corner to the sheet borders, if selected geometry top left point is placed outside displayed sheet area.
+[internal] Drawing area scale development. Commit 5.
+[internal] Drawing area scale development. Commit 4. If user creates geometry then place it in the center of the displayed area. Display entire sheet(1:1 scale) if user creates a wall.
+[internal] Drawing area scale development. Commit 3. Dont draw grip point outside graphics area.
+[internal] Drawing area scale development. Commit 2.
+[internal] Drawing area scale development. Commit 1.
+
+RackDrawingApp Master.430
+[internal] Shutter swing door development. Commit 3. Find intersection between shutter door and other geometry worked incorrect.
+[fixed] PRJ_10298_001.rda. Incorrect rack statistics for B(M) and D(M) racks. They have incorrect M-length in statistics.
+[internal] Shutter swing door development. Commit 2.
+[internal] Merge errors. If rectangle height was changed through properties and it is not correct than need to revert changes and display error messame.
+[internal] Merge fix.
+[internal] Shutter swing door development.
+[internal] DrawingDocument. Synchronize major, minor version numbers with RackDrawingApp_01.407 branch. Update DocumentTemplate.rda.
+[internal] Column geometry. Rotate command development. Column geometry is reworked and it can be rotated in this version. So, increase minor number for display warning message if user open new drawing in prev. version app. Synchronize major, minor document versions with RackDrawongApp_01.407 branch. Add "Document_BRANCH" parameter to the document. Update DocumentTemplate.rda.
+[internal] Column geometry. Rotate command development.
+[internal] Column geometry. Rotate command development.
+[internal] Column geometry. Rotate command development.
+[internal] Column geometry. Rotate command development.
+[internal] Column geometry. Rotate command development.
+[internal] Column geometry. Rotate command development.
+[internal] Column geometry. Rotate command development.
+
+RackDrawingApp Master.429
+[internal] Application colors theme development. Commit 21. Add color pick button to the dialog.
+
+RackDrawingApp Master.428
+[internal] Application colors theme development. Commit 20. Add roof and floor colors to app theme.
+[internal] Application colors theme development. Commit 19.
+[internal] Application colors theme development. Commit 18.
+[internal] Application colors theme development. Commit 17.
+[internal] Application colors theme development. Commit 16.
+[internal] Application colors theme development. Commit 15.
+[internal] Application colors theme development. Commit 14.
+[internal] Application colors theme development. Commit 13.
+[internal] Application colors theme development. Commit 12.
+[internal] Application colors theme development. Commit 11.
+[internal] Application colors theme development. Commit 10.
+[internal] Application colors theme development. Commit 9.
+[internal] Application colors theme development. Commit 8.
+[internal] Application colors theme development. Commit 7.
+[internal] Application colors theme development. Commit 6.
+[internal] Fix errors after merge from RackDrawingApp_01 branch.
+[internal #82] Add warning icon to RackAdvancedProperties picture. Display tooltip without delay. Dont hide toolrip. Change tooltip font size.
+[internal #82] Add warning icon to RackAdvancedProperties picture.
+[internal] Application colors theme development. Commit 5.
+[internal] Application colors theme development. Commit 4.
+[internal] Application colors theme development. Commit 3.
+[internal] Application colors theme development. Commit 2.
+[internal] Application colors theme development. Commit 1.
+
+RackDrawingApp Master.427
+[fixed] Dont apply tie beam and display the message at the Rack Advanced Properties when rack height with tie beam is more then 12000.
+[fixed] Tie-Beam_Export_001.rda. If racks requires start and end frame tie beams, then the end frame tie beam was not added.
+
+RackDrawingApp Master.426
+[fixed] Rack statistics are not correct, after change count of pallets and apply changes to all racks with the same index.
+[fixed] Racks with tie beams are displayed with red rectangle over them(tie beam error).
+
+RackDrawingApp Master.425
+[fixed #81] Max rack height should be 12000. Display the message with total deleted racks count on open document.
+[fixed #80] Show racks which requires tie beams. Racks, which require tie beam at start or end frame but dont have it, have red rectangle over them. Change group rectangle color from red to indigo. Export commands are disabled if any sheet contains rack wich requires tie beam but doesnt have it.
+[fixed #79] Tie Beam was not displayed
+[fixed] Apply scale to rack's red dots.
+[fixed] Create rack row with 2 racks. Select the second rack and increase number of levels. Now racks have different height and they are not correct 3D displayed. Their common column height should have value of the biggest rack.
+[internal] Refactoring.
+[fixed] Excel export. "Master BOM.xlsx" is not required.
+
+RackDrawingApp Master.424
+[fixed] LoadChart.xlsx. Fix beam name parse.
+
+RackDrawingApp Master.423
+[fixed #78] Tie beams are missing.
+[fixed] Rack column is not correct calculated if Underpass and MaterialOnGround are unchecked. First level load was not included.
+[fixed] Rack.m_StiffenersHeight was not passed\restored from Rack_State.
+[fixed] Export to TXT file Stiffener Count for "X bracing with stiffener" racks.
+[fixed] Update Stiffener Count formula.
+[fixed] TXT export. Export stiffeners count for "normal bracing with stiffener". Format is "SBr_" + stiffeners count.
+[fixed] License check now try to get physical address from Wireless80211 adapters.
+[fixed] Rack match properties command sometimes set incorrect rack size index.
+[fixed] Move selection command and move rack by center grip point sometimes work incorrect. They move entire racks row\column instead selection.
+[fixed] Create rack row\column grip point works incorrect. It doesnt recalculate created racks height depend on the roof height.
+[fixed] Change rack depth via advanced properties sometimes leads to incorrect layout.
+[fixed] Change rack depth via properties sometimes leads to incorrect layout.
+[fixed] Racks was not deleted from rack index dictionary on delete sheet.
+[internal] Rack index system was reworked.
+[fixed] Create rack row - select any rack - go to the advanced properties - change any property which changes rack length - apply it to all racks - go to the sheet layout - it contains old racks graphic.
+[fixed] Fast rack size index fix.
+
+RackDrawingApp Master.422
+[fixed] "BOM_Temp.xlsx", "LayoutDrawing.dll", "PRDApp.exe", "PRDBOM_App.exe" and "PRD_Temp.dwt" should be invisible.
+[internal] Merge errors
+[fixed] Place "BOM_Temp.xlsx", "LayoutDrawing.dll", "PRDApp.exe", "PRDBOM_App.exe" and "PRD_Temp.dwt" in Resource folder. Make them invisible and copy on "Create BOM" and "Create dwg" commands.
+[internal #74] Tie Beam Trick. Rack in the second row of BTB group should have the same depth.
+[internal #74] Tie Beam Trick. Use the biggest beam span for tie beam placement calculation.
+[internal] Tie Beam trick development. Columns are face to face if their center points are aligned.
+[internal] Tie Beam trick development.
+[internal] Tie Beam trick development.
+[internal] Tie Beam trick development. Draw red border around tie beam groups.
+[internal] Tie Beam trick development.
+[fixed] Sheet 3D model. Add floor.
+[fixed] PDF export. Hide "NOTES" on rack export sheet.
+[internal] Rack tie beeam calculation.
+[internal] Rack tie beeam calculation.
+[fixed] Rack 3D view. Change diagonal members count formula. Use 138 instead 338 in diagonal members count calculation.
+[fixed] Change diagonal members count formula. Use 138 instead 338 in diagonal members count calculation.
+[fixed] Column height with tie beam should be in multiple of 100.
+[internal] Fix build errors after previous commit(merge from RackDrawingApp_01.407 branch).
+[fixed] Elevation should be always full screen. Rack advanced properties picture depends on sheet size.
+[fixed] Tie beam calculation sometimes works incorrect.
+[fixed] Tie beam error is not removed after tie beam recalculation.
+[fixed] Aisle Space change size by top left grip point sometimes works incorrect.
+[internal] Sheet notes dialog. Stretch notes textbox content.
+[internal] Tie Beam development. Display error at rack advanced properties picture if tie beam cannot be added to the rack.
+[internal] Tie Beam development.
+[internal] Sheet notes development.
+[internal] Sheet notes development.
+[internal] Merge
+[internal] Sheet notes development.
+[fixed] Change roofs default values.
+[fixed] PDF\images export. Increase font size by (1.5 * current size).
+[fixed] Export dwg command. Sometimes additional files were not deleted.
+[fixed #69] Display dimensions for unique index rack in the group. These dimensions are not required for (A) racks unless there is a change in index.
+[fixed] If user edit shutter through the properties tab then shutter geometry is not updating.
+[fixed] Ignore Ctrl+V if copied geometry list is empty.
+[fixed] "Master BOM.xlsx" file should be visible. It is placed at "AppFolder\Resources" folder.
+[fixed] Tie beam is not shown in pdf output
+[fuxed] Level Accessories dialog. Change "Along depth(UDL)" to "6 BP (Shelving application)", "Along depth (Pallet support)" to "6 BP (Pallet application)", "Along length" to "4 BP".
+[fixed] Update DocumentTemplate.rda
+[fixed] Change X\Y margin between rack and wall from 100 to 200. Dont support old documents.
+[internal] Rack X bracing height development.
+[internal] Rack X bracing height development.
+[fixed #65] Rack Advancced Properties picture. Change Clear Available Height text. 
+[fixed #65] Rack Advancced Properties picture. Change Clear Available Height text. 
+[fixed] Document Settings. Pallet configuration default capacity should be 1000. Bug #31 from Bugs_RackDrawingApp_20_10_2019.xlsx file.
+[fixed] Rack Advanced Properties picture. Change dimnesion text "Clear Available Height" to "Clear Height". Bug #27 from Bugs_RackDrawingApp_20_10_2019.xlsx file.
+[fixed] Add "All dimensions are rack to rack" note to Document Settings. Bug #26 from Bugs_RackDrawingApp_20_10_2019.xlsx file.
+[internal] Sheet 3D view development. Verical rack incorrect display.
+[internal] Sheet 3D view development. Verical rack incorrect display.
+[internal] Sheet 3D view development. Verical rack incorrect display.
+[internal] Sheet 3D view development. Verical rack incorrect display.
+
+RackDrawingApp Master.421
+[internal] Sheet 3D view development. Display sheet 3D view in the application.
+[fixed] Bug. Create bound sheet at warehouse(with flat roof) - go to the bound sheet - place rack - go to the warehouse sheet - set 6000 as roof height - infinitive loop exception.
+[internal] Sheet 3D view development. Min shutter height is MHE lowered value + 200. Max shutter and block height is roof height - 200.
+[internal] Sheet 3D view development. Use rack color for display rack beams and columns when display sheet 3D view.
+[internal] Sheet 3D view development. Add ShowWalls and ShowRoof properties.
+[internal] Sheet 3D view development. Build 3D models only when Viewport3D is visible.
+[internal] Sheet 3D view development. Performance.
+[internal] Sheet 3D view development. Performance.
+[internal] Sheet 3D view development. Performance.
+[internal] Sheet 3D view development. Wall 3D model. Shutter's height is editable.
+[internal] Sheet 3D view development. Wall 3D model.
+[internal] Sheet 3D view development. Wall 3D model.
+[internal] Sheet 3D view development. Wall 3D model. Fix gable vertical roof 3D model issue.
+[internal] Sheet 3D view development. Wall 3D model.
+[internal] Application performance. Commit 24. Wall is incorrect cloned.
+[internal] Sheet 3D view development. Wall 3D model.
+[internal] Remove AisleSpace.IsCorrect() - it is not used.
+
+RackDrawingApp Master.420
+[internal] Application performance. Commit 23. Create rack - place it - go to the advanced properties - go back to the simple properties - call "Undo" command - empty screen. SelectedGeometryCollection was not restored.
+[internal] Application performance. Commit 22. Change display error code.
+[internal] Application performance. Commit 21. Change rack's length\depth through the properties tab.
+[internal] Application performance. Commit 20. Change rack's length\depth through the properties tab.
+[internal] Application performance. Commit 19. Rack index is not update if user moves rack out of the row using grip point.
+[internal] Application performance. Commit 18. Rack index is not recalculated if user clicks "NO" in "Change racks with the same index".
+[fixed] Application crash. CustomerENQ string is null.
+[internal] Application performance. Commit 17. MHE configurations list contains all items twice.
+[internal] Application performance. Commit 16. Change DrawingDocument.RemoveRackUniqueSize() - decrease count of racks with the same index using old rack index value. "Move" geometry command increase racks unique size counter for already placed geometry.
+
+RackDrawingApp Master.419
+[internal] Rack match properties command. Racks statistics was not recalculated after match properties command.
+[internal] Rack match properties command works incorrect.
+[internal] Application performance. Commit 15. RacksGroups were not cloned inside during DrawingSheet.Clone().
+[internal] Application performance. Commit 14. IClonable.Clone() should be virtual.
+[internal] Application performance. Commit 13.
+[internal] Application performance. Commit 12.
+[internal] Application performance. Commit 11.
+[internal] Application performance. Commit 10.
+[internal] Application performance. Commit 9. Delete geometry command works incorrect.
+[internal] Application performance. Commit 8.
+[internal] Application performance. Commit 7.
+[internal] Application performance. Commit 6.
+[internal] Application performance. Commit 5.
+[internal] Application performance. Commit 4.
+[internal] Application performance. Use Clone() instead Utils.DeepClone(). Commit 3.
+[internal] Application performance. Commit 2.
+[internal] Application performance. Commit 1.
+
+RackDrawingApp Master.418
+[internal] Small perfomance improvement.
+[internal] Small perfomance improvement.
+[internal] Sheet 3D view development. Column 3D model.
+[internal] Sheet 3D view development. Roof 3D model.
+[internal] Sheet 3D view development. Roof 3D model.
+[fixed] Rack 3D view. The minimum distance between top horizontal bracing and top of the column is 138.
+[fixed] Rack advancd properties picture. The minimum distance between top horizontal bracing and top of the column is 138.
+[fixed] Rack advanced properties picture. Display TieBeamFrame height dimension only for right column.
+[internal] Sheet 3D view development. Roof 3D model development.
+[internal] Sheet 3D view development.
+[internal] Sheet 3D view development.
+[fixed] DocumentSettings dialog. Add units to pallet configurations list header.
+[fixed] Set 1000 as default pallet load.
+[fixed] Rack 3D view. Additional horizontal bracing. New requirements(prev commit).
+[fixed] Add additional horizontal bracing if distance from the topmost bracing point to the column end is greater or equal to 338. It should be placed with 138 offset from the column top.
+[internal] Sheet 3D model tests.
+
+RackDrawingApp Master.417
+[fixed] Create rack - go to the advanced properties - check Underpass - change number of levels to 4 - Underpass value was increased by level height and advanced properties picture is not correct.
+[internal] Warehouse development. "Create bound sheet" command increases states count by 3.
+[internal] State was marked changed twice when user edits any geometry properties at the properties tab. For example, create block - change length via properties - states count is increased by 2.
+[internal] Display StatesCount in DEBUG.
+[internal] Warehouse development. Change or delete shutters and walls when SheetGeometry size was changed.
+[fixed] Create shutter - place it on the right or bottom drawing area side - click in empty drawing area space - shutter is not placed. Commit 2.
+[fixed] Create shutter - place it on the right or bottom drawing area side - click in empty drawing area space - shutter is not placed.
+[internal] Update DocumentTemplate.rda.
+[fixed] Max pallet height(3000) development.
+[internal] Max pallet height(3000) development.
+[internal] Warehouse development. Check bound sheet layout after size change.
+[internal #63] Export to TXT file X bracings count for "Normal Bracing with Stiffener" bracing type.
+[fixed] Create new DocumentTempalte.rda, place it in solution and rebuild it. Run application, click application type button - error message. Exception inside DrawingDocument._SetState().
+[internal #62] Change X bracing display at rack advanced properties 3D picture.
+[internal #62] Change X bracing display at rack advanced properties 2D picture.
+[fixed] Bracings should be rectangular and not overlap.
+[fixed] Open document which was passed through command line arguments(/drawing_path=) after login through LoginWindow.
+[fixed] Add "/drawing_path=" command line argument. It contains path of the drawing which will be opened on the application start.
+[internal] Warehouse development. Sheet geometry grip points.
+[internal] Warehouse development. Sheet geometry grip points.
+[internal] Warehouse development. Top left grip point behaviour for geometry with bound sheet.
+
+RackDrawingApp Master.416
+[internal] Rack 3D view development. Add more materials light. Zoom at the start.
+[internal] Rack 3D view development. Display decking plate.
+[internal] Rack 3D view development. Update rack 3D view when rack is changed.
+[internal] Rack 3D view development. Add watermark to rack 3D view control.
+[internal] Rack 3D view development.
+[internal] Rack 3D view development.
+[internal] Rack 3D view development.
+[internal] Rack 3D view development.
+[fixed] Update underpass value at the rack advanced properties picture. It should be greater or equal than the biggest enabled MHE overall height lowered.
+[fixed] Level Accessories dialog. When Pallet Support bar(PSB) is selected Disable the option Guided Type pallet Support.
+[fixed] Recalculate underpass value when user enables on Underpass checkbox.
+[fixed] Create rack - go to the advanced properties - change any property(Material on the ground, for example) - click Undo - drawing area is empty.
+[internal] Rack 3D view development.
+
+RackDrawingApp Master.415
+[fixed] Increase distance between front and side view at the Rack Advanced Properties picture.
+[fixed] Change MAX_USL_DISTANCE to 6000, update LoadChart.xlsx and DocumentTemplate.rda.
+[fixed] Change decking plate combobox value at Level Accessories dialog.
+[fixed] If tie beam is applied then display frame height(max material height + 500) instead rack height at the rack advanced properties picture.
+[fixed #60] Remove beam name and colum size dimensions from Rack Advanced Properties picture.
+[internal] Prev commit disable login window.
+[fixed] Add /contact_no /email_id /billing_address /site_address as command line arguments.
+[fixed] Underpass is not checked before enable it. It should be greater than the biggest OverallHeight value + 200.
+[fixed] Export bracing type to the TXT file.
+[internal] Update DocumentTempalte.rda file.
+[fixed] At rack advance properties tab change "L(mm)" to "W(mm)" inside pallet's size block.
+[fixed] Add Currency, Rate and Discount to Document Settings. Update DocumentTemplate.rda file.
+[internal] Add "Heavy Duty" to RackAccessories.
+[internal] Add "Mena" to RackAccessories.
+[fixed] Replace the message text.
+[fixed] Use "C:\DrawingFactory\EnqNo"(where EnqNo is Customer ENQ No string) as a default path for Save\SaveAs and all export commands(txt, excel, dwg, pictures and pdf). Use Customer ENQ No as a default name for TXT, PDF export.
+[fixed #57] Incorrect X bracing height
+[internal] Dont change DrawingSheet.GUID if exists SheetGeometry, bound to sheet.
+[internal] Create new GUID for DrawingSheet on when create new document.
+
+UserLayout_414
+[fixed] "Read data from the LoadChart.xlsx" button was not enabled.
+
+UserLayout_413
+[fixed #56] Rack is deleted wutomatically if change number of pallets for all racks with the same index
+[fixed] Rack index changes.
+[fixed] Tie member not required.
+[fixed] ENQ Number.
+[fixed] X bracing in Text file.
+
+UserLayout_412
+[internal] Warehouse development. Commit 27. Move command is working on Warehouse sheet.
+[internal] Warehouse development. Commit 26. Warehouse sheet. Allow user to change geometry by grip points.
+[internal] Warehouse development. Commit 25.
+[internal] Rack 3D view development. Tests.
+[internal] Rack 3D view development.
+[internal] Rack 3D view development. Add HelixToolkit 3D library.
+[internal] Rack 3D view development.
+[fixed] Set "C:\DrawingFactory\Enq.No" as default save file directory. User is able to change save file path. If user opens any file and clicks Save\SaveAs then use old file path as default directory.
+[fixed] "*" symbols was not displayed in the name of sheet with changes.
+[internal] Close app after 24 hours run. Development. Commit 5. Completed.
+[internal] Close app after 24 hours run. Development. Commit 4.
+[internal] Close app after 24 hours run. Development. Commit 3.
+[internal] Close app after 24 hours run. Development. Commit 2.
+[internal] Close app after 24 hours run. Development.
+[internal] Save files only in "C:\DrawingFactory\Enq.No".
+[new] Add IsSafetyPrecautionsEnabled, SafetyPrecautionsQuantity, IsSafeWorkingLoadsEnabled and SafeWorkingLoadsQuantity. Change Rack Accessories dialog and TXT export.
+[fixed] Fix build errors in RELEASE.
+[fixed] Display ApplicationVersion in DEBUG mode.
+
+UserLayout_411
+[internal] Warehouse development. Commit 24. If user deletes sheet then bound to deleted sheet geometry at WarehouseSheet will be deleted too.
+[internal] Warehouse development. Commit 23. When user changes the size of the sheet which is placed at WarehouseSheet then need to check WarehouseSheet layout.
+[internal] Warehouse development. Commit 22. Warehouse sheet TXT export.
+[internal] Warehouse development. Commit 21. Dont display text inside geometry at WarehouseSheet.
+[internal] Warehouse development. Commit 20. Check racks height in bound to SheetGeometry at WarehouseSheet on grip point move.
+[internal] Warehouse development. Commit 19. WarehouseSheet PlaceSheet command. After select sheet for bind and click OK in dialog bound sheet size is changed to 20000x17000.
+[internal] Warehouse development. Commit 18. Update DocumentTemplate.rda. Dont check racks in DrawingDocument.CheckDocuments() in WarehouseSheet.
+[internal] Warehouse development. Commit 17. Move Roof to WarehouseSheet.
+
+UserLayout_410
+[internal] Warehouse development. Commit 16. Disable copy\paste and rack match properties commands. Roof command available only at Warehouse sheet.
+[internal] Warehouse development. Commit 15. Sheet preview rectangle at Warehouse sheet now has "Create sheet" button if no one sheet is bound to preview.
+[internal] Warehouse development. Commit 14. PlaceSheetDialog. Disable sheet preview if sheet has greater length or width than warehouse sheet size.
+[internal] Warehouse development. Commit 13. PlaceSheetDialog. Disable sheet preview, change background color and display tooltip if sheet it already used at WarehouseSheet.
+[internal] Warehouse development. Commit 12. Remove display name of rectangle at the sheet preview at PlaceSheetDialog.
+[internal] Warehouse development. Commit 11. Sheet preview at PlaceSheetDialog.
+
+UserLayout_409
+[fixed #49] Incorrect export to TXT file.
+[new] Add "/customer_name=" and "/enq_no" parameters. Example of use: DrawingFactoryApp.exe /customer_name="ivan" /enq_no="123"
+[internal] Warehouse development. Commit 10. SheetGeometry incorrect restore on undo\redo. Use Guid instead DrawingSheet inside.
+[internal] Warehouse development. Commit 9. Add "Go to bound sheet" and "Create sheet" buttons.
+[internal] Warehouse development. Commit 8. Add separate tab for warehouse sheet.
+[internal] Warehouse development. Commit 7. Remove "Height" property from sheet geometry at Warehouse sheet.
+[internal] Warehouse development. Commit 6. Remove BaseRectangleGeometry.OnMouseMove(), it was not used.
+[internal] Warehouse development. Commit 5.
+
+UserLayout_408
+[internal] Warehouse development. Commit 4.
+[internal] Warehouse development. Commit 3.
+[internal] Warehouse development. Commit 2.
+[internal] Warehouse development. Commit 1.
+
+UserLayout_407
+[fixed] Call create Rack command - while rack is not placed change rack's size by grip point - click in layout empty space - go to the rack's advanced properties - pallets sizes is not correct.
+[fixed] Change images and PDF export. Change the way watermark image apply.
+[fixed] Watermark image. In WatermarkInfo.cs file(DrawingControl project) add properties which drives watermark image draw: Rows, Columns, MarginX, MarginY, Opacity. Watermark is automatically stretched with save length\height ratio.
+[fixed #43] Copy-paste-move columns sometimes works incorrect
+[fixed] Allow copy-paste columns.
+[fixed] Aisle space incorrect export to TXT file.
+[fixed] Rack Level Accessories. Cant check "With PSB".
+
+UserLayout_406
+[fixed] Add hyperlink to Login Window.
+[fixed] Change rack max depth from 1600 to 1500. All old documents are not correct, because they can have 1600 depth racks. Dont support old documents.
+[fixed] Remove Mesh Cladding from rack level accessories and place it to rack accessories. Fix TXT export.
+
+UserLayout_405
+[fixed] Create rack row - copy-paste - click in empty layout space - paste is canceled, but all commands in the top toolbar are disabled.
+[fixed] Export to PDf file. Dimensions were not displaed on the rotated racks at layout with dimensions picture.
+[fixed] Rack statistics. Display index of statistics items, not rack size index.
+[fixed] Add WatermarkInfo.cs file to DrawingControl project. It file contains watermark angle in degrees which is applied to all watermarks in the application - layout, rack advanced properties, pdf and image export. Set 0 angle as watermark angle.
+
+UserLayout_404
+[new] Add Mesh Cladding and Mesh Height to Rack Level Accessories. Mesh Height should be greater or equal than 0.
+
+UserLayout_403
+[fixed #42] Move rack from the row using center grip point moves all next racks. "X location" video bug.
+[fixed] Export to TXT. Export "D" if Decking plate is enabled and it has along depth value. Export "L" if decking plate is enabled and it has along length value. Export "0" if decking plate is not enabled.
+[fixed] If "Decking plate" is enabled then need to draw dotted lines at the front view if it has along depth value. Draw dotted lines at the side view if it has along length value.
+[fixed] Rack Level Accessories dialog. Rename "Deck plate" to "Decking panel".
+
+UserLayout_402
+[fixed] Draw rack pallets on layout with dimension PDF export picture.
+[new] Increase size of text, dimension lines thickness on pdf export.
+[fixed] X location video bug.
+[new] Increase font size for pictures(rack advanced properties, layout picture) which are used in pdf export templates.
+[new] Implement another pdf export template sheet which is used when number of items in rack statistics is greater than 5 or number of items in pallet statistics is greater than 10.
+[fixed] Change export PDF sheet size to 4200x2970 pixels. Sometimes OutOfMemory exception was thrown while PDF export.
+[new] Draw watermark image over all pdf export sheet.
+
+UserLayout_401
+[new] New PDF export template development.
+
+UserLayout_400
+[fixed] Add 125, 150 and 175 to overhang values list.
+[fixed] Create rack row - select the second rack in the row - change the column - all racks in the row change their index. Index should be the same.
+[fixed #41] After delete rack from the row, next rack doesnt transform to M-rack.
+[fixed] CustomerInfo dialog. Rename "Name" to "Customer Name", "RQF No" to "ENQ. No." and add "Site" property.
+[fixed] Rack advanced properties picture. If tie beam is applied then show bracings as per increased height. Shift inner length, rack length and rack depth dimensions up.
+[fixed] Check Underpass value, it cant be greater than MAX_USL_DISTANCE(3500) minus height of the first level beam.
+[fixed] Display USL distance value in Underpass value.
+
+UserLayout_399
+[fixed] LicenseGeneratorServer application doesnt work through network.
+
+UserLayout_398
+[fixed] Fix error in the error message.
+[fixed #40] Not possible to change number of levels from 10 to 5.
+[fixed] Change IP of login server from "http://localhost:7144/" to "http://103.81.243.66". It is used to get login, password and license file when "Connect to server" checkbox is checked.
+[fixed] Consider BTB-racks while make tie beam calculation.
+[fixed] RackColumn development. Always set the minimum available column if user doesnt select it manually.
+[new] Use alphabet rack index. Instead R_1, R_2, R_3 use A, B, C.
+[fixed] Add "Master BOM.xlsx" file. It is used with PRDBOM_App.exe.
+[fixed] Add minimize button for the app.
+
+UserLayout_397
+[internal] RackColumn development. Always set the minimum available column if user doesnt select it manually.
+[fixed] RackDrawingApp_LicenseGeneratorServer. "end_date" was not read from GET parameters.
+[fixed] Incorrect picture for rack advanced properties. If Underpass and MaterialOnGround is unchecked then distance from the ground to the top of first level beam should be 250.
+[fixed] UnderpassChangeHeight.mp4 video.
+[fixed] Document Settings dialog was not correct displayed at 1366x768 display resolution.
+
+UserLayout_396
+[new] Add "Connect to server" option to RackDrawingApp. It tries to send GET request to "http://localhost:7144/" with username and password as parameters. In responce it download the license file and tries to login using downloaded file.
+[new] LicenseGeneratorServer application. It listen connections on "http://localhost:7143/", takes parameters and send license file in response.
+
+UserLayout_395
+[fixed] PDF export. Increase font size.
+[internal] Add a comment.
+[fixed] If Underpass and MaterialOnGround are not checked then the distance from the ground to top of the first level beam should be 250.
+[fixed] LoadChart.xlsx. Include "Normal Bracing+Stiffener" and "X Bracing+Stiffener" in bracing type calculation.
+[fixed] TieBeam. Use MaxLoadingHeight instead RackHeight in Height\Depth ratio calculation. Set 0 as tie beam depth, it affects on the tie beam export in TXT file. Change tie beam draw.
+
+UserLayout_394
+[internal] Tie beam development. Add tie beam to the last rack in the row\column.
+[internal] Tie beam development. Change AdvancedProperties picture. Export tie beams to TXT file.
+[internal] Tie beam development.
+
+UserLayout_393
+[fixed] Index of the first rack changes when rack row attaches to the end of another rack row with the same index.
+[fixed #39] Rack index changes when rack moved out of row.
+[fixed] RackIndexChangesWhenMovedToWall.mp4 video.
+
+UserLayout_392
+[fixed] Remove export bracing material(GI or PC) to txt file. Add column name and beam name export.
+
+UserLayout_391
+[new] Read arguments on LicenseGeneratorApp start.
+
+UserLayout_390
+[new] Read arguments on application start. Login, password and license path.
+[fixed] Save works as SaveAs.
+
+UserLayout_389
+[fixed] Change Rack and Level accessories. Change export to TXT file.
+[fixed] Set 400 as minimum level height value(except the last level).
+[fixed #37] Underpass&MaterialOnGround.mp4. Now Underpass value is recalculated when any property is changed(except Underpass and IsUnderpassAvailable properties). Underpass value is setted to the height which will remove only the first or ground level.
+[fixed] RackIndexChangesforAddOnRacks.mp4
+[fixed] Bug-2019-13.mp4
+[fixed] Bug-2019-10.mp4
+[fixed] Add more info to the length\width\height calculation errors.
+[fixed] Change property change message to "Would you like to apply this change for all racks with same index?" for racks and columns.
+[fixed] Compare FRQNumber with document name without extension on document open. Case sensitive.
+
+UserLayout_388
+[internal] Refactoring.
+[fixed] Change error display template.
+[fixed] Adapt application for low screen resolution.
+[internal] Adapt application for low screen resolution.
+[fixed] Application types screen adapts to the screen resolution.
+[internal] Tie beams development
+[internal] Tie beams development
+[internal] Tie beams development
+
+UserLayout_387
+[fixed] Fix export column size(depth and thickness) to the txt file. Enable "Export to txt" command in DEBUG
+
+UserLayout_386
+[fixed] Add LayoutDrawing.dll to RackDrawingApp project as an embedded resource. This file is neccessary for RDPApp.exe.
+[fixed] Change max number of pallets per level from 4 to 3. Change max levels number from 8 to 20. Increase document major because old documents can have levels with 4 pallets. Update DocumentTemplate.rda.
+[fixed] Change column, level and pallets colors at the advanced properties picture.
+
+UserLayout_385
+[fixed] Create rack row - select the second rack - uncheck Underpass - select NO as change all other racks with the same index - changed rack keeps R_1 index, all other racks in the row get R_2 index. Changed rack should be R_2.
+[fixed #34] Dont recalc pallets if number of pallets was changed manually
+[fixed #33] Dont recalc levels height like they are the same if user checks\unchecks "MaterialOnGround" and result rack's height doesnt go out the limits.
+
+UserLayout_384
+[internal] Check rack's column after regrouping.
+[internal] Rack match properties command.
+[fixed] Show beam name at the advanced properties picture. If beams are equal then display beam name only for the first level. Otherwise display beam name for all levels.
+[fixed] Change distance from the ground to the first bracing horizontal line from 150 to 162.
+[internal] Calculate rack length based on pallets length when rack is created. Beam length calculation is fixed.
+[internal] Rack beams development.
+[internal] Add beams sorting after read from LoadChart.xlsx. Replace DocumentTemplate.rda
+[internal] Read Beams and BeamWeight from LoadChart.xlsx and save this data in the document. Replace DocumentTemplate.rda.
+
+UserLayout_383
+[fixed] Ignore all command shortcuts if AdvancedProperties tab is displayed. Otherwise user can press "Delete" button while AdvancedProperties tab is displayed - selected rack will be deleted - and user will see empty AdvancedProperties tab without return button.
+[fixed] Draw X bracing height from the ground.
+[fixed] Hide "Rack weight" at the advanced properties tab.
+[fixed] Hide "States count" at the top toolbar.
+[fixed] After close CustomerInfo dialog remove all incorrect characters from RFQ number.
+[fixed] In RELEASE dont allow user to Save\SaveAs the file if RFQ number is empty or not correct.
+[fixed] Add error message if RFQ number is empty, not correct or doesnt match the filename on open document.
+[fixed] Display the error if RFQ number contains incorrect filename characters.
+[new] Add BOM_Templ.xlsx, PRDApp.exe, PRDBOM_App.exe and PRD_Temp.dwt to the RackDrawingApp solution. Add check RFQ number before any kind of dwg, excel, images, pdf export. RFQ number should be not empty and doesnt contains invalid for filename characters.
+[internal] Add try-catch blocks to ExportToExcel() function.
+[new] Add PRDBOM_App.exe and PRD_BOM.xlsx as embedded resources in RackDrawingApp. Add "Export to text file" button. If user clicks it then PRDBOM_App.exe and PRD_BOM.xlsx are copied to the assybmly folder, text file is exported to the same folder and PRDBOM_App.exe runs. After that all files(exe, xlsx and txt) are deleted.
+[internal] Dont check Underpass value if IsUnderpassAvailable is false. Otherwise racks with unchecked Underpass are removed after user checks any MHE configuration in the Document Settings dialog.
+[fixed] If user presses Esc while RackMatchProperties command is running then command stops, if CreateWall command is running then undo is executed.
+[fixed] Display error message and close application if it is not correct inirialized.
+[fixed] Fix last level height export in the txt file.
+[fixed] Fix compare columns for the column combobox at the advanced properties tab. Fix find column algorithm. If after Underpass check the first level USL distance is greater than 3500 then Underpass unchecks and error message is displayed.
+[fixed] Column compare if fixed.
+[new] Add combobox with available columns to the rack advanced properties.
+[internal] Add DisplayName to RackColumn - it is name without depth. Change RackColumn through advanced properties tab development.
+[fixed] Exclude last level from levels list when LevelsAreSame=true and user changes level height.
+[fixed] X bracing height minimum value. RackColumn.GetBracing() works incorrect - it doesnt consider beam spans except the first one(3000).
+[internal] RackUtils.CalculateRacksColumnSizeAndBracingType() function should return false if column is not found.
+[fixed] It is not possible to uncheck MaterialOnGround. "Bug-2019-9.mp4" video.
+[internal] Remove RackLevel.m_LevelLoad field, now it is calculated based on the children Pallets load. Separate level load and children pallets load leads to bugs with them.
+[fixed] Underpass check methods always tries to set the column. Fix it, now it sets the column only if Underpass value was changed.
+
+UserLayout_382
+[fixed] Recalc column on rack's length changed.
+[fixed] Rack receives incorrect index after add it to the row with diff column size.
+[fixed] Level load was not changed when palet configuration was applied.
+[fixed #32] Remove deleted geometry from selection.
+[internal] Set column and bracing in all racks group when RecalculateColumn was called on any rack from this group.
+[internal] Rack column and bracing development.
+[internal] Rack column and bracing development.
+[internal] Recalculate column on IsUnderpassAvalable, IsMaterialOnGround and Underpass value change.
+[fixed] Fix rack weight calculation - X bracing horizontal lines was changed in prev commit.
+[fixed] Change vertical bracing step from 500 to 600.
+[internal] Dont draw intermediate horizontal lines in X bracing.
+[internal] Clean the code.
+[internal] Remove m_bIsColumnAutoSelectEnabled.
+[internal] Rack column and bracing development. Pallet load is not set if all MHE configurations are disabled.
+[internal] Rack column and bracing development. Bracing and X bracing height.
+[internal] Rack column and bracing development. Incorrect advanced properties picture.
+[internal] Rack column and bracing development.
+[internal] Rack column and bracing development. Add guid to the RackColumn. Replace DocumentTemplate.rda. Dont use DocumentTemplate.rda if errors ocurred while open it.
+[internal] Rack column and bracing development.
+[new] Add "Load data from LoadChart.xlsx file" button to the top toolbar. This button available only in debug.
+[new] Add DocumentTemplate.rda to RackDrawingApp project. It is default document template and it containg column data from the "Frame" sheet of LoadChart.xlsx. Load time is equal to 1-2 seconds.
+[internal] Frame bracing development.
+[internal] Frame bracing development.
+[internal] Frame bracing development.
+[internal] Frame bracing development.
+[internal] Frame bracing development. LoadChart.xlsx file.
+
+UserLayout_381
+[fixed] Dont mark document state changed when user clicks rotate grip on the new rack. Video "Bug-2019-9.mp4".
+
+UserLayout_380
+[fixed] Rack match property doesnt work sometimes because MaxRackHeight(probably with pallets) was compared with MaxRackHeight(without pallets).
+[fixed] Create rack - select the rack - copy-paste-click in empty space - commands are not available.
+[fixed #27] Racks get 0 index after change sheet width. Bug-2019-8.mp4 video file. It was reproduced if you create racks in the new document. After rack row copy-paste and place, racks were not added to the document's unique size list.
+
+UserLayout_379
+[fixed #31] Offset value is not corrected if layout is not correct when Move command is running. "Bug-2019-5.mp4" video.
+[fixed #30] After calling Move commands and stop move all command are disabled. "Bug-2019-6.mp4" video.
+[fixed #29] Move selection command works incorrect. "BTB_is_not_respected_if_racks_are_moved.mp4" video.
+[fixed] When user moves shutter by center grip and shutter changes horizontal\vertical state then properties have incorrect name and value at the properties tab.
+[fixed #27] Racks get 0 index after change sheet width. Bug-2019-8.mp4 video file.
+[fixed] Restore old behavior when user checks\unchecks Underpass checkbox at the advanced properties tab. Total rack height without pallets doesnt change.
+
+UserLayout_378
+[fixed] When user checks underpass i try to remove levevs in (0; Underpass) height if it is possible. After that i place all other levels over underpass value and check rack height. If result rack height goes out height limits then i recalc levels height like they are the same using available rack's height.
+[fixed] If MHE configurations is checked then the biggest OverallHeightLowest is used as a default Underpass value for the new rack.
+[fixed] Rack advanced properties picture. Change underpass dimension text to "Underpass <<underpass_value>>".
+
+UserLayout_377
+[fixed] Disable the last level height edit by user. It is calculated automatically to make rack height without pallets be multiple of 100.
+[fixed] Draw underpass dimension at the advanced properties picture. Draw underpass dimension symbol.
+[fixed] Level height incorrect calculations based on the pallet height. Pallet riser height was included twice.
+[fixed] Uncheck all MHE configurations - create rack - go to the advanced properties - check "Levels are same" - go to the level accessories - check "Pallet riser" - uncheck "Levels are same" - uncheck "Pallet riser" at the last level - select the first level - check "Levels are same" - "Pallet riser" is not checked at the last leve. Because level accessories are not copied between synchronized levels.
+[fixed #25] Rack. Max material height is not correct calculated when PalletRiser is checked at the last level.
+[fixed #24] Rack advanced properties picture. Dont draw the last level height.
+
+UserLayout_376
+[fixed #23] Modify rack advanced properties graphics. Rack advanced properties picture. Instead display level height need to display height from the top of level beam to the top of next level beam.
+[internal #22] Add "Overall height lowered" to the MHE configurations. Rename MHE configration, change default value and change order.
+[new] Rack height development. Rack height without pallets should be less than (MaxLoadingHeight - 200). Rack height with pallets should be less than ClearAvailableHeight(it is roof height - 200).
+[internal] Add rack height without pallets multiplicity check.
+[fixed] Create rack - go to the advanced properties - uncheck "Are levels the same" and "Show pallet" - change the ground level height to 300 - it is not possible.
+[internal] Rack height and last level height development.
+
+UserLayout_375
+[new] If LevelAccessories.PalletRiser is checked then 100mm distance is added under each pallet.
+[fixed] "Show pallet" checkbox was removed from rack's advanced properties tab.
+
+UserLayout_374
+[new] Add 100 mm margin in both X and Y directions between rack geometry and wall\block geometry.
+[fixed] If pallet type is Flush then BTB distance is 60. For Overhang pallet types BTB distance = 2*Overhang_value + 50.
+
+UserLayout_373
+[internal] Racl depth development.
+[internal] Rack depth development.
+[internal] Rack depth development.
+
+UserLayout_372
+[fixed #21] PalletsAreEqual removes pallet configuration binding.
+[fixed #20] Check\uncheck "Material on ground" property decreases pallets and rack height.
+[fixed #19] Rack advanced properties. Number of levels should display count of all levels except ground level. Export to txt file was changed too.
+[fixed #17] Rack weight calculation. Use beam length instead inner length for beam weight calculation.
+[internal] After level beam change it is necessary to recalc level height. Because level height depends on the next level beam height.
+[internal] Rack length development.
+
+UserLayout_371
+[fixed] Create rack - go to the advanced properties - change "Number of levels" to 2 and then to 6 - levels have incorrect index.
+[fixed] Increase document major. It means that if user opens the document created in this version(UserLayout_371) in older version(less than UserLayout_371) then "You open new document in old application" message box will be displayed.
+[fixed #15] Check levels rules on old document. If user opens old document then rack's level height is recalculated, because it(level height) should end with 12\62 or 50\100.
+[fixed] Create pallet configuration - create rack - go to the advanced properties - select pallet configuration - pallet configuration is applied, but levels height rules are not satisfied. Level height should ends with 12\62 or 50\100.
+
+UserLayout_370
+[fixed] Incorrect excel version on login. Temporary fix.
+
+UserLayout_369
+[fixed #13] Material on ground reduces rack's height.
+[fixed] Exception on open document. Invalid type.
+[new] New rack level height rules. If ground level is enabled then distance from the ground to top of the first level beam should ends with 12 or 62. For all other levels distance from the top of level beam to the top of next level beam should ends with 50 or 100.
+[fixed] Create rack - set number of levels to 2 - uncheck Material on ground - it is not possible because number of levels is 1. Min number of levels value is 2.
+[fixed] Create rack - place it - go to the advanced properties - call document settings - Graphics Area redraws without borders.
+[fixed] Create rack - dont place it - go to the advanced properties - document state is marked changed and it was placed in the undo\redo stack. Dont do it if command is running.
+[new] Default rack properties from the "Guidelines" document.
+[fixed] Go to the advanced properties and make "Material on ground" checked - 0 value dimension is displayed from the floor to the ground level.
+
+UserLayout_368
+[new] Undo\redo development. Save geometry IsSelected state to the stream. It is necessary to restore it with DrawingDocument.ShowAdvancedProperties value. Otherwise it can be displayed empty space on undo\redo when ShowAdvancedProperties is restored as true, but SelectedGeometry is null.
+[fixed] After copy-paste command, pasted geometry are not marked as initialized.
+[internal] Undo\redo development.
+[fixed] Sheet's geometry is hidden after Save\SaveAs command
+[fixed] Compare rack's height with pallets with clear available height, because MaxLengthZ can be max loading height plus the last level height, which sum is less then ClearAvailableHeight.
+[internal] Undo\redo development.
+[fixed] Create rack - create aisle space with 1000 width and adjust it to rack - go to the document settings and enable MHE configuration with picking aisle width greate than 1000 - press OK button - aisle space size is changed, but the text of Aisle Space is not changed.
+[fixed] Rename column from "W(mm) to "D(mm)" at pallet properties list at advanced properties tab.
+
+UserLayout_367
+[fixed] Create block - place it - select placed block - cant click in the bot right grip point.
+[internal] AisleSpace min length\width should depend on the adjusted geometry and enabled MHE configurations.
+[internal] Aisle space development. Min Aisle space length\width is the biggest value from enabled PickingAisleWidth(if parallel rack is adjusted), CrossAisleWidth(if perpendicular rack is adjusted), EndAisleWidth(if block or wall is adjusted).
+[fixed] Docment settings dialog. Pallets configuration table. Rename "Length" column to "Depth".
+
+UserLayout_366
+[fixed] Break Clear Available Height dimension line if Clear Available Height is greater than 1.1 * Max Rack Height.
+[fixed #3] Cant create rack in the attached document. Application crash. WareHouse.rda.
+[fixed] Display the message if user closes sheet with geometry inside.
+[fixed] Create rack - place it at the top left corner - create rack's row with 3 items - move the first rack down by half of the rack - the second rack receives incorrect index R_0(M).
+[fixed] Create rack - place it at (0, 0) point - create rack - the second rack receive R_2(M) index, because checking layout occurred in the Rack constructor.
+[fixed] Change walls length\width\position when sheet's lenegth\width is changed.
+
+UserLayout_365
+[new] Walls.
+[fixed] Select few geometries - copy - paste - pasted geometries are not possible to move.
+[fixed] Disable buttons at the top toolbar and geometry create buttons if any command is running.
+
+UserLayout_364
+[fixed] Replace MHE travels width, max loading height and pallet truck max capacity with MHE configuration table. If MHE configuration is checked then it is editable.
+        Max loading height is the lowest max loading height value from ENABLED MHE configurations.
+        Max pallet truck capacity is the lowest capacity value from ENABLED MHE configurations.
+        Minimum aisle space width\length is the lowest pickung aisle width value from ENABLED MHE configurations, if there is no enabled MHE configuration then used 100 as min width\length aisle space value.
+
+UserLayout_363
+[fixed] Create rack - go to the adv properties - press Save button at the top toolbar - empty document.
+[fixed] Selected pallet configuration text sometimes doesnt fit in the PC column.
+[fixed] Display only one pallet if "Pallets are equal" is checked.
+[fixed] Sometimes column's length\width text overlaps view name.
+[fixed] Add roof type pictures to the edit roof properties dialog.
+[fixed] Selection move command doesnt check height of moved racks - it depends on the roof properties and rack position.
+[fixed] Match rack properties command doesnt check height of moved racks - it depends on the roof properties and rack position. If height is not correct after match then this target rack will be skipped and message with count of skipped racks will be displayed.
+[fixed] Change SaveAs icon, it was the same as copy icon
+
+UserLayout_362
+[fixed] Set 60 as BTBDistance minimum value, if BTBDistance is equal 60 then all racks should be flush. All old version documents(without BTBDistance) will have 200 as BTBDistance value on open. All new version docs have 250 as BTBDistance default value.
+[fixed] Disable close sheet button if sheets count is less than 2.
+[new] Roof development. Roof drives rack's max available height. Rack's total height with pallets(ShowPallet doesnt matter) should be less or equal max available height.
+[fixed] Select rack - select rack row\column by grip point - move rack's group by center grip point - rack's group can be moved outside graphics area.
+[fixed] Create rack - go to the adv properties - enable "Material on ground" - delete rack - create new rack - new rack get "R_2" index instead "R_1".
+[internal] Enable license check
+
+UserLayout_361
+[fixed] Remove current sheet selection on document settings command. Dont clear PalletConfigurationCollection when rack advanced properties are displayed, because it set NULL as PalletConfiguration to the selected rack pallets.
+[fixed] Dont set Flush pallet type on the rack after edit DrawingDocument settings(BTB distance) if rack's pallet type is Flush already.
+[fixed] Add sorting based on the Pallet Configuration index in the Document Settings dialog and Rack Advanced Properties tab.
+[fixed] Dont recalc pallets sizes if AreLevelsTheSame is switched to false.
+[fixed] Rack match properties command. If source and target rack's height is different then "Are you sure?" dialog is displayed. "Remeber the state" combobox state was not saved during the command, so dialog was displayed multiple times.
+[fixed] Call rack match properties command - select the property source - select target racks with different depth by rectangle - first time click YES in the dialog - second time click CANCEL - canceled rack get 0 index.
+[internal] Refactoring
+
+UserLayout_360
+[internal] Pallet configuration development.
+[fixed] Inside DrawingDocument.CheckDocument regroup racks was not called.
+[internal] Some properties were not applied in DrawingDocument._SetState().
+
+UserLayout_359
+[new] Add horizontal and verical gutters to document settings dialog.
+[new] Add MaxLoadingHeight property to the documents settings. Max rack height = MaxLoadingHeight + the last level height.
+[new] Add PalletTruckMaxCapacity property to the document settings. Pallet load cant be greater than value of this property.
+[internal] Customer info and BackToBack distance were not passed to the document state.
+[fixed] Create rack row\column grip point doesnt work. Overlap calulation bug.
+[new] Add MHE travel width to the document settings. It drives the minimum Aisle Space length\width.
+[fixed] Disable copy command if selection contains only columns.
+
+UserLayout_358
+[new] Add BackToBack distance. Old documents will have 200 as BTB distance and all racks will be Flush.
+[new] PalletType(Flush\Overhang) is disabled when BTB distance is less or equal than 200.
+[new] Document setting dialog.
+[fixed] When PalletType is changed from Overhang to Flush rack's depth is increased by 200. Now rack will keep his depth.
+[fixed] Advanced properties button was always hidden.
+[internal] Add customer info and BTB distance to the document state.
+
+UserLayout_357
+    [internal] Before save document remove all non initialized and incorrect geometry
+    [internal] Include geometry fill and text color in IGeomDisplaySettings.
+    [fixed] Fix MarginX and MarginY values for the Rack. Margin value is not zero if ShowPallet = true and PalletType = Overhang.
+    [new] Check sheets layout after document open, ask user for delete incorrect geometry.
+
+Based on UserLayout_356

@@ -1,0 +1,369 @@
+﻿<Window
+	x:Class="RackDrawingApp_LicenseGenerator.MainWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	
+	xmlns:local="clr-namespace:RackDrawingApp_LicenseGenerator"
+	
+	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+	xmlns:mdWPF="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf" 
+	xmlns:mdConverters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
+	
+	TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+	TextElement.FontWeight="Medium"
+	TextElement.FontSize="14"
+	TextOptions.TextFormattingMode="Ideal" 
+	TextOptions.TextRenderingMode="Auto"
+	
+	Background="{DynamicResource AppBackground}"
+	FontFamily="{DynamicResource MaterialDesignFont}"
+	
+	Height="650"
+	Width="500"
+
+	
+	WindowState="Normal"
+	ResizeMode="NoResize"
+	WindowStartupLocation="CenterScreen"
+	
+	SnapsToDevicePixels="True"
+	
+	Title="RackDrawingApp license file generator"
+	Icon="/RackDrawingApp_LicenseGenerator;component/Properties/lock.ico"
+	
+	AllowDrop="True"
+	Drop="Window_Drop"
+	>
+
+	<Window.Resources>
+
+		<!--
+		Apply app theme colors
+		-->
+		<Style TargetType="{x:Type materialDesign:Card}" BasedOn="{StaticResource {x:Type materialDesign:Card}}">
+			<Setter Property="Background" Value="{DynamicResource AppCardBackground}"/>
+			<Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+		</Style>
+		<Style TargetType="{x:Type ToolTip}" BasedOn="{StaticResource MaterialDesignToolTip}">
+			<Setter Property="Foreground" Value="{DynamicResource AppBackground}" />
+			<Setter Property="Background" Value="{DynamicResource MaterialDesignToolTipBackground}" />
+		</Style>
+		<!---->
+		<Style x:Key="AppTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignTextBox}">
+			<Setter Property="materialDesign:ValidationAssist.Background" Value="Transparent"/>
+			<Setter Property="Background" Value="Red"/>
+		</Style>
+		<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource AppTextBox}"/>
+		<!---->
+		<Style x:Key="AppComboBox" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource MaterialDesignComboBox}">
+			<Setter Property="materialDesign:ValidationAssist.Background" Value="Transparent"/>
+		</Style>
+		<Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource AppComboBox}"/>
+
+		<Style x:Key="AppCalendarStyle" TargetType="{x:Type Calendar}" BasedOn="{StaticResource MaterialDesignDatePickerCalendarPortrait}">
+			<Setter Property="Background" Value="{DynamicResource AppCardBackground}" />
+		</Style>
+
+		<Style x:Key="CommandButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderBrush" Value="Transparent"/>
+
+			<Setter Property="Margin" Value="8, 0, 8, 0"/>
+			<Setter Property="Padding" Value="0"/>
+
+			<Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+
+			<Style.Triggers>
+				<Trigger Property="IsMouseOver" Value="True">
+					<Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"/>
+				</Trigger>
+			</Style.Triggers>
+
+		</Style>
+
+	</Window.Resources>
+
+	<Grid>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="auto"/>
+		</Grid.RowDefinitions>
+
+		<Grid
+			Grid.Row="0"
+			
+			VerticalAlignment="Center"
+			HorizontalAlignment="Center"
+			
+			Grid.IsSharedSizeScope="True"
+			>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="auto"/>
+				<RowDefinition Height="auto"/>
+				<RowDefinition Height="auto" SharedSizeGroup="FieldsHeightGroup"/>
+				<RowDefinition Height="auto" SharedSizeGroup="FieldsHeightGroup"/>
+				<RowDefinition Height="auto" SharedSizeGroup="FieldsHeightGroup"/>
+				<RowDefinition Height="auto" SharedSizeGroup="FieldsHeightGroup"/>
+				<RowDefinition Height="auto" SharedSizeGroup="FieldsHeightGroup"/>
+				<RowDefinition Height="auto" SharedSizeGroup="FieldsHeightGroup"/>
+				<RowDefinition Height="auto" SharedSizeGroup="FieldsHeightGroup"/>
+				<RowDefinition Height="auto"/>
+				<RowDefinition Height="auto"/>
+			</Grid.RowDefinitions>
+
+			<TextBlock
+				Grid.Row="0"
+				
+				VerticalAlignment="Center"
+				HorizontalAlignment="Center"
+				
+				Style="{DynamicResource MaterialDesignDisplay1TextBlock}"
+				Foreground="{DynamicResource SecondaryAccentBrush}"
+				
+				Text="RackDrawingApp"
+				
+				Margin="16, 0, 16, 0"
+				/>
+			<TextBlock
+				Grid.Row="1"
+				
+				VerticalAlignment="Center"
+				HorizontalAlignment="Center"
+				
+				Style="{DynamicResource MaterialDesignCaptionTextBlock}"
+				Foreground="{DynamicResource SecondaryAccentBrush}"
+				
+				Text="license file generator"
+				
+				Margin="16, 0, 16, 16"
+				/>
+
+			<TextBox
+				Grid.Row="2"
+				
+				materialDesign:HintAssist.Hint="Username"
+				Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+				
+				Text="{Binding UserName, Mode=TwoWay}"
+				
+				Margin="0, 0, 0, 4"
+				/>
+
+			<TextBox
+				Grid.Row="3"
+				
+				materialDesign:HintAssist.Hint="Password"
+				Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+				
+				Text="{Binding Password, Mode=TwoWay}"
+				
+				Margin="0, 0, 0, 4"
+				/>
+
+			<TextBox
+				Grid.Row="4"
+				
+				materialDesign:HintAssist.Hint="Ethernet address"
+				Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+				
+				Text="{Binding EthernetAddress, Mode=TwoWay}"
+				
+				Margin="0, 0, 0, 4"
+				/>
+
+			<TextBox
+				Grid.Row="5"
+				
+				materialDesign:HintAssist.Hint="GUID"
+				Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+				
+				Text="{Binding GUID, Mode=TwoWay}"
+				
+				Margin="0, 0, 0, 4"
+				/>
+
+			<ComboBox
+				Grid.Row="6"
+				
+				materialDesign:HintAssist.Hint="Windows version"
+				
+				SelectedValue="{Binding WindowsVersion}"
+				ItemsSource="{Binding windowsVersionsList, Mode=OneWay}"
+				Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+				
+				Margin="0, 0, 0, 4"
+				>
+				<ComboBox.ItemTemplate>
+					<DataTemplate>
+						<TextBlock
+							Text="{Binding DisplayName, Mode=OneWay}"/>
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+			</ComboBox>
+
+			<ComboBox
+				Grid.Row="7"
+				
+				materialDesign:HintAssist.Hint="Excel version"
+				
+				SelectedValue="{Binding ExcelVersion}"
+				ItemsSource="{Binding ExcelVersionsList, Mode=OneWay}"
+				Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+				
+				Margin="0, 0, 0, 4"
+				>
+				<ComboBox.ItemTemplate>
+					<DataTemplate>
+						<TextBlock
+							Text="{Binding DisplayName, Mode=OneWay}"/>
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+			</ComboBox>
+
+			<Grid
+				Grid.Row="8"
+				>
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" MaxWidth="300"/>
+					<ColumnDefinition Width="auto"/>
+				</Grid.ColumnDefinitions>
+
+				<CheckBox
+					Grid.Column="0"
+					Content="Include date"
+					
+					VerticalAlignment="Center"
+					
+					IsChecked="{Binding IncludeDate, Mode=TwoWay}"
+					Margin="0, 0, 8, 0"
+					/>
+				<DatePicker
+					Grid.Column="1"
+					
+					SelectedDate="{Binding CanRunTill, Mode=TwoWay}"
+					CalendarStyle="{StaticResource AppCalendarStyle}"
+					
+					VerticalAlignment="Center"
+					>
+					<DatePicker.Style>
+						<Style TargetType="{x:Type DatePicker}" BasedOn="{StaticResource {x:Type DatePicker}}">
+							<Setter Property="IsEnabled" Value="True"/>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding IncludeDate}" Value="False">
+									<Setter Property="IsEnabled" Value="False"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</DatePicker.Style>
+				</DatePicker>
+			</Grid>
+
+			<Grid
+				Grid.Row="9"
+				
+				Margin="0, 16, 0, 0"
+				>
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" MaxWidth="300"/>
+					<ColumnDefinition Width="auto"/>
+				</Grid.ColumnDefinitions>
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
+				</Grid.RowDefinitions>
+
+				<TextBox
+					Grid.Row="0"
+					Grid.Column="0"
+					Grid.ColumnSpan="2"
+					
+					materialDesign:HintAssist.Hint="License file name"
+					Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+					
+					VerticalAlignment="Center"
+					
+					Text="{Binding LicenseFileName, Mode=TwoWay}"
+					TextWrapping="NoWrap"
+					
+					Margin="0, 0, 0, 0"
+					/>
+				
+				<TextBox
+					Grid.Row="1"
+					Grid.Column="0"
+					
+					materialDesign:HintAssist.Hint="License file directory"
+					Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+					
+					VerticalAlignment="Center"
+					
+					Text="{Binding LicenseFileDirectory, Mode=TwoWay}"
+					TextWrapping="NoWrap"
+					
+					Margin="0, 0, 8, 0"
+					/>
+
+				<Button
+					Grid.Row="1"
+					Grid.Column="1"
+					
+					Style="{StaticResource CommandButtonStyle}"
+					Click="ChooseDirectoryButton_Click"
+					>
+					<materialDesign:PackIcon
+						Kind="Folder"
+						
+						Width="20"
+						Height="20"
+						/>
+				</Button>
+
+			</Grid>
+
+			<TextBlock
+				Grid.Row="10"
+				
+				VerticalAlignment="Center"
+				HorizontalAlignment="Center"
+				
+				Text="{Binding Status, Mode=OneWay}"
+				
+				Margin="0, 16, 0, 16"
+				>
+				<TextBlock.Style>
+					<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignCaptionTextBlock}">
+						<Setter Property="Foreground" Value="{StaticResource SecondaryAccentBrush}"/>
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding DoesStatusContainsError, Mode=OneWay}" Value="True">
+								<Setter Property="Foreground" Value="Salmon"/>
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</TextBlock.Style>
+			</TextBlock>
+
+		</Grid>
+
+		<Button
+			Grid.Row="1"
+			
+			Margin="8"
+			HorizontalAlignment="Right"
+			
+			Content="CREATE"
+			Style="{DynamicResource MaterialDesignFlatButton}"
+			
+			Click="CreateButton_Click"
+			/>
+
+	</Grid>
+	
+</Window>

@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RackDrawingApp", "RackDrawingApp\RackDrawingApp.csproj", "{80EFFDCF-6442-445D-86E0-F0DEF98C449A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D3E50E6A-2982-4AD4-99B9-9B3219AA5B51} = {D3E50E6A-2982-4AD4-99B9-9B3219AA5B51}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingControl", "DrawingControl\DrawingControl.csproj", "{D3E50E6A-2982-4AD4-99B9-9B3219AA5B51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RacDrawingApp_LicenseDebugger", "RackDrawingApp_LicenseDebugger\RacDrawingApp_LicenseDebugger.csproj", "{8E57FA85-6659-4E96-AD36-76F490C6727C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RackDrawingApp_LicenseGenerator", "RackDrawingApp_LicenseGenerator\RackDrawingApp_LicenseGenerator.csproj", "{16C66276-EFBA-4DCB-A3EE-95362063D5DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RackDrawingApp_LicenseGeneratorServer", "RackDrawingApp_LicenseGeneratorServer\RackDrawingApp_LicenseGeneratorServer.csproj", "{D9C63DD3-2DA4-4EBA-9FB5-3FB4E9DEBF80}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{80EFFDCF-6442-445D-86E0-F0DEF98C449A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80EFFDCF-6442-445D-86E0-F0DEF98C449A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80EFFDCF-6442-445D-86E0-F0DEF98C449A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80EFFDCF-6442-445D-86E0-F0DEF98C449A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3E50E6A-2982-4AD4-99B9-9B3219AA5B51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3E50E6A-2982-4AD4-99B9-9B3219AA5B51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3E50E6A-2982-4AD4-99B9-9B3219AA5B51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3E50E6A-2982-4AD4-99B9-9B3219AA5B51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E57FA85-6659-4E96-AD36-76F490C6727C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E57FA85-6659-4E96-AD36-76F490C6727C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E57FA85-6659-4E96-AD36-76F490C6727C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E57FA85-6659-4E96-AD36-76F490C6727C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16C66276-EFBA-4DCB-A3EE-95362063D5DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16C66276-EFBA-4DCB-A3EE-95362063D5DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16C66276-EFBA-4DCB-A3EE-95362063D5DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16C66276-EFBA-4DCB-A3EE-95362063D5DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9C63DD3-2DA4-4EBA-9FB5-3FB4E9DEBF80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9C63DD3-2DA4-4EBA-9FB5-3FB4E9DEBF80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9C63DD3-2DA4-4EBA-9FB5-3FB4E9DEBF80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9C63DD3-2DA4-4EBA-9FB5-3FB4E9DEBF80}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

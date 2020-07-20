@@ -1,0 +1,30 @@
+﻿<Application
+	x:Class="RackDrawingApp_LicenseDebugger.App"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="clr-namespace:RackDrawingApp_LicenseDebugger"
+	StartupUri="MainWindow.xaml">
+
+	<Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<!-- Styles -->
+				<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+
+				<!-- Colors -->
+				<ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.BlueGrey.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.LightBlue.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+
+			<SolidColorBrush x:Key="AppBackground" Color="{Binding Color, Source={StaticResource MaterialDesignPaper}}"/>
+			<SolidColorBrush x:Key="AppCardBackground" Color="{Binding Color, Source={StaticResource MaterialDesignCardBackground}}"/>
+			<SolidColorBrush x:Key="AppWarningBackground" Color="DarkOrange"/>
+			<SolidColorBrush x:Key="GeometryTextForeground" Color="Black"/>
+			<SolidColorBrush x:Key="MaterialDesignCheckBoxOff" Color="{Binding Color, Source={StaticResource MaterialDesignTextBoxBorder}}"/>
+			<SolidColorBrush x:Key="ValidationErrorForeground" Color="White"/>
+
+		</ResourceDictionary>
+	</Application.Resources>
+
+</Application>

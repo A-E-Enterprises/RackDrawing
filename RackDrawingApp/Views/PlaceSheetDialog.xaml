@@ -1,0 +1,183 @@
+﻿<UserControl
+	x:Class="RackDrawingApp.PlaceSheetDialog"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+	xmlns:local="clr-namespace:RackDrawingApp"
+	mc:Ignorable="d" 
+	
+	d:DesignHeight="300" d:DesignWidth="300"
+	
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+	
+	xmlns:dc="clr-namespace:DrawingControl;assembly=DrawingControl"
+	
+	TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+	TextElement.FontWeight="Medium"
+	TextElement.FontSize="14"
+	TextOptions.TextFormattingMode="Ideal" 
+	TextOptions.TextRenderingMode="Auto"
+	
+	Background="{DynamicResource AppBackground}"
+	FontFamily="{DynamicResource MaterialDesignFont}"
+	
+	Width="600"
+	Height="600"
+	
+	SnapsToDevicePixels="True"
+	>
+
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="CommonResources.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+
+	<Grid
+		Margin="8"
+		>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="auto"/>
+		</Grid.RowDefinitions>
+
+		<!--
+		ROW 0
+		HEADER
+		-->
+		<TextBlock
+			Grid.Row="0"
+			
+			VerticalAlignment="Center"
+			HorizontalAlignment="Center"
+			
+			Style="{DynamicResource MaterialDesignDisplay1TextBlock}"
+			Foreground="{DynamicResource SecondaryAccentBrush}"
+			
+			Text="Select sheet:"
+			
+			Margin="16, 0, 16, 16"
+			/>
+		
+		<!--
+		ROW 1
+		SHEETS
+		-->
+		<ListBox
+			Grid.Row="1"
+			VerticalAlignment="Center"
+			HorizontalAlignment="Center"
+			
+			SelectedValue="{Binding SelectedSheetPreview, Mode=TwoWay}"
+			ItemsSource="{Binding SheetsPreviewsList, Mode=OneWay}"
+			>
+
+			<ListBox.ItemsPanel>
+				<ItemsPanelTemplate>
+					<WrapPanel IsItemsHost="True"/>
+				</ItemsPanelTemplate>
+			</ListBox.ItemsPanel>
+
+			<ListBox.ItemContainerStyle>
+				<Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+					<Setter Property="IsEnabled" Value="True"/>
+					<Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
+					<Setter Property="ToolTip" Value="{Binding ErrorMessage, Mode=OneWay}"/>
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding Path=IsEnabled, Mode=OneWay}" Value="False">
+							<Setter Property="Background" Value="#FFCECE"/>
+							<Setter Property="Opacity" Value="0.44"/>
+							<Setter Property="IsEnabled" Value="False"/>
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</ListBox.ItemContainerStyle>
+			
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<Grid
+						Width="200"
+						Height="200"
+						>
+						<dc:SheetPreviewControl
+							VerticalAlignment="Stretch"
+							HorizontalAlignment="Stretch"
+							
+							Sheet="{Binding Path=Sheet, Mode=OneWay}"
+							/>
+						<TextBlock
+							VerticalAlignment="Center"
+							HorizontalAlignment="Center"
+							>
+							<TextBlock.Style>
+								<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+									<Setter Property="Text" Value="{Binding Path=Sheet.Name, Mode=OneWay}"/>
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding Path=Sheet}" Value="{x:Null}">
+											<Setter Property="Text" Value="Without bound sheet"/>
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</TextBlock.Style>
+						</TextBlock>
+					</Grid>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+
+		</ListBox>
+		
+		<!--
+		ROW 2
+		OK CANCEL buttons
+		-->
+		<StackPanel
+			Grid.Row="2"
+			Margin="0 16 0 0"
+			Orientation="Horizontal"
+			HorizontalAlignment="Right">
+
+			<Button
+				IsDefault="True"
+				IsEnabled="{Binding IsOkButtonEnabled}"
+				
+				Style="{DynamicResource MaterialDesignFlatButton}"
+				
+				Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+				>
+
+				<Button.CommandParameter>
+					<system:Boolean>True</system:Boolean>
+				</Button.CommandParameter>
+
+				OK
+
+			</Button>
+
+			<Button
+				IsCancel="True"
+				Margin="8 0 0 0"
+				
+				Style="{DynamicResource MaterialDesignFlatButton}"
+				
+				Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+				>
+
+				<Button.CommandParameter>
+					<system:Boolean>False</system:Boolean>
+				</Button.CommandParameter>
+
+				CANCEL
+
+			</Button>
+
+		</StackPanel>
+
+	</Grid>
+	
+</UserControl>

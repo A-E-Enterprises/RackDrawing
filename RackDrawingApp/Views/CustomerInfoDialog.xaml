@@ -1,0 +1,262 @@
+﻿<UserControl
+	x:Class="RackDrawingApp.CustomerInfoDialog"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+	
+	xmlns:local="clr-namespace:RackDrawingApp"
+	mc:Ignorable="d" 
+	
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+	
+	TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+	
+	Width="500"
+	Height="390"
+	
+	d:DesignHeight="300"
+	d:DesignWidth="300"
+	>
+
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="CommonResources.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+	
+	<Grid
+		Margin="16"
+		>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+
+		<TextBlock
+			Grid.Row="0"
+			
+			VerticalAlignment="Center"
+			HorizontalAlignment="Center"
+			
+			Style="{DynamicResource MaterialDesignDisplay1TextBlock}"
+			Foreground="{DynamicResource SecondaryAccentBrush}"
+			
+			Text="Customer info:"
+			/>
+
+		<ScrollViewer
+			Grid.Row="1"
+			Margin="16"
+			
+			HorizontalAlignment="Stretch"
+			VerticalScrollBarVisibility="Auto"
+			
+			KeyboardNavigation.ControlTabNavigation="Cycle"
+			KeyboardNavigation.DirectionalNavigation="Cycle"
+			KeyboardNavigation.TabNavigation="Cycle"
+			>
+
+			<ScrollViewer.Resources>
+
+				<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+					<Setter Property="Margin" Value="0, 0, 16, 0"/>
+					<Setter Property="VerticalAlignment" Value="Center"/>
+					<Setter Property="Opacity" Value="0.7"/>
+				</Style>
+
+				<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource AppTextBox}">
+					<Setter Property="HorizontalAlignment" Value="Stretch"/>
+					<Setter Property="TextWrapping" Value="Wrap"/>
+				</Style>
+
+			</ScrollViewer.Resources>
+
+			<Grid>
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="{StaticResource HorizontalGutter_x2}"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="{StaticResource HorizontalGutter_x2}"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="{StaticResource HorizontalGutter_x2}"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="{StaticResource HorizontalGutter_x2}"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="{StaticResource HorizontalGutter_x2}"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+
+				<!--
+				ROW 0
+				CUSTOMER NAME
+				-->
+				<TextBlock
+					Grid.Row="0"
+					Grid.Column="0"
+					
+					Text="Customer Name"
+					/>
+				<TextBox
+					Grid.Row="0"
+					Grid.Column="1"
+					
+					Text="{Binding CustomerName, Mode=TwoWay}"
+					TextWrapping="Wrap"
+					/>
+				
+				<!--
+				ROW 1
+				HORIZONTAL GUTTER
+				-->
+
+				<!--
+				ROW 2
+				CUSTOMER CONTACT NO
+				-->
+				<TextBlock
+					Grid.Row="2"
+					Grid.Column="0"
+					
+					Text="Contact No"
+					/>
+				<TextBox
+					Grid.Row="2"
+					Grid.Column="1"
+					
+					Text="{Binding CustomerContactNo, Mode=TwoWay}"
+					/>
+
+				<!--
+				ROW 3
+				HORIZONTAL GUTTER
+				-->
+
+				<!--
+				ROW 4
+				CUSTOMER EMAIL
+				-->
+				<TextBlock
+					Grid.Row="4"
+					Grid.Column="0"
+					
+					Text="E-mail"
+					/>
+				<TextBox
+					Grid.Row="4"
+					Grid.Column="1"
+					
+					Text="{Binding CustomerEMail, Mode=TwoWay}"
+					/>
+
+				<!--
+				ROW 5
+				HORIZONTAL GUTTER
+				-->
+				
+				<!--
+				ROW 6
+				CUSTOMER ENQ NUMBER
+				-->
+				<TextBlock
+					Grid.Row="6"
+					Grid.Column="0"
+					
+					Text="ENQ. No."
+					/>
+				<TextBox
+					Grid.Row="6"
+					Grid.Column="1"
+					>
+					<TextBox.Text>
+						<Binding Path="CustomerENQ" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+							<Binding.ValidationRules>
+								<DataErrorValidationRule />
+							</Binding.ValidationRules>
+						</Binding>
+					</TextBox.Text>
+				</TextBox>
+
+				<!--
+				ROW 7
+				HORIZONTAL GUTTER
+				-->
+				
+				<!--
+				ROW 8
+				CUSTOMER ADDRESS
+				-->
+				<TextBlock
+					Grid.Row="8"
+					Grid.Column="0"
+					
+					Text="Address"
+					/>
+				<TextBox
+					Grid.Row="8"
+					Grid.Column="1"
+					
+					Text="{Binding CustomerAddress, Mode=TwoWay}"
+					/>
+
+				<!--
+				ROW 9
+				HORIZONTAL GUTTER
+				-->
+
+				<!--
+				ROW 10
+				CUSTOMER ADDRESS
+				-->
+				<TextBlock
+					Grid.Row="10"
+					Grid.Column="0"
+					
+					Text="Site"
+					/>
+				<TextBox
+					Grid.Row="10"
+					Grid.Column="1"
+					
+					Text="{Binding CustomerSite, Mode=TwoWay}"
+					/>
+
+			</Grid>
+
+		</ScrollViewer>
+
+		<Button
+			Grid.Row="2"
+			IsDefault="True"
+			IsCancel="True"
+			Margin="0, 16, 0, 0"
+			HorizontalAlignment="Right"
+			Style="{DynamicResource MaterialDesignFlatButton}"
+			Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+
+			<Button.CommandParameter>
+				<system:Boolean>True</system:Boolean>
+			</Button.CommandParameter>
+
+			OK
+
+		</Button>
+
+	</Grid>
+	
+</UserControl>

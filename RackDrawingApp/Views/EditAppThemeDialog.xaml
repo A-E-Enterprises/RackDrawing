@@ -1,0 +1,413 @@
+﻿<UserControl
+	x:Class="RackDrawingApp.EditAppThemeDialog"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+	
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+	
+	xmlns:dc="clr-namespace:DrawingControl;assembly=DrawingControl"
+	xmlns:local="clr-namespace:RackDrawingApp"
+	
+	TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+	
+	Width="550"
+	Height="600"
+	>
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="CommonResources.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+
+			<!--
+			Data template for ColorInfo SystemName
+			-->
+			<DataTemplate x:Key="SystemName_CellTemplate">
+				<Grid
+					HorizontalAlignment="Stretch"
+					>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" SharedSizeGroup="SystemName"/>
+						<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					
+					<!--
+					column 0
+					display name
+					-->
+					<TextBlock
+						Grid.Column="0"
+						VerticalAlignment="Bottom"
+						Text="{Binding DisplayName, Mode=OneWay}"/>
+					
+					<!--
+					column 1
+					vertical gutter
+					-->
+					
+					<!--
+					column 2
+					help button
+					-->
+					<Border
+						Grid.Column="2"
+						VerticalAlignment="Bottom"
+						
+						BorderThickness="0"
+						Background="Transparent"
+						ToolTip="{Binding Description, Mode=OneWay}"
+						ToolTipService.InitialShowDelay="0"
+						ToolTipService.ShowDuration="9999"
+						>
+						<materialDesign:PackIcon
+							Width="16"
+							Height="16"
+							
+							Kind="HelpOutline"
+							Foreground="{DynamicResource SecondaryAccentBrush}"
+							Opacity="0.5"
+							/>
+					</Border>
+
+				</Grid>
+			</DataTemplate>
+
+			<!--
+			Data template for ColorInfo color value
+			-->
+			<DataTemplate x:Key="ColorValue_CellTemplate">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" SharedSizeGroup="ColorValue"/>
+						<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					
+					<!--
+					column 0
+					color value
+					-->
+					<TextBox
+						Grid.Column="0"
+						Padding="0"
+						BorderThickness="0"
+						VerticalAlignment="Center"
+						VerticalContentAlignment="Center"
+						HorizontalAlignment="Stretch"
+						
+						Height="20"
+						FontSize="12"
+						
+						KeyDown="TextBox_KeyDown"
+						
+						Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+					
+					<!--
+					column 1
+					vertical splitter
+					-->
+					
+					<!--
+					column 2
+					rectangle with selected color
+					-->
+					<Border
+						Grid.Column="2"
+						VerticalAlignment="Bottom"
+						
+						Width="16"
+						Height="16"
+						
+						BorderThickness="1"
+						BorderBrush="Black"
+						
+						Background="{Binding ColorBrush, Mode=OneWay}"
+						/>
+
+					<!--
+					column 3
+					vertical splitter
+					-->
+					
+					<!--
+					column 4
+					Pick color
+					-->
+					<Button
+						Grid.Column="4"
+							
+						Padding="0"
+						Height="20"
+						Style="{DynamicResource MaterialDesignFlatButton}"
+						Click="OnPickColorButton_Click"
+						>
+						<TextBlock
+							Text="Pick"
+							TextDecorations="Underline"
+							>
+							<TextBlock.Style>
+								<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+									<Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+									<Style.Triggers>
+										<Trigger Property="IsMouseOver" Value="True">
+											<Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"/>
+										</Trigger>
+									</Style.Triggers>
+								</Style>
+							</TextBlock.Style>
+						</TextBlock>
+					</Button>
+
+				</Grid>
+			</DataTemplate>
+
+			<!--
+			ListBox with colors
+			-->
+			<Style x:Key="ColorsListBoxStyle" TargetType="{x:Type ListView}" BasedOn="{StaticResource {x:Type ListView}}">
+				<Setter Property="Grid.IsSharedSizeScope" Value="True"/>
+				<Setter Property="VerticalAlignment" Value="Stretch"/>
+				<Setter Property="HorizontalAlignment" Value="Stretch"/>
+				<Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+				<Setter Property="Background" Value="Transparent"/>
+			</Style>
+
+			<Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
+				<Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="{x:Type TabItem}">
+							<Grid>
+								<Border
+									Name="Border"
+									Background="Transparent"
+									BorderBrush="{DynamicResource MaterialDesignTextBoxBorder}"
+									BorderThickness="1,1,1,0"
+									Padding="10, 4, 10, 4"
+									Opacity="0.5"
+									TextElement.FontWeight="Regular"
+									TextElement.FontSize="14"
+									CornerRadius="2"
+									Height="30"
+									>
+									<ContentPresenter
+										x:Name="ContentSite"
+										ContentSource="Header"
+										VerticalAlignment="Center"
+										HorizontalAlignment="Center"
+										RecognizesAccessKey="True"/>
+								</Border>
+							</Grid>
+							<ControlTemplate.Triggers>
+								<Trigger Property="IsSelected" Value="True">
+									<Setter TargetName="Border" Property="TextElement.FontWeight" Value="Normal" />
+									<Setter TargetName="Border" Property="Opacity" Value="1"/>
+									<Setter TargetName="Border" Property="TextElement.Foreground" Value="{DynamicResource SecondaryAccentBrush}"/>
+								</Trigger>
+							</ControlTemplate.Triggers>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
+
+		</ResourceDictionary>
+	</UserControl.Resources>
+
+	<Grid Margin="16">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+
+		<!--
+		row 0
+		header
+		-->
+		<TextBlock
+			Grid.Row="0"
+			
+			VerticalAlignment="Center"
+			HorizontalAlignment="Center"
+			
+			Style="{DynamicResource MaterialDesignDisplay1TextBlock}"
+			Foreground="{DynamicResource SecondaryAccentBrush}"
+			
+			Text="App theme colors"
+			/>
+		
+		<!--
+		row 1
+		horizontal gutter
+		-->
+
+		<!--
+		row 2
+		notes
+		-->
+		<TabControl
+			Grid.Row="2"
+			Background="Transparent"
+			>
+			<!--
+			INTERFACE colors tab
+			-->
+			<TabItem
+				Header="Interface"
+				>
+				<ListView
+					Style="{StaticResource ColorsListBoxStyle}"
+					ItemsSource="{Binding InterfaceColorsCollection}">
+					<ListView.View>
+						<GridView>
+							
+							<!--
+							system name column
+							-->
+							<GridViewColumn
+								Header="SystemName"
+								Width="300"
+								CellTemplate="{StaticResource SystemName_CellTemplate}"
+								/>
+							
+							<!--
+							color value column
+							-->
+							<GridViewColumn
+								Header="Value"
+								CellTemplate="{StaticResource ColorValue_CellTemplate}"
+								/>
+
+						</GridView>
+					</ListView.View>
+				</ListView>
+			</TabItem>
+			
+			<!--
+			GEOMETRY colors tab
+			-->
+			<TabItem
+				Header="Geometry">
+				<ListView
+					Style="{StaticResource ColorsListBoxStyle}"
+					ItemsSource="{Binding GeometryColorsCollection}">
+					<ListView.View>
+						<GridView>
+
+							<!--
+							system name column
+							-->
+							<GridViewColumn
+								Header="SystemName"
+								Width="300"
+								CellTemplate="{StaticResource SystemName_CellTemplate}"
+								/>
+
+							<!--
+							color value column
+							-->
+							<GridViewColumn
+								Header="Value"
+								CellTemplate="{StaticResource ColorValue_CellTemplate}"
+								/>
+
+						</GridView>
+					</ListView.View>
+				</ListView>
+			</TabItem>
+		</TabControl>
+
+		<!--
+		row 3
+		horizontal gutter
+		-->
+
+		<!--
+		row 4
+		commands and OK\CANCEL buttons
+		-->
+		<Grid
+			Grid.Row="4"
+			>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			
+			<!--
+			commands
+			-->
+			<ItemsControl
+				Grid.Column="0"
+				ItemsSource="{Binding BottomToolbarCommandsCollection}"
+				Style="{StaticResource CommandsToolbarStyle}"
+				>
+				<ItemsControl.Resources>
+					<Style TargetType="{x:Type Button}" BasedOn="{StaticResource ToolbarCommandButtonStyle}">
+						<Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ItemsControl}}, Path=DataContext}"/>
+					</Style>
+				</ItemsControl.Resources>
+			</ItemsControl>
+			
+			<!--
+			OK\CANCEL buttons
+			-->
+			<Grid
+				x:Name="ButtonsGrid"
+				Grid.Column="1"
+				Grid.IsSharedSizeScope="True"
+				HorizontalAlignment="Right"
+				>
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" SharedSizeGroup="ButtonsWidthSizeGroup"/>
+					<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+					<ColumnDefinition Width="Auto" SharedSizeGroup="ButtonsWidthSizeGroup"/>
+				</Grid.ColumnDefinitions>
+
+				<Button
+					Grid.Column="0"
+					IsDefault="True"
+					Style="{DynamicResource MaterialDesignFlatButton}"
+					Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+
+					<Button.CommandParameter>
+						<system:Boolean>True</system:Boolean>
+					</Button.CommandParameter>
+
+					OK
+
+				</Button>
+
+				<Button
+					Grid.Column="2"
+					IsCancel="True"
+					Style="{DynamicResource MaterialDesignFlatButton}"
+					Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+
+					<Button.CommandParameter>
+						<system:Boolean>False</system:Boolean>
+					</Button.CommandParameter>
+
+					CANCEL
+
+				</Button>
+
+			</Grid>
+		</Grid>
+
+	</Grid>
+	
+</UserControl>

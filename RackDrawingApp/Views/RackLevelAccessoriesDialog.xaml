@@ -1,0 +1,220 @@
+﻿<UserControl
+	x:Class="RackDrawingApp.RackLevelAccessoriesDialog"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+	xmlns:local="clr-namespace:RackDrawingApp"
+	
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+	
+	TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+	
+	mc:Ignorable="d" 
+	d:DesignHeight="300" d:DesignWidth="300">
+
+	<UserControl.Resources>
+		<ResourceDictionary>
+
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="CommonResources.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+
+			<local:DeckPlateTypeConverter x:Key="DeckPlateTypeConverter"/>
+
+		</ResourceDictionary>
+	</UserControl.Resources>
+
+	<Grid Margin="16">
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto"/>
+			<RowDefinition Height="auto"/>
+			<RowDefinition Height="auto"/>
+		</Grid.RowDefinitions>
+
+		<TextBlock
+			Grid.Row="0"
+			
+			HorizontalAlignment="Left"
+			VerticalAlignment="Center"
+			
+			Style="{DynamicResource MaterialDesignHeadlineTextBlock}"
+			Foreground="{DynamicResource SecondaryAccentBrush}"
+			Text="Level accessories"/>
+
+		<Grid
+			Grid.Row="1"
+			Margin="16"
+			
+			Grid.IsSharedSizeScope="True"
+			>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="auto"/>
+				<RowDefinition Height="auto"/>
+			</Grid.RowDefinitions>
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" MinWidth="300"/>
+				<ColumnDefinition Width="auto" SharedSizeGroup="AccessoriesColumn"/>
+			</Grid.ColumnDefinitions>
+
+			<!--Deck plate-->
+			<CheckBox
+				Grid.Row="0"
+				Grid.Column="0"
+				
+				Content="Decking panel"
+				IsChecked="{Binding IsDeckPlateAvailable, Mode=TwoWay}"/>
+			<ComboBox
+				Grid.Row="0"
+				Grid.Column="1"
+				
+				IsEnabled="{Binding IsDeckPlateAvailable, Mode=OneWay}"
+				SelectedValue="{Binding DeckPlateType, Converter={StaticResource DeckPlateTypeConverter}}"
+				ItemsSource="{Binding DeckPlateTypeList, Mode=OneWay}"/>
+
+			<!--Pallet properties-->
+			<Grid
+				Grid.Row="1"
+				Grid.Column="0"
+				Grid.ColumnSpan="2"
+				
+				IsEnabled="{Binding ShowPallet, Mode=OneWay}"
+				>
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
+				</Grid.RowDefinitions>
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" MinWidth="300"/>
+					<ColumnDefinition Width="auto" SharedSizeGroup="AccessoriesColumn"/>
+				</Grid.ColumnDefinitions>
+
+				<CheckBox
+					Grid.Row="0"
+					Grid.Column="0"
+					Grid.ColumnSpan="2"
+					
+					HorizontalAlignment="Left"
+					
+					Content="Pallet Stopper"
+					IsChecked="{Binding PalletStopper, Mode=TwoWay}"/>
+
+				<CheckBox
+					Grid.Row="1"
+					Grid.Column="0"
+					Grid.ColumnSpan="2"
+					
+					HorizontalAlignment="Left"
+						
+					Content="Fork Entry Bar"
+					IsChecked="{Binding ForkEntryBar, Mode=TwoWay}"/>
+
+				<CheckBox
+					Grid.Row="2"
+					Grid.Column="0"
+					Grid.ColumnSpan="2"
+					
+					HorizontalAlignment="Left"
+					
+					Content="Pallet Support Bar(PSB)"
+					IsChecked="{Binding PalletSupportBar, Mode=TwoWay}"/>
+
+				<CheckBox
+					Grid.Row="3"
+					Grid.Column="0"
+					Grid.ColumnSpan="2"
+					
+					HorizontalAlignment="Left"
+					
+					Content="Guided Type Pallet Support"
+					IsChecked="{Binding GuidedTypePalletSupport, Mode=TwoWay}">
+					<CheckBox.Style>
+						<Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
+							<Setter Property="IsEnabled" Value="True"/>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding PalletSupportBar, Mode=OneWay}" Value="True">
+									<Setter Property="IsEnabled" Value="False"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</CheckBox.Style>
+				</CheckBox>
+
+				<CheckBox
+					Grid.Row="4"
+					Grid.Column="0"
+					Grid.ColumnSpan="2"
+					
+					Margin="16, 0, 0, 0"
+					
+					HorizontalAlignment="Left"
+					
+					Content="With Stopper"
+					IsEnabled="{Binding GuidedTypePalletSupport, Mode=OneWay}"
+					IsChecked="{Binding GuidedTypePalletSupport_WithStopper, Mode=TwoWay}"/>
+
+				<CheckBox
+					Grid.Row="5"
+					Grid.Column="0"
+					Grid.ColumnSpan="2"
+					
+					Margin="16, 0, 0, 0"
+					
+					HorizontalAlignment="Left"
+					
+					Content="With PSB"
+					IsEnabled="{Binding GuidedTypePalletSupport, Mode=OneWay}"
+					IsChecked="{Binding GuidedTypePalletSupport_WithPSB, Mode=TwoWay}"/>
+			</Grid>
+
+		</Grid>
+
+		<StackPanel
+			Grid.Row="2"
+			Margin="0 16 0 0"
+			Orientation="Horizontal"
+			HorizontalAlignment="Right">
+
+			<Button
+				IsDefault="True"
+				Style="{DynamicResource MaterialDesignFlatButton}"
+				Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+
+				<Button.CommandParameter>
+					<system:Boolean>True</system:Boolean>
+				</Button.CommandParameter>
+
+				OK
+
+			</Button>
+
+			<Button
+				IsCancel="True"
+				Margin="8 0 0 0"
+				Style="{DynamicResource MaterialDesignFlatButton}"
+				Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+
+				<Button.CommandParameter>
+					<system:Boolean>False</system:Boolean>
+				</Button.CommandParameter>
+
+				CANCEL
+
+			</Button>
+
+		</StackPanel>
+
+	</Grid>
+	
+</UserControl>

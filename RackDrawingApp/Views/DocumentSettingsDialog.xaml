@@ -1,0 +1,688 @@
+﻿<UserControl
+	x:Class="RackDrawingApp.DocumentSettingsDialog"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	
+	xmlns:dc="clr-namespace:DrawingControl;assembly=DrawingControl"
+	xmlns:local="clr-namespace:RackDrawingApp"
+	
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+	
+	TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+	>
+
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="CommonResources.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+
+			<local:PalletTypeConverter x:Key="PalletTypeConverter"/>
+			
+			<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+				<Setter Property="VerticalAlignment" Value="Center"/>
+			</Style>
+
+			<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource AppTextBox}">
+				<Setter Property="VerticalAlignment" Value="Center"/>
+			</Style>
+
+			<Style TargetType="{x:Type materialDesign:Badged}" BasedOn="{StaticResource {x:Type materialDesign:Badged}}">
+				<Setter Property="VerticalAlignment" Value="Center"/>
+			</Style>
+
+			<Style TargetType="{x:Type GridViewRowPresenter}">
+				<Setter Property="VerticalAlignment" Value="Center"/>
+			</Style>
+			
+		</ResourceDictionary>
+	</UserControl.Resources>
+
+	<Grid
+		Margin="{StaticResource DialogMargin}">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="{StaticResource HorizontalGutter_x3}"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="{StaticResource HorizontalGutter_x3}"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="{StaticResource HorizontalGutter_x3}"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto"/>
+			<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+			<ColumnDefinition Width="Auto"/>
+		</Grid.ColumnDefinitions>
+
+		<!--
+		ROW 0
+		DIALOG HEADER
+		-->
+		<TextBlock
+			Grid.Row="0"
+			Grid.Column="0"
+			Grid.ColumnSpan="3"
+			
+			Margin="32, 12, 32, 12"
+			
+			HorizontalAlignment="Center"
+			VerticalAlignment="Center"
+			
+			Style="{DynamicResource MaterialDesignHeadlineTextBlock}"
+			Foreground="{DynamicResource SecondaryAccentBrush}"
+			Text="Document settings"/>
+		
+		<!--
+		ROW 1
+		HORIZONTAL GUTTER
+		-->
+
+		<!--
+		ROW 2
+		RACKS PALLETS TYPE
+		RACKS PALLETS OVERHANG VALUE
+		-->
+		<Grid
+			Grid.Row="2"
+			Grid.Column="0"
+			Grid.ColumnSpan="3"
+			>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+				<ColumnDefinition Width="Auto" MinWidth="70" MaxWidth="70"/>
+			</Grid.ColumnDefinitions>
+
+			<!--
+			PALLET TYPE
+			-->
+			<TextBlock
+				Grid.Row="0"
+				Grid.Column="0"
+				
+				Text="Pallets type"
+				/>
+			<ComboBox
+				Grid.Row="0"
+				Grid.Column="2"
+				
+				ItemsSource="{Binding PalletTypesList}"
+				SelectedItem="{Binding RacksPalletsType, Converter={StaticResource PalletTypeConverter}}"
+				/>
+
+			<!--
+			OVERHANG
+			-->
+			<TextBlock
+				Grid.Row="2"
+				Grid.Column="0"
+				
+				Text="Overhang value"
+				/>
+			<ComboBox
+				Grid.Row="2"
+				Grid.Column="2"
+				
+				ItemsSource="{Binding RacksPalletsOverhangValuesList}"
+				SelectedValue="{Binding RacksPalletsOverhangValue}"
+				>
+				<ComboBox.Style>
+					<Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+						<Setter Property="IsEnabled" Value="False"/>
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding RacksPalletsType}" Value="{x:Static dc:ePalletType.eOverhang}">
+								<Setter Property="IsEnabled" Value="True"/>
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</ComboBox.Style>
+			</ComboBox>
+			
+			<!--
+			CURRENCY
+			-->
+			<TextBlock
+				Grid.Row="0"
+				Grid.Column="4"
+				
+				Text="Currency"
+				/>
+			<TextBox
+				Grid.Row="0"
+				Grid.Column="6"
+				
+				HorizontalContentAlignment="Right"
+				Text="{Binding Currency, Mode=TwoWay}"
+				/>
+			<!--
+			RATE
+			-->
+			<TextBlock
+				Grid.Row="2"
+				Grid.Column="4"
+				
+				Text="Rate"
+				/>
+			<TextBox
+				Grid.Row="2"
+				Grid.Column="6"
+				
+				HorizontalContentAlignment="Right"
+				DataObject.Pasting="TextBoxNumericPasting"
+				PreviewTextInput="TextBox_PreviewNumericTextInput"
+				Text="{Binding Rate, Mode=TwoWay, StringFormat={}{0:0.00}}"
+				/>
+			<!--
+			DISCOUNT
+			-->
+			<TextBlock
+				Grid.Row="4"
+				Grid.Column="4"
+				
+				Text="Discount"
+				/>
+			<Grid
+				Grid.Row="4"
+				Grid.Column="6"
+				>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+				</Grid.ColumnDefinitions>
+				<TextBox
+					Grid.Column="0"
+					
+					HorizontalContentAlignment="Right"
+					DataObject.Pasting="TextBoxNumericPasting"
+					PreviewTextInput="TextBox_PreviewNumericTextInput"
+					Text="{Binding Discount, Mode=TwoWay, StringFormat={}{0:0.00}}"
+					/>
+				<TextBlock
+					Grid.Column="1"
+					
+					Margin="4, 0, 0, 0"
+					Text="%"
+					/>
+			</Grid>
+		</Grid>
+
+		<!--
+		ROW 3
+		HORIZONTAL GUTTER
+		-->
+
+		<!--
+		ROW 4
+		MHE CONFIGURATIONS
+		-->
+		<TextBlock
+			Grid.Row="4"
+			Grid.Column="0"
+			Grid.ColumnSpan="3"
+			Text="MHE configuration (All dimensions are rack to rack)"
+			/>
+		<!--
+		ROW 5
+		horizontal gutter
+		-->
+
+		<!--
+		ROW 6
+		MHE configurations list
+		-->
+		<ListView
+			Grid.Row="6"
+			Grid.Column="0"
+			Grid.ColumnSpan="3"
+			
+			ItemsSource="{Binding MHEConfigurationsCollection}"
+			MaxHeight="200"
+			materialDesign:DataGridAssist.ColumnHeaderPadding="8, 2, 8, 2"
+			materialDesign:ListViewAssist.ListViewItemPadding="8, 0, 8, 0"
+			>
+			<ListView.ItemContainerStyle>
+				<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+					<Setter Property="VerticalContentAlignment" Value="Center"/>
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding IsEnabled}" Value="False">
+							<Setter Property="Opacity" Value="0.4"/>
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</ListView.ItemContainerStyle>
+			<ListView.View>
+				<GridView>
+					<!--
+					IS ENABLED
+					-->
+					<GridViewColumn>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<CheckBox
+									VerticalAlignment="Center"
+									IsChecked="{Binding IsEnabled}"
+									/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					TYPE
+					-->
+					<GridViewColumn
+						Header="Type"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBox
+									Text="{Binding Type}"
+									>
+									<TextBox.Style>
+										<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource GridTextBox}">
+											<Style.Triggers>
+												<DataTrigger Binding="{Binding IsEnabled}" Value="False">
+													<Setter Property="IsEnabled" Value="True"/>
+												</DataTrigger>
+											</Style.Triggers>
+										</Style>
+									</TextBox.Style>
+								</TextBox>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					PICKING AISLE WIDTH
+					-->
+					<GridViewColumn
+						Header="Picking aisle width(mm)"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBox
+									Text="{Binding PickingAisleWidth}"
+									>
+									<TextBox.Style>
+										<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource GridTextBox}">
+											<Style.Triggers>
+												<DataTrigger Binding="{Binding IsEnabled}" Value="False">
+													<Setter Property="IsEnabled" Value="True"/>
+												</DataTrigger>
+											</Style.Triggers>
+										</Style>
+									</TextBox.Style>
+								</TextBox>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					CROSS AISLE WIDTH
+					-->
+					<GridViewColumn
+						Header="Cross aisle width(mm)"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBox
+									Text="{Binding CrossAisleWidth}"
+									>
+									<TextBox.Style>
+										<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource GridTextBox}">
+											<Style.Triggers>
+												<DataTrigger Binding="{Binding IsEnabled}" Value="False">
+													<Setter Property="IsEnabled" Value="True"/>
+												</DataTrigger>
+											</Style.Triggers>
+										</Style>
+									</TextBox.Style>
+								</TextBox>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					END AISLE WIDTH
+					-->
+					<GridViewColumn
+						Header="End aisle width(mm)"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBox
+									Text="{Binding EndAisleWidth}"
+									>
+									<TextBox.Style>
+										<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource GridTextBox}">
+											<Style.Triggers>
+												<DataTrigger Binding="{Binding IsEnabled}" Value="False">
+													<Setter Property="IsEnabled" Value="True"/>
+												</DataTrigger>
+											</Style.Triggers>
+										</Style>
+									</TextBox.Style>
+								</TextBox>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					CAPACITY
+					-->
+					<GridViewColumn
+						Header="Capacity(kg)"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBox
+									Text="{Binding Capacity}"
+									>
+									<TextBox.Style>
+										<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource GridTextBox}">
+											<Style.Triggers>
+												<DataTrigger Binding="{Binding IsEnabled}" Value="False">
+													<Setter Property="IsEnabled" Value="True"/>
+												</DataTrigger>
+											</Style.Triggers>
+										</Style>
+									</TextBox.Style>
+								</TextBox>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					MAX LOADING HEIGHT
+					-->
+					<GridViewColumn
+						Header="Max loading height(mm)"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBox
+									Text="{Binding MaxLoadingHeight}"
+									>
+									<TextBox.Style>
+										<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource GridTextBox}">
+											<Style.Triggers>
+												<DataTrigger Binding="{Binding IsEnabled}" Value="False">
+													<Setter Property="IsEnabled" Value="True"/>
+												</DataTrigger>
+											</Style.Triggers>
+										</Style>
+									</TextBox.Style>
+								</TextBox>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					OVERALL HEIGHT LOWERED
+					-->
+					<GridViewColumn
+						Header="Overall height lowered(mm)"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBox
+									Text="{Binding OverallHeightLowered}"
+									>
+									<TextBox.Style>
+										<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource GridTextBox}">
+											<Style.Triggers>
+												<DataTrigger Binding="{Binding IsEnabled}" Value="False">
+													<Setter Property="IsEnabled" Value="True"/>
+												</DataTrigger>
+											</Style.Triggers>
+										</Style>
+									</TextBox.Style>
+								</TextBox>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+				</GridView>
+			</ListView.View>
+		</ListView>
+
+		<!--
+		ROW 7
+		HORIZONTAL GUTTER
+		-->
+
+		<!--
+		ROW 8
+		PALLET CONFIGURATION COLLECTION HEADER
+		-->
+		<StackPanel
+			Grid.Row="8"
+			Grid.Column="0"
+			Grid.ColumnSpan="3"
+			Orientation="Horizontal"
+			>
+			<TextBlock
+				Text="Pallet configuration"
+				/>
+			<Button
+				Background="Transparent"
+				BorderBrush="Transparent"
+				Foreground="{DynamicResource PrimaryHueMidBrush}"
+				ToolTip="Add new pallet configuration"
+				Click="AddNewPalletConfig_ButtonClick"
+				>
+				<materialDesign:PackIcon
+					Kind="Add"
+					/>
+			</Button>
+		</StackPanel>
+		<!--
+		ROW 9
+		PALLET CONFIGURATION COLLECTION
+		-->
+		<ListView
+			Grid.Row="9"
+			Grid.Column="0"
+			Grid.ColumnSpan="3"
+			ItemsSource="{Binding PalletConfigurationCollView}"
+			MaxHeight="200"
+			materialDesign:DataGridAssist.ColumnHeaderPadding="8, 2, 8, 2"
+			materialDesign:ListViewAssist.ListViewItemPadding="8, 0, 8, 0"
+			>
+			<ListView.ItemContainerStyle>
+				<Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+					<Setter Property="VerticalContentAlignment" Value="Center"/>
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding MarkDeleted}" Value="True">
+							<Setter Property="Opacity" Value="0.4"/>
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</ListView.ItemContainerStyle>
+			<ListView.View>
+				<GridView>
+					<!--
+					INDEX
+					-->
+					<GridViewColumn
+						Header="#"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBlock
+									VerticalAlignment="Center"
+									Text="{Binding DisplayName}"
+									/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					LENGTH
+					-->
+					<GridViewColumn
+						Header="Length(mm)"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBox
+									Style="{StaticResource GridTextBox}"
+									Text="{Binding Length}"
+									/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					WIDTH
+					-->
+					<GridViewColumn
+						Header="Depth(mm)"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBox
+									Style="{StaticResource GridTextBox}"
+									Text="{Binding Width}"
+									/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					HEIGHT
+					-->
+					<GridViewColumn
+						Header="Height(mm)"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBox
+									Style="{StaticResource GridTextBox}"
+									Text="{Binding Height}"
+									/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					CAPACITY
+					-->
+					<GridViewColumn
+						Header="Capacity(kg)"
+						>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBox
+									Style="{StaticResource GridTextBox}"
+									Text="{Binding Capacity}"
+									/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!--
+					COMMAND
+					-->
+					<GridViewColumn>
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<Grid>
+									<Button
+										ToolTip="{Binding Description}"
+										Foreground="{DynamicResource PrimaryHueMidBrush}"
+										
+										DataContext="{Binding Path=DataContext.DeletePalletConfigCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+										Command="{Binding Path=DataContext.DeletePalletConfigCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+										CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListViewItem}}, Path=DataContext}"
+										>
+										<Button.Style>
+											<Style TargetType="{x:Type Button}" BasedOn="{StaticResource CommandButtonStyle}">
+												<Setter Property="Visibility" Value="Visible"/>
+												<Style.Triggers>
+													<DataTrigger Binding="{Binding Path=DataContext.MarkDeleted, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListViewItem}}}" Value="True">
+														<Setter Property="Visibility" Value="Hidden"/>
+													</DataTrigger>
+												</Style.Triggers>
+											</Style>
+										</Button.Style>
+										<materialDesign:PackIcon Kind="{Binding IconKind}"/>
+									</Button>
+									<Button
+										ToolTip="{Binding Description}"
+										Foreground="{DynamicResource PrimaryHueMidBrush}"
+										
+										DataContext="{Binding Path=DataContext.RestorePalletConfigCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+										Command="{Binding Path=DataContext.RestorePalletConfigCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+										CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListViewItem}}, Path=DataContext}"
+										>
+										<Button.Style>
+											<Style TargetType="{x:Type Button}" BasedOn="{StaticResource CommandButtonStyle}">
+												<Setter Property="Visibility" Value="Hidden"/>
+												<Style.Triggers>
+													<DataTrigger Binding="{Binding Path=DataContext.MarkDeleted, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListViewItem}}}" Value="True">
+														<Setter Property="Visibility" Value="Visible"/>
+													</DataTrigger>
+												</Style.Triggers>
+											</Style>
+										</Button.Style>
+										<materialDesign:PackIcon Kind="{Binding IconKind}"/>
+									</Button>
+								</Grid>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+				</GridView>
+			</ListView.View>
+		</ListView>
+
+		<!--
+		ROW 10
+		HORIZONTAL GUTTER
+		-->
+
+		<!--
+		ROW 11
+		OK BUTTON
+		-->
+		<Button
+			Grid.Row="11"
+			Grid.Column="0"
+			Grid.ColumnSpan="3"
+			
+			Margin="0, 8, 0, 0"
+			HorizontalAlignment="Right"
+			
+			IsDefault="True"
+			IsCancel="True"
+			Content="OK"
+			Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+			Style="{DynamicResource MaterialDesignFlatButton}"
+			>
+			<Button.CommandParameter>
+				<system:Boolean>True</system:Boolean>
+			</Button.CommandParameter>
+		</Button>
+
+	</Grid>
+</UserControl>

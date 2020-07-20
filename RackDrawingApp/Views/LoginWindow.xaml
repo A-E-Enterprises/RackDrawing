@@ -1,0 +1,277 @@
+﻿<Window
+	x:Class="RackDrawingApp.LoginWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	
+	xmlns:local="clr-namespace:RackDrawingApp"
+	
+	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+	xmlns:mdWPF="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf" 
+	xmlns:mdConverters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
+	
+	TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+	TextElement.FontWeight="Medium"
+	TextElement.FontSize="14"
+	TextOptions.TextFormattingMode="Ideal" 
+	TextOptions.TextRenderingMode="Auto"
+	
+	Background="{DynamicResource AppBackground}"
+	FontFamily="{DynamicResource MaterialDesignFont}"
+	
+	Height="420"
+	Width="525"
+	
+	Title="RackDrawingApp"
+	Icon="/DrawingFactoryApp;component/Properties/logo_1.ico"
+	
+	WindowState="Normal"
+	ResizeMode="NoResize"
+	
+	WindowStartupLocation="CenterScreen"
+	
+	SnapsToDevicePixels="True"
+	>
+	<!--
+	SizeToContent="WidthAndHeight"
+	-->
+
+	<Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="CommonResources.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+
+			<Style x:Key="CommandButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+				<Setter Property="Background" Value="Transparent"/>
+				<Setter Property="BorderBrush" Value="Transparent"/>
+
+				<Setter Property="Margin" Value="8, 0, 8, 0"/>
+				<Setter Property="Padding" Value="0"/>
+
+				<Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+
+				<Style.Triggers>
+					<Trigger Property="IsMouseOver" Value="True">
+						<Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"/>
+					</Trigger>
+				</Style.Triggers>
+
+			</Style>
+		</ResourceDictionary>
+	</Window.Resources>
+
+	<Grid>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="auto"/>
+			<RowDefinition Height="auto"/>
+		</Grid.RowDefinitions>
+
+		<Grid
+			Grid.Row="0"
+			Grid.IsSharedSizeScope="True"
+			
+			VerticalAlignment="Center"
+			HorizontalAlignment="Center"
+			>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="auto"/>
+				<RowDefinition Height="auto"/>
+				<RowDefinition Height="auto" SharedSizeGroup="SharedHeightGroup"/>
+				<RowDefinition Height="auto" SharedSizeGroup="SharedHeightGroup"/>
+				<RowDefinition Height="auto" SharedSizeGroup="SharedHeightGroup"/>
+				<RowDefinition Height="auto" SharedSizeGroup="SharedHeightGroup"/>
+			</Grid.RowDefinitions>
+
+			<!--
+			ROW 0
+			HEADER
+			-->
+			<TextBlock
+				Grid.Row="0"
+				
+				VerticalAlignment="Center"
+				HorizontalAlignment="Center"
+				
+				Style="{DynamicResource MaterialDesignDisplay1TextBlock}"
+				Foreground="{DynamicResource SecondaryAccentBrush}"
+				
+				Text="RackDrawingApp"
+				
+				Margin="16, 0, 16, 0"
+				/>
+			<Grid
+				Grid.Row="1"
+				Margin="0, 0, 0, 16"
+				
+				TextElement.FontSize="13"
+				>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
+					<RowDefinition Height="auto"/>
+				</Grid.RowDefinitions>
+				<TextBlock
+					Grid.Row="0"
+					
+					VerticalAlignment="Center"
+					HorizontalAlignment="Center"
+					
+					Text="Developed by"
+					/>
+				<TextBlock
+					Grid.Row="1"
+					
+					VerticalAlignment="Center"
+					HorizontalAlignment="Center"
+					>
+					<Hyperlink NavigateUri="www.aneeindia.com" RequestNavigate="Hyperlink_RequestNavigate">
+						www.aneeindia.com
+					</Hyperlink>
+				</TextBlock>
+				<TextBlock
+					Grid.Row="2"
+					
+					VerticalAlignment="Center"
+					HorizontalAlignment="Center"
+					
+					Text="(Patent pending)"
+					/>
+			</Grid>
+
+			<!--
+			ROW 2
+			USERNAME
+			-->
+			<TextBox
+				Grid.Row="2"
+				
+				Margin="0, 0, 0, 4"
+				
+				materialDesign:HintAssist.Hint="Username"
+				Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+				
+				Text="{Binding UserName, Mode=TwoWay}"
+				/>
+
+			<!--
+			ROW 3
+			PASSWORD
+			-->
+			<PasswordBox
+				x:Name="_PasswordBox"
+				Grid.Row="3"
+				
+				materialDesign:HintAssist.Hint="Password"
+				Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+				
+				Margin="0, 0, 0, 4"
+				/>
+			
+			<!--
+			ROW 4
+			CONNECT TO SERVER CHECKBOX
+			-->
+			<CheckBox
+				Grid.Row="4"
+				Content="Connect to server"
+				IsChecked="{Binding ConnectToServer, Mode=TwoWay}"
+				VerticalAlignment="Center"
+				/>
+
+			<!--
+			ROW 5
+			LICENSE FILE PATH
+			-->
+			<Grid
+				Grid.Row="5"
+				>
+
+				<Grid.Style>
+					<Style TargetType="{x:Type Grid}">
+						<Setter Property="IsEnabled" Value="False"/>
+						<!--
+						<Setter Property="Visibility" Value="Hidden"/>
+						-->
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding ConnectToServer}" Value="False">
+								<Setter Property="IsEnabled" Value="True"/>
+								<!--
+								<Setter Property="Visibility" Value="Visible"/>
+								-->
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</Grid.Style>
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" MaxWidth="300"/>
+					<ColumnDefinition Width="auto"/>
+				</Grid.ColumnDefinitions>
+
+				<TextBox
+					Grid.Column="0"
+					
+					materialDesign:HintAssist.Hint="License file path"
+					Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+					
+					VerticalAlignment="Center"
+					
+					Text="{Binding LicenseFilePath, Mode=TwoWay}"
+					TextWrapping="NoWrap"
+					
+					Margin="0, 0, 8, 0"
+					/>
+
+				<Button
+					Grid.Column="1"
+					
+					Style="{StaticResource CommandButtonStyle}"
+					Click="SelectLicenseFileButton_Click"
+					>
+					<materialDesign:PackIcon
+						Kind="Folder"
+						
+						Width="20"
+						Height="20"
+						/>
+				</Button>
+
+			</Grid>
+
+		</Grid>
+
+		<TextBlock
+			Grid.Row="1"
+			
+			VerticalAlignment="Center"
+			HorizontalAlignment="Center"
+			
+			Style="{DynamicResource MaterialDesignCaptionTextBlock}"
+			TextWrapping="Wrap"
+			Foreground="Salmon"
+			
+			Text="{Binding Error, Mode=OneWay}"
+			
+			Margin="0, 12, 0, 12"
+			/>
+
+		<Button
+			Grid.Row="2"
+			
+			Margin="8"
+			HorizontalAlignment="Right"
+			
+			Content="LOGIN"
+			Style="{DynamicResource MaterialDesignFlatButton}"
+			
+			Click="LoginButton_Click"
+			/>
+
+	</Grid>
+</Window>

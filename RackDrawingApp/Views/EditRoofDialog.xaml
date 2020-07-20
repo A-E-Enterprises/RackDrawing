@@ -1,0 +1,480 @@
+﻿<UserControl
+	x:Class="RackDrawingApp.EditRoofDialog"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	
+	xmlns:system="clr-namespace:System;assembly=mscorlib"
+	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+	
+	xmlns:dc="clr-namespace:DrawingControl;assembly=DrawingControl"
+	xmlns:local="clr-namespace:RackDrawingApp"
+	
+	TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+	
+	MinWidth="600"
+	>
+
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="CommonResources.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+
+			<local:GableRoofDirectionConverter x:Key="GableRoofDirectionConverter"/>
+			<local:ShedRoofDirectionConverter x:Key="ShedRoofDirectionConverter"/>
+
+			<!--
+			FLAT ROOF data template
+			-->
+			<DataTemplate DataType="{x:Type dc:FlatRoof}">
+				<Grid
+					HorizontalAlignment="Center"
+					Margin="8"
+					>
+
+					<Grid.Style>
+						<Style TargetType="{x:Type Grid}">
+							<Setter Property="IsEnabled" Value="False"/>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding IsSelected}" Value="True">
+									<Setter Property="IsEnabled" Value="True"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Grid.Style>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" SharedSizeGroup="RoofTypeImage"/>
+						<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+						<RowDefinition Height="Auto" SharedSizeGroup="RoofTypeHeader"/>
+						<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" SharedSizeGroup="PropertyNameColumn"/>
+						<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+						<ColumnDefinition Width="Auto" SharedSizeGroup="PropertyValueColumn"/>
+					</Grid.ColumnDefinitions>
+
+					<!--
+					row 0
+					image
+					-->
+					<Image
+						Grid.Row="0"
+						Grid.Column="0"
+						Grid.ColumnSpan="3"
+						
+						VerticalAlignment="Center"
+						HorizontalAlignment="Center"
+						
+						Source="/DrawingFactoryApp;component/Properties/FlatRoof.png"
+						/>
+
+					<!--
+					row 1
+					horizontal gutter
+					-->
+					
+					<!--
+					row 2
+					header
+					-->
+					<TextBlock
+						Grid.Row="2"
+						Grid.Column="0"
+						Grid.ColumnSpan="3"
+						
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						FontWeight="SemiBold"
+						FontSize="14"
+						Text="{Binding DisplayName}"
+						/>
+
+					<!--
+					row 3
+					horizontal gutter
+					-->
+					
+					<!--
+					row 4
+					-->
+					<TextBlock
+						Grid.Row="4"
+						Grid.Column="0"
+						
+						VerticalAlignment="Center"
+						Text="Height"
+						/>
+					<TextBox
+						Grid.Row="4"
+						Grid.Column="3"
+						
+						VerticalAlignment="Center"
+						Text="{Binding Height}"
+						/>
+				</Grid>
+			</DataTemplate>
+
+			<!--
+			GABLE ROOF data template
+			-->
+			<DataTemplate DataType="{x:Type dc:GableRoof}">
+				<Grid
+					Margin="8"
+					>
+
+					<Grid.Style>
+						<Style TargetType="{x:Type Grid}">
+							<Setter Property="IsEnabled" Value="False"/>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding IsSelected}" Value="True">
+									<Setter Property="IsEnabled" Value="True"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Grid.Style>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" SharedSizeGroup="RoofTypeImage"/>
+						<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+						<RowDefinition Height="Auto" SharedSizeGroup="RoofTypeHeader"/>
+						<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" SharedSizeGroup="PropertyNameColumn"/>
+						<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+						<ColumnDefinition Width="Auto" SharedSizeGroup="PropertyValueColumn"/>
+					</Grid.ColumnDefinitions>
+
+					<!--
+					row 0
+					image
+					-->
+					<Image
+						Grid.Row="0"
+						Grid.Column="0"
+						Grid.ColumnSpan="3"
+						
+						VerticalAlignment="Center"
+						HorizontalAlignment="Center"
+						
+						Source="/DrawingFactoryApp;component/Properties/GableRoof.png"
+						/>
+
+					<!--
+					row 1
+					horizontal gutter
+					-->
+					
+					<!--
+					row 2
+					header
+					-->
+					<TextBlock
+						Grid.Row="2"
+						Grid.Column="0"
+						Grid.ColumnSpan="3"
+						
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						FontWeight="SemiBold"
+						FontSize="14"
+						Text="{Binding DisplayName}"
+						/>
+
+					<!--
+					row 3
+					horizontal gutter
+					-->
+
+					<!--
+					row 4
+					min height
+					-->
+					<TextBlock
+						Grid.Row="4"
+						Grid.Column="0"
+						
+						VerticalAlignment="Center"
+						Text="Min height"
+						/>
+					<TextBox
+						Grid.Row="4"
+						Grid.Column="3"
+						
+						VerticalAlignment="Center"
+						Text="{Binding MinHeight}"
+						/>
+
+					<!--
+					row 5
+					horizontal gutter
+					-->
+
+					<!--
+					row 6
+					max height
+					-->
+					<TextBlock
+						Grid.Row="6"
+						Grid.Column="0"
+						
+						VerticalAlignment="Center"
+						Text="Max height"
+						/>
+					<TextBox
+						Grid.Row="6"
+						Grid.Column="3"
+						
+						VerticalAlignment="Center"
+						Text="{Binding MaxHeight}"
+						/>
+
+					<!--
+					row 7
+					horizontal gutter
+					-->
+
+					<!--
+					row 8
+					direction
+					-->
+					<TextBlock
+						Grid.Row="8"
+						Grid.Column="0"
+						
+						VerticalAlignment="Center"
+						Text="Ridge"
+						/>
+					<ComboBox
+						Grid.Row="8"
+						Grid.Column="3"
+						
+						VerticalAlignment="Center"
+						SelectedValue="{Binding HorizontalRidgeDirection, Converter={StaticResource GableRoofDirectionConverter}}"
+						ItemsSource="{Binding Path=DataContext.GableRoofDirectionValuesList, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+						/>
+				</Grid>
+			</DataTemplate>
+
+			<!--
+			SHED ROOF data template
+			-->
+			<DataTemplate DataType="{x:Type dc:ShedRoof}">
+				<Grid
+					Margin="8"
+					>
+
+					<Grid.Style>
+						<Style TargetType="{x:Type Grid}">
+							<Setter Property="IsEnabled" Value="False"/>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding IsSelected}" Value="True">
+									<Setter Property="IsEnabled" Value="True"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Grid.Style>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" SharedSizeGroup="RoofTypeImage"/>
+						<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+						<RowDefinition Height="Auto" SharedSizeGroup="RoofTypeHeader"/>
+						<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="{StaticResource HorizontalGutter}"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" SharedSizeGroup="PropertyNameColumn"/>
+						<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+						<ColumnDefinition Width="Auto" SharedSizeGroup="PropertyValueColumn"/>
+					</Grid.ColumnDefinitions>
+
+					<!--
+					row 0
+					image
+					-->
+					<Image
+						Grid.Row="0"
+						Grid.Column="0"
+						Grid.ColumnSpan="3"
+						
+						VerticalAlignment="Center"
+						HorizontalAlignment="Center"
+						
+						Source="/DrawingFactoryApp;component/Properties/ShedRoof.png"
+						/>
+
+					<!--
+					row 1
+					horizontal gutter
+					-->
+					
+					<!--
+					row 2
+					header
+					-->
+					<TextBlock
+						Grid.Row="2"
+						Grid.Column="0"
+						Grid.ColumnSpan="3"
+						
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						FontWeight="SemiBold"
+						FontSize="14"
+						Text="{Binding DisplayName}"
+						/>
+
+					<!--
+					row 3
+					horizontal gutter
+					-->
+					
+					<!--
+					row 4
+					min height
+					-->
+					<TextBlock
+						Grid.Row="4"
+						Grid.Column="0"
+						
+						VerticalAlignment="Center"
+						Text="Min height"
+						/>
+					<TextBox
+						Grid.Row="4"
+						Grid.Column="3"
+						
+						VerticalAlignment="Center"
+						Text="{Binding MinHeight}"
+						/>
+
+					<!--
+					row 5
+					horizontal gutter
+					-->
+
+					<!--
+					row 6
+					max height
+					-->
+					<TextBlock
+						Grid.Row="6"
+						Grid.Column="0"
+						
+						VerticalAlignment="Center"
+						Text="Max height"
+						/>
+					<TextBox
+						Grid.Row="6"
+						Grid.Column="3"
+						
+						VerticalAlignment="Center"
+						Text="{Binding MaxHeight}"
+						/>
+
+					<!--
+					row 7
+					horizontal gutter
+					-->
+
+					<!--
+					row 8
+					direction
+					-->
+					<TextBlock
+						Grid.Row="8"
+						Grid.Column="0"
+						
+						VerticalAlignment="Center"
+						Text="Pitch"
+						/>
+					<ComboBox
+						Grid.Row="8"
+						Grid.Column="3"
+						
+						VerticalAlignment="Center"
+						SelectedValue="{Binding PitchDirection, Converter={StaticResource ShedRoofDirectionConverter}}"
+						ItemsSource="{Binding Path=DataContext.ShedRoofDirectionValuesList, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+						/>
+				</Grid>
+			</DataTemplate>
+			
+		</ResourceDictionary>
+	</UserControl.Resources>
+
+	<Grid Margin="16">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+
+		<TextBlock
+			Grid.Row="0"
+			
+			VerticalAlignment="Center"
+			HorizontalAlignment="Center"
+			
+			Style="{DynamicResource MaterialDesignDisplay1TextBlock}"
+			Foreground="{DynamicResource SecondaryAccentBrush}"
+			
+			Text="Sheet roof type:"
+			/>
+
+		<ListBox
+			Grid.Row="1"
+			Grid.IsSharedSizeScope="True"
+			
+			Margin="0, 32, 0, 0"
+			
+			Style="{StaticResource MaterialDesignToolToggleListBox}"
+			ItemsSource="{Binding Sheet.RoofsList}"
+			materialDesign:ListBoxAssist.IsToggle="False"
+			Background="Transparent"
+			>
+			<ListBox.ItemContainerStyle>
+				<Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+					<Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+					<Setter Property="VerticalContentAlignment" Value="Top"/>
+				</Style>
+			</ListBox.ItemContainerStyle>
+		</ListBox>
+
+		<Button
+			Grid.Row="2"
+			IsDefault="True"
+			IsCancel="True"
+			Margin="0, 16, 0, 0"
+			HorizontalAlignment="Right"
+			Style="{DynamicResource MaterialDesignFlatButton}"
+			Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+
+			<Button.CommandParameter>
+				<system:Boolean>True</system:Boolean>
+			</Button.CommandParameter>
+
+			OK
+
+		</Button>
+
+	</Grid>
+	
+</UserControl>
