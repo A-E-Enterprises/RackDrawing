@@ -1,5 +1,5 @@
 HEADER_INTERFACE_COLORS
-AppBackground;#FFFAFAFA;Application background;Application background color. It is also used as text color at tooltips. For example, top toolbar commands tooltip.;
+AppBackground;#FFE5E5E5;Application background;Application background color. It is also used as text color at tooltips. For example, top toolbar commands tooltip.;
 AppCardBackground;#FFFFFFFF;Cards background;Application panels and dialogs background color. For example, top panel with commands buttons and properties panel.;
 AppWarningBackground;#FFFF8C00;Warning background;Warning background color. It is used for warning icon at Rack Advanced Properties picture.;
 MaterialDesignDivider;#1F000000;Divider;Divider color. It is used for lines which separates content, highlight scrollviewer and list item on mouse over. For example, separate items in MHE configurations list.;
@@ -21,7 +21,7 @@ DrawingAreaSelectionRectangleBorder;#FF000000;DA selection rectangle border;Draw
 DrawingAreaSelectedGeometryInfoBrush;#FF4682B4;Selected geometry info;Selected geometry info graphic color: lines from top left corner to the borders of drawing area, distance values text color, dimensions lines, dimensions text.;
 DrawingAreaNewSizePreviewFillBrush;#FF008000;DA size preview rectangle fill;Display new drawing size if drawing width or height will be decreased and some geometry will be deleted. Fill color of that displayed new size rectangle.;
 DrawingAreaNewSizePreviewBorderBrush;#FF000000;DA size preview rectangle border;Display new drawing size if drawing width or height will be decreased and some geometry will be deleted. Border color of that displayed new size rectangle.;
-DrawingAreaSheetBackgroundBrush;#FFE5F4FC;DA sheet background;Sheet background color in the Graphics Area.;
+DrawingAreaSheetBackgroundBrush;#FFFFFFFF;DA sheet background;Sheet background color in the Graphics Area.;
 
 HEADER_GEOMETRY_COLORS
 FillBlock;#FFD3D3D3;Block;Block fill color;
@@ -29,8 +29,8 @@ FillAisleSpace;#FFF0E68C;AisleSpace;AisleSpace fill color;
 FillColumn;#FF87CEFA;Column;Column fill color;
 FillShutter;#FFFFC0CB;Shutter;Shutter fill color;
 FillTieBeam;#FF808080;TieBeam;TieBeam fill color;
-FillTieBeamWithError;#FFFF0000;TieBeam error;TieBeam with error fill color. Probably height of the rack is greater than the max rack height.;
 FillSheetElevationGeometry;#FF00FF7F;SheetElevationGeometry;SheetElevationGeometry fill color;
+FillTieBeamWithError;#FFFF0000;TieBeam error;TieBeam with error fill color. Probably height of the rack is greater than the max rack height.;
 FillWall;#FF2F4F4F;Wall;Wall fill color;
 FillRoof;#FFFFA07A;Roof;Roof fill color;
 FillFloor;#FFD3D3D3;Floor;Floor fill color;

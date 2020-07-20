@@ -34,5 +34,18 @@ namespace RackDrawingApp
 
 		// Displayed document data
 		private DrawingDocument m_DrawingDoc = null;
+
+		// Disable EnqNo in Release build only.
+		public static bool IsReleaseBuild
+		{
+			get
+			{
+#if DEBUG
+				return false;
+#endif
+
+				return true;
+			}
+		}
 	}
 }

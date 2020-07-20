@@ -2932,12 +2932,8 @@ namespace DrawingControl
 
 				double result = Rack.sMaxRackHeight;
 				// calculate Clear Available Height
-				if (this.Sheet != null && this.Sheet.Document != null)
-				{
-					double maxHeightValue;
-					if(this.Sheet.Document.CalculateMaxHeightForGeometry(this, out maxHeightValue))
-						result = maxHeightValue - Rack.ROOF_HEIGHT_GAP;
-				}
+				if(this.Sheet != null && this.Sheet.SelectedRoof != null)
+					result = this.Sheet.SelectedRoof.CalculateMaxHeightForGeometry(this) - Rack.ROOF_HEIGHT_GAP;
 
 				if (Utils.FGT(result, Rack.sMaxRackHeight))
 					result = Rack.sMaxRackHeight;
@@ -2954,12 +2950,8 @@ namespace DrawingControl
 		{
 			get
 			{
-				if (this.Sheet != null && this.Sheet.Document != null)
-				{
-					double maxHeightValue;
-					if (this.Sheet.Document.CalculateMaxHeightForGeometry(this, out maxHeightValue))
-						return maxHeightValue;
-				}
+				if (this.Sheet != null && this.Sheet.SelectedRoof != null)
+					return this.Sheet.SelectedRoof.CalculateMaxHeightForGeometry(this);
 
 				return 12000.0;
 			}
@@ -3693,7 +3685,17 @@ namespace DrawingControl
 			if (m_Sheet == null)
 				return;
 
-			base.Draw(dc, cs, geomDisplaySettings);
+			IGeomDisplaySettings displaySettings = geomDisplaySettings;
+			// if NULL then get settings from the sheet
+			if (displaySettings == null)
+				displaySettings = m_Sheet;
+			// if NULL then get default settings
+			if (displaySettings == null)
+				displaySettings = DefaultGeomDisplaySettings.GetInstance();
+			if (displaySettings == null)
+				return;
+
+			base.Draw(dc, cs, displaySettings);
 
 			// draw underpass symbol
 			if (this.IsUnderpassAvailable)
@@ -3786,10 +3788,10 @@ namespace DrawingControl
 			}
 			SolidColorBrush rackDotsBrush = new SolidColorBrush(rackDotsColor);
 			Pen circleBorderPen = new Pen(m_CircleBorderBrush, 1.0);
-			// apply scale to dot size
-			double rDotSize = 50 * (LengthInPixels / m_Length_X);
-			dc.DrawEllipse(rackDotsBrush, circleBorderPen, firstCirclePoint, rDotSize, rDotSize);
-			dc.DrawEllipse(rackDotsBrush, circleBorderPen, secondCirclePoint, rDotSize, rDotSize);
+			// dots should have fixed size in pixels
+			double rDotRadius = 0.2 * displaySettings.TextFontSize; //50 * (LengthInPixels / m_Length_X);
+			dc.DrawEllipse(rackDotsBrush, circleBorderPen, firstCirclePoint, rDotRadius, rDotRadius);
+			dc.DrawEllipse(rackDotsBrush, circleBorderPen, secondCirclePoint, rDotRadius, rDotRadius);
 
 			bool startFrameError = this.StartFrameTieBeamError;
 			bool endFrameError = this.EndFrameTieBeamError;
@@ -6922,8 +6924,7 @@ namespace DrawingControl
 			// from the other levels.
 			if (this.ShowPallet && lastLevelHeight < _lastLevel.TheBiggestPalletHeightWithRiser)
 			{
-				// Create bound sheet at warehouse(with flat roof) - go to the bound sheet - place rack -
-				// go to the warehouse sheet - set 6000 as roof height - infinitive loop exception.
+				// Place rack - set 6000 as roof height - infinitive loop exception.
 				//
 				// Rack height with pallets is greater than MaxLength_Z, so set MaxLength_Z as Rack.Length_Z 
 				// and _RecalcLevelHeight() is called. But only last level height is removed from new Length_Z value.

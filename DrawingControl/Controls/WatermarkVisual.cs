@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace DrawingControl
 {
@@ -22,25 +21,6 @@ namespace DrawingControl
 		private FrameworkElement m_Owner = null;
 
 		//=============================================================================
-		/// <summary>
-		/// Return null as HitTest for the watermark visual.
-		/// It removes WatermarkVisual from any mouse\wheel clicks events.
-		/// Otherwise, WatermarkVisual blocks rotate 3D model when user clicks
-		/// mouse wheel on WatermarkVisual inside RackViewport3D.
-		/// </summary>
-		protected override GeometryHitTestResult HitTestCore(GeometryHitTestParameters hitTestParameters)
-		{
-			//return base.HitTestCore(hitTestParameters);
-			return null;
-		}
-		//=============================================================================
-		protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
-		{
-			//return base.HitTestCore(hitTestParameters);
-			return null;
-		}
-
-		//=============================================================================
 		public void Draw(ImageSource watermarkImage)
 		{
 			using (DrawingContext thisDC = this.RenderOpen())
@@ -50,22 +30,7 @@ namespace DrawingControl
 
 				if(watermarkImage != null)
 					WatermarkVisual.sDrawWatermark(thisDC, m_Owner.ActualWidth, m_Owner.ActualHeight, watermarkImage);
-			}
-		}
-
-		//=============================================================================
-		/// <summary>
-		/// Default watermark image
-		/// </summary>
-		private static BitmapImage sWatermarkImage = null;
-		public static BitmapImage WatermarkImage
-		{
-			get
-			{
-				if (sWatermarkImage == null)
-					sWatermarkImage = new BitmapImage(new Uri("pack://application:,,,/DrawingFactoryApp;component/Properties/Watermark.png"));
-
-				return sWatermarkImage;
+				//WatermarkVisual.sDrawSingleWatermark(thisDC, m_Owner.ActualWidth, m_Owner.ActualHeight, m_Owner.WatermarkImage);
 			}
 		}
 

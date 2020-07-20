@@ -303,9 +303,9 @@ namespace DrawingControl
 			get
 			{
 				if (this.m_bIsHorizontal)
-					return Length_X;
+					return m_Length_X;
 
-				return Length_Y;
+				return m_Length_Y;
 			}
 			set
 			{
@@ -321,9 +321,9 @@ namespace DrawingControl
 			get
 			{
 				if (this.m_bIsHorizontal)
-					return Length_Y;
+					return m_Length_Y;
 
-				return Length_X;
+				return m_Length_X;
 			}
 			set
 			{
@@ -335,7 +335,7 @@ namespace DrawingControl
 		}
 
 		//=============================================================================
-		public virtual double Length_X
+		public double Length_X
 		{
 			get { return m_Length_X; }
 			set
@@ -530,7 +530,7 @@ namespace DrawingControl
 		}
 
 		//=============================================================================
-		public virtual string Text
+		public string Text
 		{
 			get
 			{
@@ -586,10 +586,9 @@ namespace DrawingControl
 		{
 			get
 			{
-				Point bottomLeftPoint = m_TopLeft_GlobalPoint;
-				bottomLeftPoint.Y += Length_Y;
-
-				return bottomLeftPoint;
+				Point _bottomLeftPoint = m_TopLeft_GlobalPoint;
+				_bottomLeftPoint.Y += m_Length_Y;
+				return _bottomLeftPoint;
 			}
 		}
 
@@ -599,8 +598,8 @@ namespace DrawingControl
 			get
 			{
 				Point rightBottomPoint = m_TopLeft_GlobalPoint;
-				rightBottomPoint.X += Length_X;
-				rightBottomPoint.Y += Length_Y;
+				rightBottomPoint.X += m_Length_X;
+				rightBottomPoint.Y += m_Length_Y;
 
 				return rightBottomPoint;
 			}
@@ -612,7 +611,7 @@ namespace DrawingControl
 			get
 			{
 				Point rightTopPoint = m_TopLeft_GlobalPoint;
-				rightTopPoint.X += Length_X;
+				rightTopPoint.X += m_Length_X;
 
 				return rightTopPoint;
 			}
@@ -623,11 +622,10 @@ namespace DrawingControl
 		{
 			get
 			{
-				Point centerPoint = m_TopLeft_GlobalPoint;
-				centerPoint.X += Length_X / 2;
-				centerPoint.Y += Length_Y / 2;
-
-				return centerPoint;
+				Point _centerPoint = m_TopLeft_GlobalPoint;
+				_centerPoint.X += m_Length_X / 2;
+				_centerPoint.Y += m_Length_Y / 2;
+				return _centerPoint;
 			}
 		}
 
@@ -656,9 +654,6 @@ namespace DrawingControl
 		//=============================================================================
 		// false - rectangle place at the center of Graphics Area for init. User allows to change its
 		// size and rotations by grip points. Dont check layout for this rectangle.
-		//
-		// Serialize and deserialize m_IsInit instead IsInit because on open document
-		// it executes SheetGeometry.IsInit.set.
 		private bool m_IsInit = true;
 		public virtual bool IsInit
 		{
@@ -782,7 +777,7 @@ namespace DrawingControl
 				displaySettings = m_Sheet;
 			// if NULL then get default settings
 			if (displaySettings == null)
-				displaySettings = new DefaultGeomDisplaySettings();
+				displaySettings = DefaultGeomDisplaySettings.GetInstance();
 			if (displaySettings == null)
 				return;
 
@@ -808,7 +803,7 @@ namespace DrawingControl
 			dc.DrawRectangle(fillBrush, _pen, new Rect(TopLeft_ScreenPoint, BottomRight_ScreenPoint));
 
 			// draw text
-			if (displaySettings.DisplayText && !string.IsNullOrEmpty(Text))
+			if (!string.IsNullOrEmpty(Text))
 			{
 				Brush br = new SolidColorBrush(textColor);
 				br.Opacity = displaySettings.FillBrushOpacity;
@@ -857,6 +852,12 @@ namespace DrawingControl
 		}
 
 		//=============================================================================
+		public virtual void OnMouseMove(Point mousePoint, double DrawingLength, double DrawingWidth)
+		{
+			SetGripPoint(GRIP_CENTER, mousePoint, DrawingLength, DrawingWidth);
+		}
+
+		//=============================================================================
 		public virtual List<Point> GetGripPoints()
 		{
 			List<Point> grips = new List<Point>();
@@ -864,13 +865,13 @@ namespace DrawingControl
 			grips.Add(m_TopLeft_GlobalPoint);
 			// 1 center
 			Point centerPoint = m_TopLeft_GlobalPoint;
-			centerPoint.X += Length_X / 2;
-			centerPoint.Y += Length_Y / 2;
+			centerPoint.X += m_Length_X / 2;
+			centerPoint.Y += m_Length_Y / 2;
 			grips.Add(centerPoint);
 			// 2 bottom right
 			Point bottomRight = m_TopLeft_GlobalPoint;
-			bottomRight.X += Length_X;
-			bottomRight.Y += Length_Y;
+			bottomRight.X += m_Length_X;
+			bottomRight.Y += m_Length_Y;
 			grips.Add(bottomRight);
 
 			return grips;
@@ -1145,8 +1146,8 @@ namespace DrawingControl
 			bool bRes = true;
 			if (Utils.FLT(m_TopLeft_GlobalPoint.X, MarginX)
 				|| Utils.FLT(m_TopLeft_GlobalPoint.Y, MarginY)
-				|| Utils.FGT(m_TopLeft_GlobalPoint.X + Length_X, DrawingLength - MarginX)
-				|| Utils.FGT(m_TopLeft_GlobalPoint.Y + Length_Y, DrawingWidth - MarginY))
+				|| Utils.FGT(m_TopLeft_GlobalPoint.X + m_Length_X, DrawingLength - MarginX)
+				|| Utils.FGT(m_TopLeft_GlobalPoint.Y + m_Length_Y, DrawingWidth - MarginY))
 			{
 				bRes = false;
 			}
@@ -1159,10 +1160,10 @@ namespace DrawingControl
 					m_TopLeft_GlobalPoint.X = MarginX;
 				if (Utils.FLT(m_TopLeft_GlobalPoint.Y, MarginY))
 					m_TopLeft_GlobalPoint.Y = MarginY;
-				if (Utils.FGT(m_TopLeft_GlobalPoint.X + Length_X, DrawingLength - MarginX))
-					m_TopLeft_GlobalPoint.X = DrawingLength - MarginX - Length_X;
-				if (Utils.FGT(m_TopLeft_GlobalPoint.Y + Length_Y, DrawingWidth - MarginY))
-					m_TopLeft_GlobalPoint.Y = DrawingWidth - MarginY - Length_Y;
+				if (Utils.FGT(m_TopLeft_GlobalPoint.X + m_Length_X, DrawingLength - MarginX))
+					m_TopLeft_GlobalPoint.X = DrawingLength - MarginX - m_Length_X;
+				if (Utils.FGT(m_TopLeft_GlobalPoint.Y + m_Length_Y, DrawingWidth - MarginY))
+					m_TopLeft_GlobalPoint.Y = DrawingWidth - MarginY - m_Length_Y;
 
 				//
 				eAppliedChanges appliedChanges = eAppliedChanges.eMoveCenterGripPoint;
@@ -1182,13 +1183,13 @@ namespace DrawingControl
 					{
 						m_TopLeft_GlobalPoint = newTopLeftPoint;
 						//
-						Length_X = newGlobalLength;
-						Length_X = Utils.GetWholeNumberByStep(Length_X, StepLength_X);
-						Length_X = Utils.CheckWholeNumber(Length_X, MinLength_X, MaxLength_X);
+						m_Length_X = newGlobalLength;
+						m_Length_X = Utils.GetWholeNumberByStep(m_Length_X, StepLength_X);
+						m_Length_X = Utils.CheckWholeNumber(m_Length_X, MinLength_X, MaxLength_X);
 						//
-						Length_Y = newGlobalWidth;
-						Length_Y = Utils.GetWholeNumberByStep(Length_Y, StepLength_Y);
-						Length_Y = Utils.CheckWholeNumber(Length_Y, MinLength_Y, MaxLength_Y);
+						m_Length_Y = newGlobalWidth;
+						m_Length_Y = Utils.GetWholeNumberByStep(m_Length_Y, StepLength_Y);
+						m_Length_Y = Utils.CheckWholeNumber(m_Length_Y, MinLength_Y, MaxLength_Y);
 
 						//
 						if (IsCorrect(appliedChanges, out overlappedRectangles))
@@ -1244,8 +1245,8 @@ namespace DrawingControl
 			out double newGlobalWidth)
 		{
 			newTopLeft_GlobalPoint = m_TopLeft_GlobalPoint;
-			newGlobalLength = Length_X;
-			newGlobalWidth = Length_Y;
+			newGlobalLength = m_Length_X;
+			newGlobalWidth = m_Length_Y;
 
 			if (GRIP_TOP_LEFT != iGripIndex && GRIP_CENTER == iGripIndex && GRIP_BOTTOM_RIGHT == iGripIndex)
 				return false;
@@ -1697,8 +1698,8 @@ namespace DrawingControl
 			m_TopLeft_GlobalPoint.X = Convert.ToInt32(Math.Truncate(m_TopLeft_GlobalPoint.X));
 			m_TopLeft_GlobalPoint.Y = Convert.ToInt32(Math.Truncate(m_TopLeft_GlobalPoint.Y));
 			//
-			Length_X = Convert.ToInt32(Math.Truncate(Length_X));
-			Length_Y = Convert.ToInt32(Math.Truncate(Length_Y));
+			m_Length_X = Convert.ToInt32(Math.Truncate(m_Length_X));
+			m_Length_Y = Convert.ToInt32(Math.Truncate(m_Length_Y));
 		}
 
 		//=============================================================================
@@ -1726,20 +1727,18 @@ namespace DrawingControl
 					// change size
 					Point bottomRightPoint = BottomRight_GlobalPoint;
 					Point newTopLeftPoint = Utils.CheckBorders(newGlobalPoint, 0, 0, DrawingLength, DrawingWidth, MarginX, MarginY);
-					// calc width
-					double length_X_Value = bottomRightPoint.X - newTopLeftPoint.X;
-					length_X_Value = Utils.GetWholeNumberByStep(length_X_Value, StepLength_X);
-					length_X_Value = Utils.CheckWholeNumber(length_X_Value, MinLength_X, MaxLength_X);
-					this.Length_X = length_X_Value;
+					// calc width 
+					m_Length_X = bottomRightPoint.X - newTopLeftPoint.X;
+					m_Length_X = Utils.GetWholeNumberByStep(m_Length_X, StepLength_X);
+					m_Length_X = Utils.CheckWholeNumber(m_Length_X, MinLength_X, MaxLength_X);
 					//
-					double length_Y_Value = bottomRightPoint.Y - newTopLeftPoint.Y;
-					length_Y_Value = Utils.GetWholeNumberByStep(length_Y_Value, StepLength_Y);
-					length_Y_Value = Utils.CheckWholeNumber(length_Y_Value, MinLength_Y, MaxLength_Y);
-					this.Length_Y = length_Y_Value;
+					m_Length_Y = bottomRightPoint.Y - newTopLeftPoint.Y;
+					m_Length_Y = Utils.GetWholeNumberByStep(m_Length_Y, StepLength_Y);
+					m_Length_Y = Utils.CheckWholeNumber(m_Length_Y, MinLength_Y, MaxLength_Y);
 					//
 					m_TopLeft_GlobalPoint = bottomRightPoint;
-					m_TopLeft_GlobalPoint.X -= this.Length_X;
-					m_TopLeft_GlobalPoint.Y -= this.Length_Y;
+					m_TopLeft_GlobalPoint.X -= m_Length_X;
+					m_TopLeft_GlobalPoint.Y -= m_Length_Y;
 
 					//
 					bResult = true;
@@ -1754,8 +1753,8 @@ namespace DrawingControl
 
 					// just drag rectangle
 					Point newTopLeft_GlobalPoint = newGlobalPoint;
-					newTopLeft_GlobalPoint.X -= this.Length_X / 2;
-					newTopLeft_GlobalPoint.Y -= this.Length_Y / 2;
+					newTopLeft_GlobalPoint.X -= m_Length_X / 2;
+					newTopLeft_GlobalPoint.Y -= m_Length_Y / 2;
 
 					//
 					m_TopLeft_GlobalPoint = newTopLeft_GlobalPoint;
@@ -1772,61 +1771,60 @@ namespace DrawingControl
 					Point newGlobalPoint = (Point)value;
 
 					// change the size
-					double length_X_Value = newGlobalPoint.X - m_TopLeft_GlobalPoint.X;
+					//
+					m_Length_X = newGlobalPoint.X - m_TopLeft_GlobalPoint.X;
 					// if value was changed via properties and it is not correct, then revert changes
 					if(bWasChangedViaProperties)
 					{
-						if (Utils.FLT(length_X_Value, MinLength_X))
+						if (Utils.FLT(m_Length_X, MinLength_X))
 							bRevertChanges = true;
 						if (double.IsPositiveInfinity(MaxLength_X))
 						{
-							if (Utils.FGT(length_X_Value, DrawingLength - MarginX))
+							if (Utils.FGT(m_Length_X, DrawingLength - MarginX))
 								bRevertChanges = true;
 						}
 						else
 						{
-							if (Utils.FGT(length_X_Value, MaxLength_X))
+							if (Utils.FGT(m_Length_X, MaxLength_X))
 								bRevertChanges = true;
 						}
 					}
 					//
 					if (!bRevertChanges)
 					{
-						length_X_Value = Utils.GetWholeNumberByStep(length_X_Value, StepLength_X);
+						m_Length_X = Utils.GetWholeNumberByStep(m_Length_X, StepLength_X);
 						if (double.IsPositiveInfinity(MaxLength_X))
-							length_X_Value = Utils.CheckWholeNumber(length_X_Value, MinLength_X, DrawingLength - MarginX);
+							m_Length_X = Utils.CheckWholeNumber(m_Length_X, MinLength_X, DrawingLength - MarginX);
 						else
-							length_X_Value = Utils.CheckWholeNumber(length_X_Value, MinLength_X, MaxLength_X);
-						this.Length_X = length_X_Value;
+							m_Length_X = Utils.CheckWholeNumber(m_Length_X, MinLength_X, MaxLength_X);
 					}
 
 					//
-					double length_Y_Value = newGlobalPoint.Y - m_TopLeft_GlobalPoint.Y;
+					m_Length_Y = newGlobalPoint.Y - m_TopLeft_GlobalPoint.Y;
 					// if value was changed via properties and it is not correct, then revert changes
 					if (bWasChangedViaProperties)
 					{
-						if (Utils.FLT(length_Y_Value, MinLength_Y))
+						if (Utils.FLT(m_Length_Y, MinLength_Y))
 							bRevertChanges = true;
 						if (double.IsPositiveInfinity(MaxLength_Y))
 						{
-							if (Utils.FGT(length_Y_Value, DrawingWidth - MarginY))
+							if (Utils.FGT(m_Length_Y, DrawingWidth - MarginY))
 								bRevertChanges = true;
 						}
 						else
 						{
-							if (Utils.FGT(length_Y_Value, MaxLength_Y))
+							if (Utils.FGT(m_Length_Y, MaxLength_Y))
 								bRevertChanges = true;
 						}
 					}
 					//
 					if (!bRevertChanges)
 					{
-						length_Y_Value = Utils.GetWholeNumberByStep(length_Y_Value, StepLength_Y);
+						m_Length_Y = Utils.GetWholeNumberByStep(m_Length_Y, StepLength_Y);
 						if (double.IsPositiveInfinity(MaxLength_Y))
-							length_Y_Value = Utils.CheckWholeNumber(length_Y_Value, MinLength_Y, DrawingWidth - MarginY);
+							m_Length_Y = Utils.CheckWholeNumber(m_Length_Y, MinLength_Y, DrawingWidth - MarginY);
 						else
-							length_Y_Value = Utils.CheckWholeNumber(length_Y_Value, MinLength_Y, MaxLength_Y);
-						this.Length_Y = length_Y_Value;
+							m_Length_Y = Utils.CheckWholeNumber(m_Length_Y, MinLength_Y, MaxLength_Y);
 					}
 
 					//
@@ -1839,11 +1837,11 @@ namespace DrawingControl
 
 					// change the size
 					//
-					double length_X_Value = iNewValue;
+					m_Length_X = iNewValue;
 					// if value was changed via properties and it is not correct, then revert changes
 					if (bWasChangedViaProperties)
 					{
-						if (length_X_Value < MinLength_X)
+						if (m_Length_X < MinLength_X)
 						{
 							bRevertChanges = true;
 
@@ -1853,7 +1851,7 @@ namespace DrawingControl
 						}
 						if (double.IsPositiveInfinity(MaxLength_X))
 						{
-							if (Utils.FGT(length_X_Value, DrawingLength - MarginX))
+							if (Utils.FGT(m_Length_X, DrawingLength - MarginX))
 							{
 								bRevertChanges = true;
 
@@ -1864,7 +1862,7 @@ namespace DrawingControl
 						}
 						else
 						{
-							if (Utils.FGT(length_X_Value, MaxLength_X))
+							if (Utils.FGT(m_Length_X, MaxLength_X))
 							{
 								bRevertChanges = true;
 
@@ -1877,20 +1875,18 @@ namespace DrawingControl
 					//
 					if (!bRevertChanges)
 					{
-						if(length_X_Value % StepLength_X != 0)
+						if(m_Length_X % StepLength_X != 0)
 						{
 							strError += "Length should be divisible by ";
 							strError += StepLength_X.ToString();
 							strError += " without remainder.";
 						}
 
-						length_X_Value = Utils.GetWholeNumberByStep(length_X_Value, StepLength_X);
+						m_Length_X = Utils.GetWholeNumberByStep(m_Length_X, StepLength_X);
 						if (double.IsPositiveInfinity(MaxLength_X))
-							length_X_Value = Utils.CheckWholeNumber(length_X_Value, MinLength_X, DrawingLength - MarginX);
+							m_Length_X = Utils.CheckWholeNumber(m_Length_X, MinLength_X, DrawingLength - MarginX);
 						else
-							length_X_Value = Utils.CheckWholeNumber(length_X_Value, MinLength_X, MaxLength_X);
-
-						this.Length_X = length_X_Value;
+							m_Length_X = Utils.CheckWholeNumber(m_Length_X, MinLength_X, MaxLength_X);
 					}
 
 					//
@@ -1902,11 +1898,11 @@ namespace DrawingControl
 					int iNewValue = Convert.ToInt32(value);
 
 					//
-					double length_Y_Value = iNewValue;
+					m_Length_Y = iNewValue;
 					// if value was changed via properties and it is not correct, then revert changes
 					if (bWasChangedViaProperties)
 					{
-						if (Utils.FLT(length_Y_Value, MinLength_Y))
+						if (Utils.FLT(m_Length_Y, MinLength_Y))
 						{
 							bRevertChanges = true;
 
@@ -1916,7 +1912,7 @@ namespace DrawingControl
 						}
 						if (double.IsPositiveInfinity(MaxLength_Y))
 						{
-							if (Utils.FGT(length_Y_Value, DrawingWidth - MarginY))
+							if (Utils.FGT(m_Length_Y, DrawingWidth - MarginY))
 							{
 								bRevertChanges = true;
 
@@ -1927,7 +1923,7 @@ namespace DrawingControl
 						}
 						else
 						{
-							if (Utils.FGT(length_Y_Value, MaxLength_Y))
+							if (Utils.FGT(m_Length_Y, MaxLength_Y))
 							{
 								bRevertChanges = true;
 
@@ -1940,20 +1936,18 @@ namespace DrawingControl
 					//
 					if (!bRevertChanges)
 					{
-						if (length_Y_Value % StepLength_Y != 0)
+						if (m_Length_X % StepLength_X != 0)
 						{
 							strError += "Depth should be divisible by ";
 							strError += StepLength_Y.ToString();
 							strError += " without remainder.";
 						}
 
-						length_Y_Value = Utils.GetWholeNumberByStep(length_Y_Value, StepLength_Y);
+						m_Length_Y = Utils.GetWholeNumberByStep(m_Length_Y, StepLength_Y);
 						if (double.IsPositiveInfinity(MaxLength_Y))
-							length_Y_Value = Utils.CheckWholeNumber(length_Y_Value, MinLength_Y, DrawingWidth);
+							m_Length_Y = Utils.CheckWholeNumber(m_Length_Y, MinLength_Y, DrawingWidth);
 						else
-							length_Y_Value = Utils.CheckWholeNumber(length_Y_Value, MinLength_Y, MaxLength_Y);
-
-						this.Length_Y = length_Y_Value;
+							m_Length_Y = Utils.CheckWholeNumber(m_Length_Y, MinLength_Y, MaxLength_Y);
 					}
 
 					//
@@ -2014,10 +2008,10 @@ namespace DrawingControl
 
 				//
 				m_TopLeft_GlobalPoint = Utils.CheckBorders(m_TopLeft_GlobalPoint, 0.0, 0.0, DrawingLength, DrawingWidth, MarginX, MarginY);
-				if (Utils.FGT(m_TopLeft_GlobalPoint.X + this.Length_X, DrawingLength - MarginX))
-					m_TopLeft_GlobalPoint.X = DrawingLength - this.Length_X - MarginX;
-				if (Utils.FGT(m_TopLeft_GlobalPoint.Y + this.Length_Y, DrawingWidth - MarginY))
-					m_TopLeft_GlobalPoint.Y = DrawingWidth - this.Length_Y - MarginY;
+				if (Utils.FGT(m_TopLeft_GlobalPoint.X + m_Length_X, DrawingLength - MarginX))
+					m_TopLeft_GlobalPoint.X = DrawingLength - m_Length_X - MarginX;
+				if (Utils.FGT(m_TopLeft_GlobalPoint.Y + m_Length_Y, DrawingWidth - MarginY))
+					m_TopLeft_GlobalPoint.Y = DrawingWidth - m_Length_Y - MarginY;
 
 				//
 				_CheckWholeNumbers();

@@ -10,7 +10,7 @@ namespace DrawingControl
 {
 	public class DefaultGeomDisplaySettings : IGeomDisplaySettings
 	{
-		public DefaultGeomDisplaySettings() { }
+		protected DefaultGeomDisplaySettings() { }
 
 		//=============================================================================
 		public double FillBrushOpacity { get { return 1.0; } }
@@ -26,6 +26,7 @@ namespace DrawingControl
 					m_DisplayText = value;
 			}
 		}
+
 
 		//=============================================================================
 		public FontWeight TextWeight { get { return FontWeights.Normal; } }
@@ -58,6 +59,12 @@ namespace DrawingControl
 				return geom.FillColor;
 
 			return Colors.White;
+		}
+
+		//=============================================================================
+		public static IGeomDisplaySettings GetInstance()
+		{
+			return new DefaultGeomDisplaySettings();
 		}
 	}
 }

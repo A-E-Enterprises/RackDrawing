@@ -157,6 +157,12 @@ namespace DrawingControl
 		}
 
 		//=============================================================================
+		public override void OnMouseMove(Point mousePoint, double DrawingLength, double DrawingWidth)
+		{
+			// nothing to do
+		}
+
+		//=============================================================================
 		public override bool SetGripPoint(int gripIndex, Point globalPoint, double DrawingLength, double DrawingWidth)
 		{
 			// wall doesnt have any grip points
@@ -184,7 +190,7 @@ namespace DrawingControl
 				displaySettings = m_Sheet;
 			//
 			if (displaySettings == null)
-				displaySettings = new DefaultGeomDisplaySettings();
+				displaySettings = DefaultGeomDisplaySettings.GetInstance();
 			if (displaySettings == null)
 				return;
 

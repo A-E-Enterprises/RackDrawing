@@ -14,7 +14,7 @@
 	TextElement.Foreground="{DynamicResource MaterialDesignBody}"
 	
 	Width="500"
-	Height="390"
+	Height="450"
 	
 	d:DesignHeight="300"
 	d:DesignWidth="300"
@@ -35,6 +35,7 @@
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
 
@@ -119,7 +120,7 @@
 					Text="{Binding CustomerName, Mode=TwoWay}"
 					TextWrapping="Wrap"
 					/>
-				
+
 				<!--
 				ROW 1
 				HORIZONTAL GUTTER
@@ -168,7 +169,7 @@
 				ROW 5
 				HORIZONTAL GUTTER
 				-->
-				
+
 				<!--
 				ROW 6
 				CUSTOMER ENQ NUMBER
@@ -190,13 +191,25 @@
 							</Binding.ValidationRules>
 						</Binding>
 					</TextBox.Text>
+					<TextBox.Style>
+						<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+							<Setter Property="IsReadOnly" Value="False"/>
+							<Setter Property="IsEnabled" Value="True"/>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding Path=IsReleaseBuild, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:CustomerInfoDialog}}, Mode=OneWay}" Value="True">
+									<Setter Property="IsReadOnly" Value="True"/>
+									<Setter Property="IsEnabled" Value="False"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</TextBox.Style>
 				</TextBox>
 
 				<!--
 				ROW 7
 				HORIZONTAL GUTTER
 				-->
-				
+
 				<!--
 				ROW 8
 				CUSTOMER ADDRESS
@@ -240,8 +253,30 @@
 
 		</ScrollViewer>
 
-		<Button
+		<!--
+		ROW 2
+		Document version
+		-->
+		<StackPanel
 			Grid.Row="2"
+			Orientation="Horizontal"
+			>
+			<TextBlock
+				Text="Document revision:"
+				/>
+			<TextBlock
+				Margin="8, 0, 0, 0"
+				
+				Text="{Binding DocumentRevision, Mode=OneWay}"
+				/>
+		</StackPanel>
+
+		<!--
+		ROW 3
+		OK button
+		-->
+		<Button
+			Grid.Row="3"
 			IsDefault="True"
 			IsCancel="True"
 			Margin="0, 16, 0, 0"

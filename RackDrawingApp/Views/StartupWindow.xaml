@@ -39,85 +39,61 @@
 	<!--
 	Wrap content in view box, because user can run application on the machine with different screen resolution.
 	-->
-	<Viewbox
-		VerticalAlignment="Stretch"
-		HorizontalAlignment="Stretch"
-		
-		Stretch="Uniform"
-		StretchDirection="DownOnly"
-		>
-		<Grid
-			Margin="64">
+	<Grid>
 
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto"/>
-				<RowDefinition Height="Auto"/>
-			</Grid.RowDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="auto"/>
+		</Grid.RowDefinitions>
 
-			<!--
-			ROW 0
-			DRAWING FACTORY HEADER
-			-->
-			<Grid
-				Grid.Row="0"
+		<!--
+		background image
+		-->
+		<Viewbox
+			Grid.Row="0"
+			Grid.RowSpan="2"
+			
+			VerticalAlignment="Stretch"
+			HorizontalAlignment="Stretch"
+			
+			Stretch="Uniform"
+			StretchDirection="Both"
+			>
+			<Image
+				Stretch="Uniform"
+				Source="/DrawingFactoryApp;component/Properties/StartupWindowBackground.png"
+				/>
+		</Viewbox>
+
+		<!--
+		APPLICATION TYPES BUTTONS
+		-->
+		<Viewbox
+			Grid.Row="1"
+			
+			VerticalAlignment="Stretch"
+			HorizontalAlignment="Stretch"
+			
+			Stretch="Uniform"
+			StretchDirection="DownOnly"
+			>
+
+			<StackPanel
+				Margin="32, 64, 32, 64"
 				
 				VerticalAlignment="Center"
 				HorizontalAlignment="Center"
-				>
-
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition Width="Auto"/>
-				</Grid.ColumnDefinitions>
-
-				<Image
-					Grid.Column="0"
-					Margin="0, 0, 24, 0"
-					
-					Source="/DrawingFactoryApp;component/Properties/logo_1_1.tif"
-					/>
-
-				<TextBlock
-					Grid.Column="1"
-					
-					HorizontalAlignment="Center"
-					VerticalAlignment="Center"
-					
-					Style="{DynamicResource MaterialDesignDisplay3TextBlock}"
-					Foreground="{DynamicResource SecondaryAccentBrush}"
-					Text="Drawing Factory"/>
-			</Grid>
-
-			<!--
-			ROW 1
-			APPLICATION TYPES BUTTONS
-			-->
-			<Grid
-				Grid.Row="1"
-				Margin="32"
 				
-				VerticalAlignment="Center"
-				HorizontalAlignment="Center"
+				Orientation="Horizontal"
 				>
 
-				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-				</Grid.RowDefinitions>
-
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition Width="Auto"/>
-				</Grid.ColumnDefinitions>
-
-				<Grid.Resources>
+				<StackPanel.Resources>
 					<Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
 						<Setter Property="Width" Value="300"/>
 						<Setter Property="Height" Value="300"/>
-						<Setter Property="Margin" Value="32"/>
+						<Setter Property="Margin" Value="16"/>
 					</Style>
-				</Grid.Resources>
+				</StackPanel.Resources>
 
 				<Button
 					Grid.Row="0"
@@ -170,9 +146,10 @@
 					<Image Source="/Properties/DrawingFactoryPicture_006.png"/>
 				</Button>
 
-			</Grid>
+			</StackPanel>
 
-		</Grid>
-	</Viewbox>
+		</Viewbox>
+		
+	</Grid>
 
 </Window>

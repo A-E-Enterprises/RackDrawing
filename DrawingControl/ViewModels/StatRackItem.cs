@@ -180,6 +180,21 @@ namespace DrawingControl
 		}
 
 		//=============================================================================
+		private int m_Load = 0;
+		public int Load
+		{
+			get { return m_Load; }
+			set
+			{
+				if (value != m_Load)
+				{
+					m_Load = value;
+					NotifyPropertyChanged(() => Load);
+				}
+			}
+		}
+
+		//=============================================================================
 		public void Update_DisplayIndex()
 		{
 			NotifyPropertyChanged(() => DisplayIndex);

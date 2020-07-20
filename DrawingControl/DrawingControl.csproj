@@ -65,7 +65,6 @@
     <Compile Include="Controls\GeometryWrapper.cs" />
     <Compile Include="Controls\RackAdvancedDrawingControl.cs" />
     <Compile Include="Controls\SelectionRectangleVisual.cs" />
-    <Compile Include="Controls\SheetPreviewControl.cs" />
     <Compile Include="Controls\TieBeamGroupsVisual.cs" />
     <Compile Include="Controls\ToolTipVisual.cs" />
     <Compile Include="Controls\WatermarkVisual.cs" />
@@ -81,7 +80,6 @@
     <Compile Include="Geometry\GripPoint.cs" />
     <Compile Include="Geometry\Rack.cs" />
     <Compile Include="Geometry\SheetElevationGeometry.cs" />
-    <Compile Include="Geometry\SheetGeometry.cs" />
     <Compile Include="Geometry\Shutter.cs" />
     <Compile Include="Controls\PreviewBordersControl.cs" />
     <Compile Include="Geometry\TieBeam.cs" />
@@ -112,13 +110,13 @@
     <Compile Include="ViewModels\Roof.cs" />
     <Compile Include="ViewModels\StatPalletItem.cs" />
     <Compile Include="ViewModels\StatRackItem.cs" />
-    <Compile Include="ViewModels\WarehouseSheet.cs" />
     <Compile Include="WatermarkInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

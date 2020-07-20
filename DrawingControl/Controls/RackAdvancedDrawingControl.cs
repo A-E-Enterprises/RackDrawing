@@ -1090,7 +1090,7 @@ namespace DrawingControl
 					{
 						LevelEnd_GlobalPoint.Y -= LevelOffset_Y + _beamHeight;
 						// dont draw level shelf at the side view
-						//dc.DrawRectangle(LevelShelfFillBrush, m_LevelShelfBorderPen, new Rect(LevelStart_ScreenPoint, LevelEnd_ScreenPoint));
+						//dc.DrawRectangle(m_LevelShelfFillBrush, m_LevelShelfBorderPen, new Rect(LevelStart_ScreenPoint, LevelEnd_ScreenPoint));
 					}
 
 					// draw "Decking plate" at the side view if it has along length value.

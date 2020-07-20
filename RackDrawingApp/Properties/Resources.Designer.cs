@@ -183,9 +183,39 @@ namespace RackDrawingApp.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap PDF_RightColumnBottomPicture {
+            get {
+                object obj = ResourceManager.GetObject("PDF_RightColumnBottomPicture", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap PDF_RightColumnHeaderPicture {
+            get {
+                object obj = ResourceManager.GetObject("PDF_RightColumnHeaderPicture", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ShedRoof {
             get {
                 object obj = ResourceManager.GetObject("ShedRoof", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap StartupWindowBackground {
+            get {
+                object obj = ResourceManager.GetObject("StartupWindowBackground", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

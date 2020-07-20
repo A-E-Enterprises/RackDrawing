@@ -14,6 +14,7 @@ namespace DrawingControl
 		public static double END_AISLE_WIDTH_MIN_VALUE = 500;
 
 		public MHEConfiguration(
+			DrawingDocument document,
 			bool isEnabled,
 			string strType,
 			double pickingAisleWidth,
@@ -24,6 +25,7 @@ namespace DrawingControl
 			double overallHeightLowered
 			)
 		{
+			m_Document = document;
 			m_bIsEnabled = isEnabled;
 			m_Type = strType;
 			m_PickingAisleWidth = pickingAisleWidth;
@@ -37,6 +39,7 @@ namespace DrawingControl
 		{
 			if(mheConfig != null)
 			{
+				//this.m_Document = mheConfig.m_Document;
 				this.m_bIsEnabled = mheConfig.m_bIsEnabled;
 				this.m_Type = mheConfig.m_Type;
 				this.m_PickingAisleWidth = mheConfig.m_PickingAisleWidth;
@@ -52,6 +55,19 @@ namespace DrawingControl
 		#region Properties
 
 		//=============================================================================
+		/// <summary>
+		/// Document-owner.
+		/// Only one MHE configuration can be enabled, so need access to MHE config collection for disable other configurations.
+		/// DONT serialize\deserialize this field, otherwise it will be infinitive loop.
+		/// </summary>
+		private DrawingDocument m_Document = null;
+		public DrawingDocument Document
+		{
+			get { return m_Document; }
+			set { m_Document = value; }
+		}
+
+		//=============================================================================
 		// If TRUE then this MHEConfiguration is included in calculations and can drive
 		// aisle space min length\width, max beam height etc.
 		private bool m_bIsEnabled = false;
@@ -63,6 +79,25 @@ namespace DrawingControl
 				if (value != m_bIsEnabled)
 				{
 					m_bIsEnabled = value;
+
+					// only one MHE config can be enabled
+					if(m_bIsEnabled)
+					{
+						if(m_Document != null && m_Document.MHEConfigurationsColl != null)
+						{
+							foreach(MHEConfiguration mheConfig in m_Document.MHEConfigurationsColl)
+							{
+								if (mheConfig == null)
+									continue;
+								if (mheConfig == this)
+									continue;
+
+								if (mheConfig.IsEnabled)
+									mheConfig.IsEnabled = false;
+							}
+						}
+					}
+
 					NotifyPropertyChanged(() => IsEnabled);
 				}
 			}

@@ -65,7 +65,6 @@ namespace DrawingControl
 			//
 			MaxLength_Y = double.PositiveInfinity;
 			MaxLength_X = double.PositiveInfinity;
-			MaxLength_Z = 100000;
 
 			//
 			IsHorizontal = true;
@@ -80,91 +79,6 @@ namespace DrawingControl
 		}
 
 		#region Properties
-
-		//=============================================================================
-		/// <summary>
-		/// On which side of drawing area this shutter is placed.
-		/// </summary>
-		public eWallPosition WallPosition
-		{
-			get
-			{
-				if(this.Sheet != null)
-				{
-					if(this.IsHorizontal)
-					{
-						if (Utils.FLT(this.TopLeft_GlobalPoint.Y, 0.0))
-							return eWallPosition.eTop;
-						else if (Utils.FGE(this.TopLeft_GlobalPoint.Y, this.Sheet.Width))
-							return eWallPosition.eBot;
-					}
-					else
-					{
-						if (Utils.FLT(this.TopLeft_GlobalPoint.X, 0.0))
-							return eWallPosition.eLeft;
-						else if (Utils.FGE(this.TopLeft_GlobalPoint.X, this.Sheet.Length))
-							return eWallPosition.eRight;
-					}
-				}
-
-				return eWallPosition.eUndefined;
-			}
-		}
-
-		//=============================================================================
-		protected override bool _Is_HeightProperty_ReadOnly { get { return false; } }
-
-		//=============================================================================
-		/// <summary>
-		/// The maximum height value
-		/// </summary>
-		public override int MaxLength_Z
-		{
-			get
-			{
-				//
-				if (this.Sheet != null && this.Sheet.Document != null)
-				{
-					double maxHeightValue;
-					if (this.Sheet.Document.CalculateMaxHeightForGeometry(this, out maxHeightValue))
-					{
-						maxHeightValue -= Rack.ROOF_HEIGHT_GAP;
-						if (Utils.FGT(maxHeightValue, 0.0))
-							return Utils.GetWholeNumber(maxHeightValue);
-					}
-				}
-
-				return 12000;
-			}
-			set
-			{
-				base.MaxLength_Z = value;
-			}
-		}
-
-		//=============================================================================
-		/// <summary>
-		/// The minimum height value
-		/// </summary>
-		public override int MinLength_Z
-		{
-			get
-			{
-				// 
-				if (this.Sheet != null && this.Sheet.Document != null)
-				{
-					double minLenghtZ = this.Sheet.Document.OverallHeightLowered;
-					if(Utils.FGT(minLenghtZ, 0.0))
-						return Utils.GetWholeNumber(minLenghtZ);
-				}
-
-				return base.MinLength_Z;
-			}
-			set
-			{
-				base.MinLength_Z = value;
-			}
-		}
 
 		/// <summary>
 		///  If true then it is Swing Door shutter.
@@ -275,6 +189,12 @@ namespace DrawingControl
 				depthProp.IsReadOnly = true;
 
 			_UpdateProperties();
+		}
+
+		//=============================================================================
+		public override void OnMouseMove(Point mousePoint, double DrawingLength, double DrawingWidth)
+		{
+			SetGripPoint(BaseRectangleGeometry.GRIP_CENTER, mousePoint, DrawingLength, DrawingWidth);
 		}
 
 		//=============================================================================
@@ -492,7 +412,7 @@ namespace DrawingControl
 
 			IGeomDisplaySettings displaySettings = geomDisplaySettings;
 			if (displaySettings == null)
-				displaySettings = new DefaultGeomDisplaySettings();
+				displaySettings = DefaultGeomDisplaySettings.GetInstance();
 			if (displaySettings == null)
 				return;
 
@@ -673,10 +593,7 @@ namespace DrawingControl
 		{
 			strError = string.Empty;
 
-			if (PROP_DIMENSION_Z == strPropSysName)
-				return base.SetPropertyValue(strPropSysName, propValue, bWasChangedViaProperties, bChangeTheSameRectangles, bNotifySheet, out strError, bCheckLayout);
-
-			if (!m_bIsHorizontal)
+			if(!m_bIsHorizontal)
 			{
 				if (PROP_DIMENSION_X == strPropSysName)
 					strPropSysName = PROP_DIMENSION_Y;
@@ -685,7 +602,7 @@ namespace DrawingControl
 			GeometryState oldState = this._GetClonedState();
 
 			bool bRes = _SetPropertyValue(strPropSysName, propValue, bCheckLayout && this.IsInit, out strError);
-
+			
 			if(bRes)
 				_MarkStateChanged();
 

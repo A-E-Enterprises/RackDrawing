@@ -74,13 +74,13 @@ namespace RackDrawingApp
 		//=============================================================================
 		private void LongSpanButton_Click(object sender, RoutedEventArgs e)
 		{
-			StartOldApp();
+			//StartOldApp();
 		}
 
 		//=============================================================================
 		private void HeavyDutyShelvingButton_Click(object sender, RoutedEventArgs e)
 		{
-			StartOldApp();
+			//StartOldApp();
 		}
 
 		//=============================================================================

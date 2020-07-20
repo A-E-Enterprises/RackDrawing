@@ -22,6 +22,7 @@ namespace DrawingControl
 			return memberExpression.Member.Name;
 		}
 
+
 		//=============================================================================
 		public static bool ConvertToDouble(string str, out double result)
 		{

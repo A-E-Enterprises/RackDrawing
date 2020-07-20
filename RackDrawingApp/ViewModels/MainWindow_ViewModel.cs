@@ -47,7 +47,7 @@ namespace RackDrawingApp
 		/// <summary>
 		/// Application version, which is displayed in DEBUG mode only.
 		/// </summary>
-		public string ApplicationVersion { get { return "RackDrawingApp Master.433"; } }
+		public string ApplicationVersion { get { return "RackDrawingApp 1.407.040"; } }
 
 		//=============================================================================
 		public DialogHost DlgHost { get; set; }
@@ -118,7 +118,8 @@ namespace RackDrawingApp
 			new Command_NewDocument(),
 			new Command_Open(),
 			new Command_Save(),
-			new Command_SaveAs(),
+			//new Command_SaveAs(),
+			new Command_IncreaseRevisionSave(),
 			new Command_NewSheet(),
 #if DEBUG
 			new Command_ReadDataFromExcel(),
@@ -148,47 +149,9 @@ namespace RackDrawingApp
 			new Command_CustomerInfo(),
 			new Command_DocumentSettings(),
 			new Command_SheetRoof(),
-			new Command_SheetNotes(),
-			new Command_Sheet3DView()
+			new Command_SheetNotes()
 		};
 		public ObservableCollection<ICommand> Commands { get { return m_commands; } }
-
-		//=============================================================================
-		/// <summary>
-		/// If true then 3D view control will be displayed.
-		/// It contains rack or sheet 3D view.
-		/// Dont serialize it.
-		/// </summary>
-		private bool m_bDisplay3DViewControl = false;
-		public bool Display3DViewControl
-		{
-			get { return m_bDisplay3DViewControl; }
-			set
-			{
-				if (value != m_bDisplay3DViewControl)
-				{
-					m_bDisplay3DViewControl = value;
-					NotifyPropertyChanged(() => Display3DViewControl);
-				}
-			}
-		}
-		//=============================================================================
-		/// <summary>
-		/// Which content 3D viewport displays.
-		/// </summary>
-		private RackAppViewport3D.eViewportContent m_Viewport3DContent = RackAppViewport3D.eViewportContent.eSelectedRack;
-		public RackAppViewport3D.eViewportContent Viewport3DContent
-		{
-			get { return m_Viewport3DContent; }
-			set
-			{
-				if(value != m_Viewport3DContent)
-				{
-					m_Viewport3DContent = value;
-					NotifyPropertyChanged(() => Viewport3DContent);
-				}
-			}
-		}
 
 		#endregion
 
@@ -444,20 +407,17 @@ namespace RackDrawingApp
 
 								if (File.Exists(NewBOM_Temp_FilePath))
 								{
-									// MasterBOM excel file is not required.
-									// Skype message 06.01.2020
-									//
 									// STEP 3.
 									// Copy "Master BOM.xlsx".
 									try
 									{
-										//string masterBOMFilePath = strAppFolder + "\\Resources\\Master BOM.xlsx";
-										//if (File.Exists(masterBOMFilePath))
+										string masterBOMFilePath = strAppFolder + "\\Resources\\Master BOM.xlsx";
+										if (File.Exists(masterBOMFilePath))
 										{
-											//string strNewMasterBOMFilePath = strDefaultFolder + "\\Master BOM.xlsx";
-											//File.Copy(masterBOMFilePath, strNewMasterBOMFilePath, true);
+											string strNewMasterBOMFilePath = strDefaultFolder + "\\Master BOM.xlsx";
+											File.Copy(masterBOMFilePath, strNewMasterBOMFilePath, true);
 
-											//if (File.Exists(strNewMasterBOMFilePath))
+											if (File.Exists(strNewMasterBOMFilePath))
 											{
 												// STEP 4.
 												// Export txt file in the same folder.
@@ -485,11 +445,11 @@ namespace RackDrawingApp
 											}
 
 											// Delete copied "Master BOM.xlsx"
-											//try
-											//{
-											//	File.Delete(strNewMasterBOMFilePath);
-											//}
-											//catch { }
+											try
+											{
+												File.Delete(strNewMasterBOMFilePath);
+											}
+											catch { }
 										}
 									}
 									catch { }
@@ -661,28 +621,25 @@ namespace RackDrawingApp
 			//foreach (string s in assembly.GetManifestResourceNames())
 			//	strResourcesList.Add(s);
 
-			if (true)
+			using (Stream stream = assembly.GetManifestResourceStream(resourceName))
 			{
-				using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+				try
 				{
-					try
+					DrawingDocument.ClearErrors();
+
+					BinaryFormatter bf = new BinaryFormatter();
+					m_DocumentTemplate = (DrawingDocument)bf.Deserialize(stream);
+
+
+					// Use this template if no errors occurred while read template.
+					if(DrawingDocument._sDontSupportDocument
+						|| DrawingDocument._sNewVersion_StreamRead > 0
+						|| DrawingDocument._sStreamReadException > 0)
 					{
-						DrawingDocument.ClearErrors();
-
-						BinaryFormatter bf = new BinaryFormatter();
-						m_DocumentTemplate = (DrawingDocument)bf.Deserialize(stream);
-
-
-						// Use this template if no errors occurred while read template.
-						if(DrawingDocument._sDontSupportDocument
-							|| DrawingDocument._sNewVersion_StreamRead > 0
-							|| DrawingDocument._sStreamReadException > 0)
-						{
-							m_DocumentTemplate = null;
-						}
+						m_DocumentTemplate = null;
 					}
-					catch { }
 				}
+				catch { }
 			}
 
 			// STEP 2.
@@ -690,7 +647,7 @@ namespace RackDrawingApp
 			// Create document template using default constructor and read excel file.
 			if(m_DocumentTemplate == null)
 				m_DocumentTemplate = new DrawingDocument(this);
-
+			
 			// Set parameters.
 			m_DocumentTemplate.CustomerName = UserInfo.CustomerName;
 			m_DocumentTemplate.CustomerENQ = UserInfo.EnqNo;

@@ -137,7 +137,7 @@ namespace DrawingControl
 
 				NotifyPropertyChanged(() => Value);
 
-				// Sheet.OnPropertyChanged was called inside SetPropertyValue
+				// Sheet.OnPropertyChanged() was called inside SetPropertyValue()
 				//
 				//// notify Sheet for update all geometry
 				//if (m_owner != null && m_owner.Sheet != null)

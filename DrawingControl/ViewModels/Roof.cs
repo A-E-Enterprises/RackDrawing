@@ -46,7 +46,7 @@ namespace DrawingControl
 
 		//=============================================================================
 		// Returns max available height for the geometry based on it's position and roof type.
-		public abstract double CalculateMaxHeightForGeometry(BaseRectangleGeometry geom, Vector geometryAdditionalOffsetVector, double areaLength, double areaWidth);
+		public abstract double CalculateMaxHeightForGeometry(BaseRectangleGeometry geom);
 
 		//=============================================================================
 		// Returns max available height for the 2D point based on it's position and roof type.
@@ -145,7 +145,7 @@ namespace DrawingControl
 		#endregion
 
 		//=============================================================================
-		public override double CalculateMaxHeightForGeometry(BaseRectangleGeometry geom, Vector geometryAdditionalOffsetVector, double areaLength, double areaWidth)
+		public override double CalculateMaxHeightForGeometry(BaseRectangleGeometry geom)
 		{
 			// just return roof height becuase it is flat
 			return this.Height;
@@ -302,16 +302,19 @@ namespace DrawingControl
 		#endregion
 
 		//=============================================================================
-		public override double CalculateMaxHeightForGeometry(BaseRectangleGeometry geom, Vector geometryAdditionalOffsetVector, double areaLength, double areaWidth)
+		public override double CalculateMaxHeightForGeometry(BaseRectangleGeometry geom)
 		{
 			if (geom == null)
 				return MinHeight;
 
+			if (geom.Sheet == null)
+				return MinHeight;
+
 			// get height at the geometry points and return the lowest height
-			double topLeftHeight = GetHeightInPoint(geom.TopLeft_GlobalPoint + geometryAdditionalOffsetVector, areaLength, areaWidth);
-			double topRightHeight = GetHeightInPoint(geom.TopRight_GlobalPoint + geometryAdditionalOffsetVector, areaLength, areaWidth);
-			double botLeftHeight = GetHeightInPoint(geom.BottomLeft_GlobalPoint + geometryAdditionalOffsetVector, areaLength, areaWidth);
-			double botRightHeight = GetHeightInPoint(geom.BottomRight_GlobalPoint + geometryAdditionalOffsetVector, areaLength, areaWidth);
+			double topLeftHeight = GetHeightInPoint(geom.TopLeft_GlobalPoint, geom.Sheet.Length, geom.Sheet.Width);
+			double topRightHeight = GetHeightInPoint(geom.TopRight_GlobalPoint, geom.Sheet.Length, geom.Sheet.Width);
+			double botLeftHeight = GetHeightInPoint(geom.BottomLeft_GlobalPoint, geom.Sheet.Length, geom.Sheet.Width);
+			double botRightHeight = GetHeightInPoint(geom.BottomRight_GlobalPoint, geom.Sheet.Length, geom.Sheet.Width);
 
 			if (double.IsNaN(topLeftHeight) || double.IsInfinity(topLeftHeight)
 				|| double.IsNaN(topRightHeight) || double.IsInfinity(topRightHeight)
@@ -376,35 +379,6 @@ namespace DrawingControl
 		public override IClonable Clone()
 		{
 			return new GableRoof(this);
-		}
-
-		//=============================================================================
-		public bool GetRidgePoints(double drawingLengthX, double drawingLengthY, out Point ridgePnt01, out Point ridgePnt02)
-		{
-			ridgePnt01 = new Point(0.0, 0.0);
-			ridgePnt02 = new Point(0.0, 0.0);
-
-			if (Utils.FLT(drawingLengthX, 0.0) || Utils.FLT(drawingLengthY, 0.0))
-				return false;
-
-			if(this.HorizontalRidgeDirection)
-			{
-				ridgePnt01.X = 0.0;
-				ridgePnt01.Y = drawingLengthY / 2;
-
-				ridgePnt02.X = drawingLengthX;
-				ridgePnt02.Y = ridgePnt01.Y;
-			}
-			else
-			{
-				ridgePnt01.X = drawingLengthX / 2;
-				ridgePnt01.Y = 0.0;
-
-				ridgePnt02.X = ridgePnt01.X;
-				ridgePnt02.Y = drawingLengthY;
-			}
-
-			return true;
 		}
 
 		#region Serialization
@@ -559,16 +533,19 @@ namespace DrawingControl
 		#endregion
 
 		//=============================================================================
-		public override double CalculateMaxHeightForGeometry(BaseRectangleGeometry geom, Vector geometryAdditionalOffsetVector, double areaLength, double areaWidth)
+		public override double CalculateMaxHeightForGeometry(BaseRectangleGeometry geom)
 		{
 			if (geom == null)
 				return MinHeight;
 
+			if (geom.Sheet == null)
+				return MinHeight;
+
 			// get height at the geometry points and return the lowest height
-			double topLeftHeight = GetHeightInPoint(geom.TopLeft_GlobalPoint + geometryAdditionalOffsetVector, areaLength, areaWidth);
-			double topRightHeight = GetHeightInPoint(geom.TopRight_GlobalPoint + geometryAdditionalOffsetVector, areaLength, areaWidth);
-			double botLeftHeight = GetHeightInPoint(geom.BottomLeft_GlobalPoint + geometryAdditionalOffsetVector, areaLength, areaWidth);
-			double botRightHeight = GetHeightInPoint(geom.BottomRight_GlobalPoint + geometryAdditionalOffsetVector, areaLength, areaWidth);
+			double topLeftHeight = GetHeightInPoint(geom.TopLeft_GlobalPoint, geom.Sheet.Length, geom.Sheet.Width);
+			double topRightHeight = GetHeightInPoint(geom.TopRight_GlobalPoint, geom.Sheet.Length, geom.Sheet.Width);
+			double botLeftHeight = GetHeightInPoint(geom.BottomLeft_GlobalPoint, geom.Sheet.Length, geom.Sheet.Width);
+			double botRightHeight = GetHeightInPoint(geom.BottomRight_GlobalPoint, geom.Sheet.Length, geom.Sheet.Width);
 
 			if(double.IsNaN(topLeftHeight) || double.IsInfinity(topLeftHeight)
 				|| double.IsNaN(topRightHeight) || double.IsInfinity(topRightHeight)
@@ -589,6 +566,7 @@ namespace DrawingControl
 		{
 			return GetHeightInPoint(pnt, areaLength, areaWidth);
 		}
+
 
 		private double GetHeightInPoint(Point pnt, double drawingLengthX, double drawingLengthY)
 		{

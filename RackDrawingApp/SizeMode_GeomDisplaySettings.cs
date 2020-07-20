@@ -21,6 +21,7 @@ namespace RackDrawingApp
 		/// </summary>
 		public double FillBrushOpacity { get { return 0.3; } }
 
+		//=============================================================================
 		public bool DisplayText { get { return true; } }
 
 		public FontWeight TextWeight { get { return FontWeights.SemiBold; } }

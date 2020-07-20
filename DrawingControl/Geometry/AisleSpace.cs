@@ -106,6 +106,14 @@ namespace DrawingControl
 		protected override BaseRectangleGeometry CreateInstance() { return new AisleSpace(null); }
 
 		//=============================================================================
+		public override void OnMouseMove(Point mousePoint, double DrawingLength, double DrawingWidth)
+		{
+			base.OnMouseMove(mousePoint, DrawingLength, DrawingWidth);
+
+			OnSizeChanged();
+		}
+
+		//=============================================================================
 		public override bool SetGripPoint(int gripIndex, Point pnt, double DrawingLength, double DrawingWidth)
 		{
 			//

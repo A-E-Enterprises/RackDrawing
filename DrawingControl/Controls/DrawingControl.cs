@@ -1082,7 +1082,6 @@ namespace DrawingControl
 				if (_grip != null)
 				{
 					m_gripToMove = _grip;
-					_BeforeGripPointMove();
 					return;
 				}
 
@@ -1254,16 +1253,6 @@ namespace DrawingControl
 						if(rackGeometry != null)
 							rackGeometry.CheckRackHeight();
 
-						// If user moves SheetGeometry which is bound to DrawingSheet then
-						// need to check drawing sheet geometry. Probably max available height was changed.
-						SheetGeometry sheetGeometry = geom as SheetGeometry;
-						if (sheetGeometry != null && sheetGeometry.BoundSheet != null)
-						{
-							sheetGeometry.BoundSheet.CheckRackHeight(sheetGeometry.BoundSheet.Rectangles, true);
-							sheetGeometry.BoundSheet.CheckTieBeams();
-							sheetGeometry.BoundSheet.CheckBlocksShuttersHeight();
-						}
-
 						// Probably user moved copy-paste racks which was not initialized.
 						// Need add them to the rack unique size collection.
 						if (bAddRackUniqueSize && rackGeometry != null)
@@ -1428,7 +1417,7 @@ namespace DrawingControl
 		/// </summary>
 		/// <param name="availableSize"></param>
 		/// <returns></returns>
-		protected Size _SizeWithRatio(Size availableSize)
+		private Size _SizeWithRatio(Size availableSize)
 		{
 			double length = 1;
 			double width = 1;
@@ -2350,7 +2339,6 @@ namespace DrawingControl
 			}
 			m_grips.Clear();
 
-			_AfterGripPointMove();
 			m_gripToMove = null;
 		}
 
@@ -2510,30 +2498,7 @@ namespace DrawingControl
 			}
 		}
 
-		//=============================================================================
-		private void _BeforeGripPointMove()
-		{
-			if (m_gripToMove == null)
-				return;
 
-			SheetGeometry sheetGeom = m_gripToMove.Geometry as SheetGeometry;
-			if (sheetGeom == null)
-				return;
-
-			sheetGeom.BeforeGripPointMove(m_gripToMove.Index);
-		}
-		//=============================================================================
-		private void _AfterGripPointMove()
-		{
-			if (m_gripToMove == null)
-				return;
-
-			SheetGeometry sheetGeom = m_gripToMove.Geometry as SheetGeometry;
-			if (sheetGeom == null)
-				return;
-
-			sheetGeom.AfterGripPointMove(m_gripToMove.Index);
-		}
 
 		//=============================================================================
 		/// <summary>

@@ -266,14 +266,9 @@ namespace DrawingControl
 			m_BeamsList = RackLoadUtils.ReallyUsedBeamsList;
 
 			m_Sheets.Clear();
-			// add warehouse sheet
-			WarehouseSheet warehouseSheet = new WarehouseSheet(this);
-			m_Sheets.Add(warehouseSheet);
-			// add empty sheet
-			DrawingSheet drawingSheet = new DrawingSheet(this);
-			m_Sheets.Add(drawingSheet);
-			//
-			this._SetCurrentSheet(drawingSheet, false);
+			DrawingSheet newSheet = new DrawingSheet(this);
+			m_Sheets.Add(newSheet);
+			this._SetCurrentSheet(newSheet, false);
 
 			//
 			foreach (DrawingSheet sheet in m_Sheets)
@@ -377,17 +372,6 @@ namespace DrawingControl
 			set
 			{
 				_SetCurrentSheet(value, true);
-			}
-		}
-		//=============================================================================
-		public WarehouseSheet WarehouseSheet
-		{
-			get
-			{
-				if (m_Sheets != null)
-					return m_Sheets.FirstOrDefault(sheet => sheet != null && sheet is WarehouseSheet) as WarehouseSheet;
-
-				return null;
 			}
 		}
 
@@ -543,7 +527,10 @@ namespace DrawingControl
 		public bool ShowAdvancedProperties
 		{
 			get { return m_bShowAdvancedProperties; }
-			set { Set_ShowAdvancedProperties(value, true); }
+			set
+			{
+				Set_ShowAdvancedProperties(value, true);
+			}
 		}
 
 		//=============================================================================
@@ -664,6 +651,15 @@ namespace DrawingControl
 				}
 			}
 		}
+
+		//=============================================================================
+		/// <summary>
+		/// Revision of the document.
+		/// It is readonly number, which is displayed in CustomerInfo dialog.
+		/// User cant edit it, it is increased only through save the document with "Increase revision" button.
+		/// </summary>
+		private uint m_DocumentRevision = 1;
+		public uint DocumentRevision { get { return m_DocumentRevision; } }
 
 		//=============================================================================
 		/// <summary>
@@ -1065,27 +1061,13 @@ namespace DrawingControl
 
 		//=============================================================================
 		/// <summary>
-		/// Selected roof is defined by warehouse sheet.
-		/// </summary>
-		public Roof SelectedRoof
-		{
-			get
-			{
-				WarehouseSheet whSheet = this.WarehouseSheet;
-				if (whSheet != null)
-					return whSheet.SelectedRoof;
-
-				return null;
-			}
-		}
-
-		//=============================================================================
-		/// <summary>
 		/// Index of changed rack during the command.
 		/// If rack is changed then it receive this index and increase it.
 		/// It is used for rack index calculation during the command.
 		/// </summary>
 		public long m_RackChangeOrder = 0;
+
+
 
 		//=============================================================================
 		/// <summary>
@@ -1178,6 +1160,26 @@ namespace DrawingControl
 			if (m_States.Count == 0)
 				return;
 
+			// User select any geometry and moves it by grip point. While movins user changes camera scale and offset.
+			// User pushes "Esc" button, geometry move is canceled, but camera scale and offset are canceled too.
+			// Camera scale and offset are stored inside DrawingSheet. When SetTheLastState() executes they are restored to old values.
+			//
+			// Need to keep new values for camera scale and offset after SetTheLastState().
+			Guid oldSelectedSheetGuid = Guid.Empty;
+			DrawingSheet olsSelectedSheet = this.CurrentSheet;
+			bool is_UnitsPerCameraPixel_Init = false;
+			double unitsPerCameraPixel = 1.0;
+			Vector cameraOffset = new Vector(0.0, 0.0);
+			Vector cameraTemporaryOffset = new Vector(0.0, 0.0);
+			if(olsSelectedSheet != null)
+			{
+				oldSelectedSheetGuid = olsSelectedSheet.GUID;
+				is_UnitsPerCameraPixel_Init = olsSelectedSheet.Is_UnitsPerCameraPixel_Init;
+				unitsPerCameraPixel = olsSelectedSheet.UnitsPerCameraPixel;
+				cameraOffset = olsSelectedSheet.CameraOffset;
+				cameraTemporaryOffset = olsSelectedSheet.TemporaryCameraOffset;
+			}
+
 			DrawingDocument_State state = m_States[m_States.Count - 1];
 			if (state == null)
 				return;
@@ -1185,6 +1187,22 @@ namespace DrawingControl
 			m_bAddStateToHistory = false;
 			State = state;
 			m_bAddStateToHistory = true;
+
+			// If it the same sheet then need to restore camera settings
+			DrawingSheet newSelectedSheet = this.CurrentSheet;
+			if (newSelectedSheet != null && newSelectedSheet.GUID == oldSelectedSheetGuid)
+			{
+				newSelectedSheet.Is_UnitsPerCameraPixel_Init = is_UnitsPerCameraPixel_Init;
+				newSelectedSheet.UnitsPerCameraPixel = unitsPerCameraPixel;
+				newSelectedSheet.CameraOffset = cameraOffset;
+				newSelectedSheet.TemporaryCameraOffset = cameraTemporaryOffset;
+
+				// NotifyPropertyChanged() will not redraw DrawingControl, because sheet is the same.
+				// Need manually invalidate DrawingControl.
+				//NotifyPropertyChanged(() => CurrentSheet);
+				if (DrawingDocument._sDrawing != null)
+					DrawingDocument._sDrawing.InvalidateVisual();
+			}
 
 			m_CurrentStateIndex = m_States.IndexOf(state);
 			NotifyPropertyChanged(() => State);
@@ -1234,8 +1252,7 @@ namespace DrawingControl
 			ds.DeleteGeometry(geomForDeleteList, false, false);
 			// Remove sheet
 			m_Sheets.Remove(ds);
-			// hide current sheet
-			this._SetCurrentSheet(null, false);
+			m_CurrentSheetIndex = -1;
 			//
 			DrawingSheet currSheet = null;
 			if (iRemoveSheetIndex >= 0 && iRemoveSheetIndex < m_Sheets.Count)
@@ -1246,33 +1263,11 @@ namespace DrawingControl
 					currSheet = m_Sheets[0];
 			}
 			this._SetCurrentSheet(currSheet, false);
-
-			// Remove bound to sheet geometry at WarehouseSheet.
-			SheetGeometry sheetGeometry = ds.BoundSheetGeometry;
-			WarehouseSheet whSheet = this.WarehouseSheet;
-			if (whSheet != null && whSheet != ds && sheetGeometry != null)
-				whSheet.DeleteGeometry(new List<BaseRectangleGeometry>() { sheetGeometry }, false, true);
-		}
-
-		//=============================================================================
-		public DrawingSheet GetSheetByGUID(Guid sheetGUID)
-		{
-			if (Guid.Empty == sheetGUID)
-				return null;
-
-			if (m_Sheets == null)
-				return null;
-
-			return m_Sheets.FirstOrDefault(sheet => sheet != null && sheet.GUID == sheetGUID);
 		}
 
 
 		//=============================================================================
-		public bool Save()
-		{
-			return this.Save(string.Empty);
-		}
-		public bool Save(string strNewPath)
+		public bool Save(string strNewPath, bool bIncreaseDocumentRevision = false)
 		{
 			string strPath = strNewPath;
 			if (string.IsNullOrEmpty(strPath))
@@ -1306,6 +1301,10 @@ namespace DrawingControl
 			FileStream fs = new FileStream(Path, FileMode.OpenOrCreate);
 			if (fs == null)
 				return false;
+
+			// increase document revision
+			if(bIncreaseDocumentRevision)
+				++m_DocumentRevision;
 
 			BinaryFormatter bf = new BinaryFormatter();
 			bf.Serialize(fs, this);
@@ -1374,33 +1373,6 @@ namespace DrawingControl
 				fs.WriteLine("Layout_" + _sheet.Name);
 				// length and width
 				fs.WriteLine(_sheet.Length.ToString() + "," + _sheet.Width.ToString());
-
-				// If it is warehouse sheet then export all children geometry with "wh" prefix.
-				if(_sheet is WarehouseSheet)
-				{
-					if (_sheet.Rectangles != null)
-					{
-						foreach(BaseRectangleGeometry geom in _sheet.Rectangles)
-						{
-							if (geom == null)
-								continue;
-
-							fs.WriteLine(
-								"\"" + geom.Name + "\"wh"
-								+ ","
-								+ geom.TopLeft_GlobalPoint.X.ToString("0.")
-								+ ","
-								+ geom.TopLeft_GlobalPoint.Y.ToString("0.")
-								+ ","
-								+ geom.Length_X.ToString("0.")
-								+ ","
-								+ geom.Length_Y.ToString("0.")
-								);
-						}
-					}
-
-					continue;
-				}
 
 				// export racks
 				foreach(List<Rack> _RowOrColumn in _sheet.RacksGroups)
@@ -2002,6 +1974,8 @@ namespace DrawingControl
 		}
 
 
+
+
 		//=============================================================================
 		public int GetColumnUniqueSizeIndex(Column c)
 		{
@@ -2426,9 +2400,6 @@ namespace DrawingControl
 				if (sheet == null)
 					continue;
 
-				if (sheet is WarehouseSheet)
-					continue;
-
 				sheet.CheckRacksColumnSizeAndBracingType(true);
 
 				List<Rack> rackList = sheet.GetAllRacks();
@@ -2565,9 +2536,6 @@ namespace DrawingControl
 				if (sheet == null)
 					continue;
 
-				if (sheet is WarehouseSheet)
-					continue;
-
 				List<Rack> rackList = sheet.GetAllRacks();
 				if (rackList.Count == 0)
 					continue;
@@ -2653,9 +2621,6 @@ namespace DrawingControl
 				if (sheet == null)
 					continue;
 
-				if (sheet is WarehouseSheet)
-					continue;
-
 				// rack can be grouped only if they have the same depth
 				// need to check all groups - probably the first rack in the group is not M after match properties
 				List<Rack> deletedRacksList = new List<Rack>();
@@ -2669,7 +2634,6 @@ namespace DrawingControl
 					continue;
 
 				sheet.CheckAisleSpaces();
-				sheet.CheckBlocksShuttersHeight();
 			}
 
 			bool bAskUser = true;
@@ -2788,110 +2752,6 @@ namespace DrawingControl
 				await this.DisplayDialog.DisplayMessageDialog("Exception was occurred while reading data from LoadChart.xlsx. Dont save this document it is incorrect probably.\n\n" + strError);
 		}
 
-		//=============================================================================
-		/// <summary>
-		/// Serach Warehouse sheet and find SheetGeometry in that sheet, which bound to passed DrawingSheet.
-		/// </summary>
-		public SheetGeometry GetBoundSheetGeometry(DrawingSheet sheet)
-		{
-			if (sheet == null)
-				return null;
-
-			// Warehouse sheet cant be bound and used at another Warehouse sheet.
-			if (sheet is WarehouseSheet)
-				return null;
-
-			if (m_Sheets == null)
-				return null;
-
-			// Find warehouse sheet.
-			WarehouseSheet whSheet = m_Sheets.FirstOrDefault(s => s != null && s is WarehouseSheet) as WarehouseSheet;
-			if (whSheet == null)
-				return null;
-
-			if (whSheet.Rectangles == null)
-				return null;
-
-			foreach(BaseRectangleGeometry geom in whSheet.Rectangles)
-			{
-				if (geom == null)
-					continue;
-
-				SheetGeometry sheetGeom = geom as SheetGeometry;
-				if (sheetGeom == null)
-					continue;
-
-				if (sheetGeom.BoundSheetGUID == sheet.GUID)
-					return sheetGeom;
-			}
-
-			return null;
-		}
-
-		//=============================================================================
-		/// <summary>
-		/// Returns the max available height for geometry.
-		/// Geometry should be placed on the sheet, which is placed at Warehouse sheet.
-		/// </summary>
-		public bool CalculateMaxHeightForGeometry(BaseRectangleGeometry geometry, out double maxHeight)
-		{
-			maxHeight = 0.0;
-
-			Roof selectedRoof = this.SelectedRoof;
-			if (selectedRoof == null)
-				return false;
-
-			//
-			if (geometry == null)
-				return false;
-			//
-			DrawingSheet geometrySheet = geometry.Sheet;
-			if (geometrySheet == null)
-				return false;
-			if (geometrySheet is WarehouseSheet)
-				return false;
-			// Sheet should be placed at Warehouse sheet.
-			SheetGeometry boundSheetGeometry = geometrySheet.BoundSheetGeometry;
-			if (boundSheetGeometry == null)
-				return false;
-
-			WarehouseSheet whSheet = this.WarehouseSheet;
-			if (whSheet == null)
-				return false;
-
-			// STEP 1.
-			// Calculate geometry position at Warehouse sheet.
-			Vector offsetVec = new Vector(0.0, 0.0);
-			offsetVec.X = boundSheetGeometry.TopLeft_GlobalPoint.X;
-			offsetVec.Y = boundSheetGeometry.TopLeft_GlobalPoint.Y;
-
-			// STEP 2.
-			// Calculate max height.
-			maxHeight = selectedRoof.CalculateMaxHeightForGeometry(geometry, offsetVec, whSheet.Length, whSheet.Width);
-
-			return true;
-		}
-		//=============================================================================
-		/// <summary>
-		/// Calculates max available height for 2D point.
-		/// It depends on the roof.
-		/// </summary>
-		public bool CalculateMaxHeightForPoint(Point pnt, out double maxHeight)
-		{
-			maxHeight = 0.0;
-
-			Roof selectedRoof = this.SelectedRoof;
-			if (selectedRoof == null)
-				return false;
-
-			WarehouseSheet whSheet = this.WarehouseSheet;
-			if (whSheet == null)
-				return false;
-
-			maxHeight = selectedRoof.CalculateMaxHeightForPoint(pnt, whSheet.Length, whSheet.Width);
-
-			return true;
-		}
 
 		//=============================================================================
 		public virtual IClonable Clone()
@@ -2922,12 +2782,12 @@ namespace DrawingControl
 		// Initialize m_MHEConfigurationsList.
 		private void _InitMHEConfigurationsList()
 		{
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(true, "Forklift", 4200, 2000, 100, 1000, 5500, 2700));
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(false, "Stacker", 2700, 2000, 100, 1000, 5500, 2700));
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(false, "Articulated forklift", 2400, 3000, 500, 1000, 10600, 4800));
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(false, "Reach truck", 3200, 2000, 100, 1000, 9000, 3900));
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(false, "Pallet truck", 3000, 2800, 1800, 1000, 2500, 2000));
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(false, "Tow tractor", 2000, 1800, 850, 1500, 6200, 5300));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, true, "Forklift", 4200, 2000, 100, 1000, 5500, 2700));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Stacker", 2700, 2000, 100, 1000, 5500, 2700));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Articulated forklift", 2400, 3000, 500, 1000, 10600, 4800));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Reach truck", 3200, 2000, 100, 1000, 9000, 3900));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Pallet truck", 3000, 2800, 1800, 1000, 2500, 2000));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Tow tractor", 2000, 1800, 850, 1500, 6200, 5300));
 		}
 
 		//=============================================================================
@@ -3153,6 +3013,7 @@ namespace DrawingControl
 					if (mheConfig == null)
 						continue;
 
+					mheConfig.Document = this;
 					m_MHEConfigurationsColl.Add(mheConfig);
 				}
 			}
@@ -3170,7 +3031,6 @@ namespace DrawingControl
 				currSheet.Show(true);
 
 			NotifyPropertyChanged(() => CurrentSheet);
-			NotifyPropertyChanged(() => IsCloseSheetButtonEnabled);
 		}
 
 		//=============================================================================
@@ -3340,6 +3200,8 @@ namespace DrawingControl
 		#region Serialization
 
 		//=============================================================================
+		//
+		// 2.0
 		// 1.1 Add m_ColumnsUniqueSizes
 		// 1.2 Add m_RacksUniqueSizes
 		// 1.3 Add rack common properties
@@ -3381,19 +3243,19 @@ namespace DrawingControl
 		// 17.17 Add Currency, Rate and Discount.
 		// 17.18 Add Pallet.MAX_HEIGHT. Dont support old documents - they are not correct.
 		// 18.18 Change X\Y margin between rack and wall from 100 to 200. Dont support old documents.
-		// 18.19 RESERVED IN RackDrawingApp_01.407 BRANCH. Add m_DocumentRevision.
+		// 18.19 Add m_DocumentRevision.
 		// 18.20 Column geometry is reworked and it can be rotated in this version. So, increase minor number for display warning message if user open new drawing in prev. version app.
 		// 18.21 Add "Document_BRANCH"
-		// 18.22 Add WarehouseSheet
-		// 20.22 Only WarehouseSheet can have a roof, DrawingSheet cant. Dont support old document.
-		// 21.22 Synchronize stream data with RackDrawingApp_01.407 branch. Dont support old documents, they have incorrect major and minor numbers.
+		// 18.22 (RESERVED in RackDrawingApp_Master BRANCH) Add WarehouseSheet
+		// 20.22 (RESERVED in RackDrawingApp_Master BRANCH) Only WarehouseSheet can have a roof, DrawingSheet cant. Dont support old document.
+		// 21.22 (RESERVED in RackDrawingApp_Master BRANCH) Synchronize stream data with RackDrawingApp_01.407 branch. Dont support old documents, they have incorrect major and minor numbers.
 		protected static string _sDocument_strMajor = "Document_MAJOR";
-		protected static int _sDocument_MAJOR = 21;
+		protected static int _sDocument_MAJOR = 18;
 		protected static string _sDocument_strMinor = "Document_MINOR";
-		protected static int _sDocument_MINOR = 22;
+		protected static int _sDocument_MINOR = 21;
 		protected static string _sDocument_strBranch = "Document_BRANCH";
-		// 0 - RackDrawingApp_Master(this code). Development branch.
-		// 1 - RackDrawingApp_01.407. Release 01 branch, it is based on RackDrawingApp_Master.407 build.
+		// 0 - RackDrawingApp_Master. Development branch.
+		// 1 - RackDrawingApp_01.407(this code). Release 01 branch, it is based on RackDrawingApp_Master.407 build.
 		protected static int _sDocument_BRANCH_Master = 0;
 		protected static int _sDocument_BRANCH_Release_01 = 1;
 		//=============================================================================
@@ -3418,13 +3280,17 @@ namespace DrawingControl
 				}
 				catch { }
 			}
+			// Documents in this branch before 18.21 document version doesnt have "Document_BRANCH" parameter.
+			// But we need to support them, so lets think that all documents before 18.21 are _sDocument_BRANCH_Release_01.
+			else if (iMajor <= 18 && iMinor <= 20)
+				iBranch = _sDocument_BRANCH_Release_01;
 
-			// This branch(Master) should support all other branches.
-			//if (_sDocument_BRANCH_Master != iBranch)
-			//{
-			//	DrawingDocument._sDontSupportDocument = true;
-			//	return;
-			//}
+			// dont support other brances
+			if (_sDocument_BRANCH_Release_01 != iBranch)
+			{
+				DrawingDocument._sDontSupportDocument = true;
+				return;
+			}
 
 			if (iMajor > _sDocument_MAJOR)
 				++DrawingDocument._sNewVersion_StreamRead;
@@ -3432,7 +3298,7 @@ namespace DrawingControl
 				++DrawingDocument._sNewVersion_StreamRead;
 
 			// dont support old docs, read comment above
-			if (iMajor < 21)
+			if (iMajor < 18 || iMinor < 18)
 			{
 				DrawingDocument._sDontSupportDocument = true;
 				return;
@@ -3556,11 +3422,10 @@ namespace DrawingControl
 						m_Discount = (double)info.GetValue("Discount", typeof(double));
 					}
 
-					// _sDocument_BRANCH = _sDocument_BRANCH_Release_01
-					//if (iMajor >= 18 && iMinor >= 19)
-					//	m_DocumentRevision = (uint)info.GetValue("DocumentRevision", typeof(uint));
-					//else
-					//	m_DocumentRevision = 1;
+					if (iMajor >= 18 && iMinor >= 19)
+						m_DocumentRevision = (uint)info.GetValue("DocumentRevision", typeof(uint));
+					else
+						m_DocumentRevision = 1;
 				}
 				catch
 				{
@@ -3576,8 +3441,8 @@ namespace DrawingControl
 			//
 			info.AddValue(_sDocument_strMajor, _sDocument_MAJOR);
 			info.AddValue(_sDocument_strMinor, _sDocument_MINOR);
-			// 18.21 Put "0", it is master branch for development.
-			info.AddValue(_sDocument_strBranch, _sDocument_BRANCH_Master);
+			// 18.21 Put "1", it is release 01 branch
+			info.AddValue(_sDocument_strBranch, _sDocument_BRANCH_Release_01);
 
 			// 
 			List<DrawingSheet> sheets = new List<DrawingSheet>();
@@ -3653,9 +3518,8 @@ namespace DrawingControl
 			info.AddValue("Rate", m_Rate);
 			info.AddValue("Discount", m_Discount);
 
-			// _sDocument_BRANCH_Release_01
-			//// 18.19
-			//info.AddValue("DocumentRevision", m_DocumentRevision);
+			// 18.19
+			info.AddValue("DocumentRevision", m_DocumentRevision);
 		}
 		//=============================================================================
 		public virtual void OnDeserialization(object sender)
@@ -3670,32 +3534,38 @@ namespace DrawingControl
 			m_Sheets.Clear();
 			if(m_DeserializedSheets != null)
 			{
-				foreach (DrawingSheet _sheet in m_DeserializedSheets)
+				foreach (DrawingSheet sheet in m_DeserializedSheets)
 				{
-					if (_sheet == null)
+					if (sheet == null)
 						continue;
 
-					_sheet.Document = this;
-					_sheet.OnDeserialization(sender);
-					m_Sheets.Add(_sheet);
+					sheet.Document = this;
+					sheet.OnDeserialization(sender);
+					m_Sheets.Add(sheet);
 				}
 			}
 
-			// Starts from 17.17 all DrawingDocuments should have single WarehouseSheet.
-			bool bAddWarehouseSheet = true;
-			foreach(DrawingSheet sheet in m_Sheets)
+			// Restore MHEConfiguration.Document property.
+			// Also, only one MHE config can be enabled.
+			if(m_MHEConfigurationsColl != null)
 			{
-				if (sheet == null)
-					continue;
-
-				if(sheet is WarehouseSheet)
+				MHEConfiguration enabledMHEConfig = null;
+				foreach(MHEConfiguration mheConfig in m_MHEConfigurationsColl)
 				{
-					bAddWarehouseSheet = false;
-					break;
+					if (mheConfig == null)
+						continue;
+
+					mheConfig.Document = this;
+
+					if (mheConfig.IsEnabled)
+					{
+						if (enabledMHEConfig == null)
+							enabledMHEConfig = mheConfig;
+						else
+							mheConfig.IsEnabled = false;
+					}
 				}
 			}
-			if (bAddWarehouseSheet)
-				m_Sheets.Insert(0, new WarehouseSheet(this));
 
 			//
 			if (m_Sheets.Count > 0 && m_CurrentSheetIndex < 0)

@@ -49,37 +49,6 @@ namespace DrawingControl
 
 		#region Properties
 
-		//=============================================================================
-		protected override bool _Is_HeightProperty_ReadOnly { get { return false; } }
-
-		//=============================================================================
-		/// <summary>
-		/// The maximum height value
-		/// </summary>
-		public override int MaxLength_Z
-		{
-			get
-			{
-				//
-				if (this.Sheet != null && this.Sheet.Document != null)
-				{
-					double maxHeightValue;
-					if (this.Sheet.Document.CalculateMaxHeightForGeometry(this, out maxHeightValue))
-					{
-						maxHeightValue -= Rack.ROOF_HEIGHT_GAP;
-						if (Utils.FGT(maxHeightValue, 0.0))
-							return Utils.GetWholeNumber(maxHeightValue);
-					}
-				}
-
-				return 12000;
-			}
-			set
-			{
-				base.MaxLength_Z = value;
-			}
-		}
-
 		#endregion
 
 		#region Functions
@@ -108,6 +77,14 @@ namespace DrawingControl
 					m_Properties.Add(new GeometryProperty(this, BaseRectangleGeometry.PROP_NAME, false, "Geometry"));
 			}
 			catch { }
+		}
+
+		//=============================================================================
+		public override void OnMouseMove(Point mousePoint, double DrawingLength, double DrawingWidth)
+		{
+			base.OnMouseMove(mousePoint, DrawingLength, DrawingWidth);
+
+			_OnSizeChanged();
 		}
 
 		//=============================================================================

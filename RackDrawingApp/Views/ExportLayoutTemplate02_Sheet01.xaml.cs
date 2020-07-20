@@ -24,6 +24,8 @@ namespace RackDrawingApp
 			this.DataContext = m_VM;
 		}
 
+		#region Properties
+
 		//=============================================================================
 		private ExportLayoutTemplateVM m_VM = null;
 
@@ -70,5 +72,98 @@ namespace RackDrawingApp
 			if (m_WatermarkVisual != null && m_WatermarkImage != null)
 				m_WatermarkVisual.Draw(m_WatermarkImage);
 		}
+
+		//=============================================================================
+		/// <summary>
+		/// Height of rack statistics block height.
+		/// It is used for calculate how many blocks can be placed at the PDF sheet.
+		/// </summary>
+		public double RackStatBlockHeight
+		{
+			get
+			{
+				if (RackStatGrid != null)
+					return RackStatGrid.ActualHeight + RackStatGrid.Margin.Top + RackStatGrid.Margin.Bottom;
+
+				return 0;
+			}
+		}
+		//=============================================================================
+		/// <summary>
+		/// Height of pallete statistics block height.
+		/// It is used for calculate how many blocks can be placed at the PDF sheet.
+		/// </summary>
+		public double PalleteStatBlockHeight
+		{
+			get
+			{
+				if (PalleteStatGrid != null)
+					return PalleteStatGrid.ActualHeight + PalleteStatGrid.Margin.Top + PalleteStatGrid.Margin.Bottom;
+
+				return 0;
+			}
+		}
+		//=============================================================================
+		/// <summary>
+		/// Height of MHE details block height.
+		/// It is used for calculate how many blocks can be placed at the PDF sheet.
+		/// </summary>
+		public double MHEDetailsBlockHeight
+		{
+			get
+			{
+				if (MHEDetailsGrid != null)
+					return MHEDetailsGrid.ActualHeight + MHEDetailsGrid.Margin.Top + MHEDetailsGrid.Margin.Bottom;
+
+				return 0;
+			}
+		}
+		//=============================================================================
+		/// <summary>
+		/// Height of "Important notes on flooring" block height.
+		/// It is used for calculate how many blocks can be placed at the PDF sheet.
+		/// </summary>
+		public double ImportantNotesOnFlooringBlockHeight
+		{
+			get
+			{
+				if (ImportantNotesOnFlooringGrid != null)
+					return ImportantNotesOnFlooringGrid.ActualHeight + ImportantNotesOnFlooringGrid.Margin.Top + ImportantNotesOnFlooringGrid.Margin.Bottom;
+
+				return 0;
+			}
+		}
+		//=============================================================================
+		/// <summary>
+		/// Height of notes block height.
+		/// It is used for calculate how many blocks can be placed at the PDF sheet.
+		/// </summary>
+		public double NotesBlockHeight
+		{
+			get
+			{
+				if (NotesGrid != null)
+					return NotesGrid.ActualHeight + NotesGrid.Margin.Top + NotesGrid.Margin.Bottom;
+
+				return 0;
+			}
+		}
+		//=============================================================================
+		/// <summary>
+		/// Height of block, which can contains rack\pallete statistics, notes, mhe details.
+		/// It is used for calculate how many blocks can be placed at the PDF sheet.
+		/// </summary>
+		public double DynamicFillBlockHeight
+		{
+			get
+			{
+				if (DynamicFillGrid != null)
+					return DynamicFillGrid.ActualHeight;
+
+				return 0;
+			}
+		}
+
+		#endregion
 	}
 }

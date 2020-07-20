@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Windows;
 
 namespace DrawingControl
@@ -89,6 +90,20 @@ namespace DrawingControl
 			catch { }
 
 			return strDefDir;
+		}
+
+		//=============================================================================
+		public static string BuildDefaultFileName(string strEnqNo, uint documentRevision)
+		{
+			StringBuilder sb = new StringBuilder();
+			if (!string.IsNullOrEmpty(strEnqNo))
+			{
+				sb.Append(strEnqNo);
+				sb.Append("_");
+			}
+			sb.Append(documentRevision.ToString("000"));
+
+			return sb.ToString();
 		}
 
 		//=============================================================================

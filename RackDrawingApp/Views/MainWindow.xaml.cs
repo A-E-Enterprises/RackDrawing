@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -377,31 +376,6 @@ namespace RackDrawingApp
 		}
 
 		//=============================================================================
-		private async void PlaceSheetButton_Click(object sender, RoutedEventArgs e)
-		{
-			//
-			WarehouseSheet warehouseSheet = _Get_CurrentSheet() as WarehouseSheet;
-			if (warehouseSheet == null)
-				return;
-			if (warehouseSheet.Document == null)
-				return;
-
-			PlaceSheetDialogVM dialogVM = new PlaceSheetDialogVM(warehouseSheet.Document);
-			PlaceSheetDialog psDialog = new PlaceSheetDialog(dialogVM);
-
-			// true - OK
-			// false - CANCEL
-			var result = await DialogHost.Show(psDialog);
-			if (result is bool && (bool)result)
-			{
-				if (dialogVM.SelectedSheetPreview == null)
-					return;
-
-				warehouseSheet.CreateSheetGeometry(dialogVM.SelectedSheetPreview.Sheet);
-			}
-		}
-
-		//=============================================================================
 		private void TextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
 		{
 			TextBox tb = sender as TextBox;
@@ -632,97 +606,6 @@ namespace RackDrawingApp
 			{
 				selectedRack.Accessories = vm.Accessories;
 			}
-		}
-
-		//=============================================================================
-		private void GoToBoundSheetButton_Click(object sender, RoutedEventArgs e)
-		{
-			Button btn = sender as Button;
-			if (btn == null)
-				return;
-
-			MainWindow_ViewModel mainVM = btn.DataContext as MainWindow_ViewModel;
-			if (mainVM == null)
-				return;
-
-			DrawingDocument curDoc = mainVM.CurrentDocument;
-			if (curDoc == null)
-				return;
-
-			WarehouseSheet curSheet = curDoc.CurrentSheet as WarehouseSheet;
-			if (curSheet == null || curSheet.SingleSelectedGeometry == null)
-				return;
-
-			SheetGeometry sheetGeometry = curSheet.SingleSelectedGeometry as SheetGeometry;
-			if (sheetGeometry == null)
-				return;
-			if (sheetGeometry.BoundSheet == null)
-				return;
-
-			curDoc.CurrentSheet = sheetGeometry.BoundSheet;
-		}
-
-		//=============================================================================
-		private void CreateSheetButton_Click(object sender, RoutedEventArgs e)
-		{
-			Button btn = sender as Button;
-			if (btn == null)
-				return;
-
-			MainWindow_ViewModel mainVM = btn.DataContext as MainWindow_ViewModel;
-			if (mainVM == null)
-				return;
-
-			DrawingDocument curDoc = mainVM.CurrentDocument;
-			if (curDoc == null)
-				return;
-
-			WarehouseSheet curSheet = curDoc.CurrentSheet as WarehouseSheet;
-			if (curSheet == null || curSheet.SingleSelectedGeometry == null)
-				return;
-
-			SheetGeometry sheetGeometry = curSheet.SingleSelectedGeometry as SheetGeometry;
-			if (sheetGeometry == null)
-				return;
-			if (sheetGeometry.BoundSheet != null)
-				return;
-
-			DrawingSheet newSheet = new DrawingSheet(curDoc);
-			if(newSheet != null)
-			{
-				newSheet.Set_Length((UInt32)Utils.GetWholeNumber(sheetGeometry.Length_X), false, false);
-				newSheet.Set_Width((UInt32)Utils.GetWholeNumber(sheetGeometry.Length_Y), false, false);
-				curDoc.AddSheet(newSheet, false);
-				sheetGeometry.BoundSheet = newSheet;
-				curDoc.MarkStateChanged();
-			}
-		}
-
-		//=============================================================================
-		private void Rack3DViewToggleButton_Click(object sender, RoutedEventArgs e)
-		{
-			ToggleButton tb = sender as ToggleButton;
-			if (tb == null)
-				return;
-			if (!(bool)tb.IsChecked)
-				return;
-
-			if (m_VM == null)
-				return;
-
-			m_VM.Viewport3DContent = RackAppViewport3D.eViewportContent.eSelectedRack;
-		}
-
-		//=============================================================================
-		private void CloseSheet3DViewButton_Click(object sender, RoutedEventArgs e)
-		{
-			if (m_VM == null)
-				return;
-
-			m_VM.Display3DViewControl = false;
-
-			if (m_VM.CurrentDocument != null)
-				m_VM.CurrentDocument.IsInCommand = false;
 		}
 	}
 }

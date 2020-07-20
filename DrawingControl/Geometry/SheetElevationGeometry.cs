@@ -137,7 +137,7 @@ namespace DrawingControl
 
 			IGeomDisplaySettings displaySettings = geomDisplaySettings;
 			if (displaySettings == null)
-				displaySettings = new DefaultGeomDisplaySettings();
+				displaySettings = DefaultGeomDisplaySettings.GetInstance();
 			if (displaySettings == null)
 				return;
 

@@ -4,12 +4,9 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-	xmlns:sys="clr-namespace:System;assembly=mscorlib" 
 	xmlns:local="clr-namespace:RackDrawingApp"
 	
 	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-	
-	TextElement.FontSize="48"
 	
 	Width="4200"
 	Height="2970"
@@ -20,36 +17,21 @@
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="CommonResources.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
-
-			<Style x:Key="DataGrid_TextBlock_Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-				<Setter Property="VerticalAlignment" Value="Center"/>
-				<Setter Property="Margin" Value="4, 1, 4, 1"/>
-			</Style>
-
-			<Style x:Key="InfoValueTextBlock" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-				<Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"/>
-			</Style>
-
-			<Thickness x:Key="StampBorderThickness">1</Thickness>
-			<SolidColorBrush x:Key="BorderBrushKey" Color="DarkGray"/>
-			<!--
-			<Thickness x:Key="BorderCornerRadiusValue">4</Thickness>
-			-->
-
 		</ResourceDictionary>
 	</UserControl.Resources>
 
 	<Border
-		BorderThickness="4"
-		BorderBrush="{StaticResource BorderBrushKey}"
-		Margin="120, 60, 180, 60"
+		TextElement.FontSize="{StaticResource PDF_FontSize}"
+		BorderThickness="{StaticResource PDF_BorderThickness}"
+		BorderBrush="{StaticResource PDF_BorderBrushKey}"
+		Margin="{StaticResource PDF_BorderMargin}"
 		>
 
 		<Grid>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="{StaticResource VerticalGutter_x3}"/>
-				<ColumnDefinition Width="Auto" MinWidth="500" MaxWidth="1250"/>
+				<ColumnDefinition Width="770"/>
 			</Grid.ColumnDefinitions>
 
 			<!--
@@ -64,8 +46,6 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="{StaticResource HorizontalGutter}"/>
 					<RowDefinition Height="*"/>
-					<RowDefinition Height="{StaticResource HorizontalGutter}"/>
-					<RowDefinition Height="Auto"/>
 				</Grid.RowDefinitions>
 
 				<!--
@@ -75,6 +55,7 @@
 				<TextBlock
 					Grid.Row="0"
 					
+					FontSize="{StaticResource PDF_FontSize}"
 					Text="{Binding ImageHeaderText, Mode=OneWay}"
 					/>
 				
@@ -101,106 +82,140 @@
 						/>
 				</Viewbox>
 
-				<!--
-				ROW 3
-				HORIZONTAL GUTTER
-				-->
+			</Grid>
+			
+			<!--
+			COLUMN 1
+			VERTICAL GUTTER
+			-->
+			<Border
+				Grid.Column="1"
 				
+				VerticalAlignment="Stretch"
+				HorizontalAlignment="Right"
+				
+				BorderThickness="{StaticResource PDF_SplitterBorderThickness}"
+				BorderBrush="{StaticResource PDF_BorderBrushKey}"
+				/>
+			
+			<!--
+			COLUMN 2
+			rack and pallet statistics, mhe config, notes, accessories, stamp, etc
+			-->
+			<Grid
+				x:Name="RightColumnGrid"
+				Grid.Column="2"
+				VerticalAlignment="Stretch"
+				>
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="480"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="Auto" MinHeight="360"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+
 				<!--
-				ROW 4
-				RACKS and PALLETS statistics
+				row 0
+				header picture
+				-->
+				<Viewbox
+					Grid.Row="0"
+					
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+					
+					Stretch="Uniform"
+					>
+					<Image Source="/DrawingFactoryApp;component/Properties/PDF_RightColumnHeaderPicture.png"/>
+				</Viewbox>
+
+				<!--
+				row 1
+				rack and pallet statistics, mhe config, notes etc
 				-->
 				<Grid
-					Grid.Row="4"
+					x:Name="DynamicFillGrid"
+					Grid.Row="1"
 					>
-					<Grid.Style>
-						<Style TargetType="{x:Type Grid}">
-							<Setter Property="Visibility" Value="Visible"/>
-							<Style.Triggers>
-								<DataTrigger Binding="{Binding DisplayStatistics}" Value="False">
-									<Setter Property="Visibility" Value="Collapsed"/>
-								</DataTrigger>
-							</Style.Triggers>
-						</Style>
-					</Grid.Style>
 
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*"/>
-						<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
-						<ColumnDefinition Width="*"/>
-					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
 
 					<!--
-					COLUMN 0
-					racks statistics
+					row 0
+					rack and pallet statistics, mhe config, etc
 					-->
 					<Grid
-						Grid.Column="0"
-						HorizontalAlignment="Left"
+						Grid.Row="0"
 						>
-						<Grid.Style>
-							<Style TargetType="{x:Type Grid}">
-								<Setter Property="Visibility" Value="Visible"/>
-								<Style.Triggers>
-									<DataTrigger Binding="{Binding RackStatisticsEmpty}" Value="True">
-										<Setter Property="Visibility" Value="Collapsed"/>
-									</DataTrigger>
-								</Style.Triggers>
-							</Style>
-						</Grid.Style>
-
 						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
 							<RowDefinition Height="Auto"/>
 							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
 
-						<TextBlock
+						<!--
+						row 0
+						Rack statistics
+						-->
+						<Grid
+							x:Name="RackStatGrid"
 							Grid.Row="0"
-							Text="Rack Statistics:"
-							/>
-
-						<DataGrid
-							Grid.Row="1"
-							
-							materialDesign:DataGridAssist.CellPadding="4 2 2 2"
-							materialDesign:DataGridAssist.ColumnHeaderPadding="4 2 2 2"
-							FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExportLayoutTemplate02_Sheet01}}}"
-							
-							Style="{StaticResource PDFExportDataGrid}"
-							
-							ItemsSource="{Binding RacksStatisticsView}"
-							AutoGenerateColumns="False"
-							
-							HorizontalAlignment="Stretch"
-							VerticalAlignment="Stretch"
-							
-							Background="Transparent"
 							>
-
-							<DataGrid.RowStyle>
-								<Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource {x:Type DataGridRow}}">
-									<Setter Property="Foreground">
-										<Setter.Value>
-											<SolidColorBrush Color="{Binding BackgroundColor, Mode=OneWay}"/>
-										</Setter.Value>
-									</Setter>
+							<Grid.Style>
+								<Style TargetType="{x:Type Grid}">
+									<Setter Property="Visibility" Value="Collapsed"/>
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding DisplayRackStatistics}" Value="True">
+											<Setter Property="Visibility" Value="Visible"/>
+										</DataTrigger>
+									</Style.Triggers>
 								</Style>
-							</DataGrid.RowStyle>
+							</Grid.Style>
+							
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+							</Grid.RowDefinitions>
 
-							<DataGrid.Columns>
-								<!--INDEX-->
-								<DataGridTextColumn
-									Binding="{Binding DisplayIndex}"
-									Header=" #  "
-									IsReadOnly="True"
-									ElementStyle="{StaticResource DataGrid_TextBlock_Style}"
+							<Border
+								Grid.Row="0"
+								BorderThickness="{StaticResource PDF_StatisticHeaderBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								>
+								<TextBlock
+									Text="Rack Statistics:"
+									VerticalAlignment="Center"
+									HorizontalAlignment="Center"
 									/>
+							</Border>
 
-								<!--TYPE-->
-								<DataGridTemplateColumn
-									Header="Type  "
-									IsReadOnly="True">
-									<DataGridTemplateColumn.CellTemplate>
+							<DataGrid
+								Grid.Row="1"
+								
+								Style="{StaticResource PDFExportDataGrid}"
+								ItemsSource="{Binding RacksStatisticsView}"
+								>
+
+								<DataGrid.Columns>
+									<!--INDEX-->
+									<DataGridTextColumn
+										Header="Sr.No."
+										Width="110"
+										Binding="{Binding DisplayIndex}"
+										ElementStyle="{StaticResource PDF_DataGrid_TextBlock_Style}"
+										/>
+
+									<!--TYPE-->
+									<DataGridTemplateColumn
+										Header="Type"
+										Width="110"
+										>
+										<DataGridTemplateColumn.CellTemplate>
 										<DataTemplate>
 											<Grid>
 												<Grid.RowDefinitions>
@@ -211,44 +226,26 @@
 												<TextBlock
 													Grid.Row="0"
 													Text="{Binding Name_M}"
-													Style="{StaticResource DataGrid_TextBlock_Style}"
+													Style="{StaticResource PDF_DataGrid_TextBlock_Style}"
 													/>
 
 												<TextBlock
 													Grid.Row="1"
 													Text="{Binding Name_A}"
-													Style="{StaticResource DataGrid_TextBlock_Style}"
+													Style="{StaticResource PDF_DataGrid_TextBlock_Style}"
 													/>
 
 											</Grid>
 										</DataTemplate>
 									</DataGridTemplateColumn.CellTemplate>
-								</DataGridTemplateColumn>
+									</DataGridTemplateColumn>
 
-								<!--Length-->
-								<DataGridTemplateColumn
-									IsReadOnly="True">
-									<DataGridTemplateColumn.Header>
-										<Grid>
-											<Grid.RowDefinitions>
-												<RowDefinition Height="Auto"/>
-												<RowDefinition Height="Auto"/>
-											</Grid.RowDefinitions>
-											<TextBlock
-												Grid.Row="0"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="Length"
-												/>
-											<TextBlock
-												Grid.Row="1"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="(mm)"
-												/>
-										</Grid>
-									</DataGridTemplateColumn.Header>
-									<DataGridTemplateColumn.CellTemplate>
+									<!--Length-->
+									<DataGridTemplateColumn
+										Header="Length"
+										Width="110"
+										>
+										<DataGridTemplateColumn.CellTemplate>
 										<DataTemplate>
 											<Grid>
 												<Grid.RowDefinitions>
@@ -259,129 +256,581 @@
 												<TextBlock
 													Grid.Row="0"
 													Text="{Binding Length_M}"
-													Style="{StaticResource DataGrid_TextBlock_Style}"
+													Style="{StaticResource PDF_DataGrid_TextBlock_Style}"
 													/>
 
 												<TextBlock
 													Grid.Row="1"
 													Text="{Binding Length_A}"
-													Style="{StaticResource DataGrid_TextBlock_Style}"
+													Style="{StaticResource PDF_DataGrid_TextBlock_Style}"
 													/>
 
 											</Grid>
 										</DataTemplate>
 									</DataGridTemplateColumn.CellTemplate>
-								</DataGridTemplateColumn>
+									</DataGridTemplateColumn>
 
-								<!--Width-->
-								<DataGridTextColumn
-									Binding="{Binding Width}"
-									IsReadOnly="True"
-									ElementStyle="{StaticResource DataGrid_TextBlock_Style}"
-									>
-									<DataGridTextColumn.Header>
-										<Grid>
-											<Grid.RowDefinitions>
-												<RowDefinition Height="Auto"/>
-												<RowDefinition Height="Auto"/>
-											</Grid.RowDefinitions>
-											<TextBlock
-												Grid.Row="0"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="Depth"
-												/>
-											<TextBlock
-												Grid.Row="1"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="(mm)"
-												/>
-										</Grid>
-									</DataGridTextColumn.Header>
-								</DataGridTextColumn>
+									<!--Width-->
+									<DataGridTextColumn
+										Header="Depth"
+										Width="110"
+										Binding="{Binding Width}"
+										ElementStyle="{StaticResource PDF_DataGrid_TextBlock_Style}"
+										/>
 
-								<!--Height-->
-								<DataGridTextColumn
-									Binding="{Binding Height}"
-									IsReadOnly="True"
-									ElementStyle="{StaticResource DataGrid_TextBlock_Style}"
-									>
-									<DataGridTextColumn.Header>
-										<Grid>
-											<Grid.RowDefinitions>
-												<RowDefinition Height="Auto"/>
-												<RowDefinition Height="Auto"/>
-											</Grid.RowDefinitions>
-											<TextBlock
-												Grid.Row="0"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="Height"
-												/>
-											<TextBlock
-												Grid.Row="1"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="(mm)"
-												/>
-										</Grid>
-									</DataGridTextColumn.Header>
-								</DataGridTextColumn>
+									<!--Height-->
+									<DataGridTextColumn
+										Header="Height"
+										Width="110"
+										Binding="{Binding Height}"
+										ElementStyle="{StaticResource PDF_DataGrid_TextBlock_Style}"
+										/>
 
-								<!--Count-->
-								<DataGridTemplateColumn
-									Header="Quantity"
-									IsReadOnly="True">
-									<DataGridTemplateColumn.CellTemplate>
-										<DataTemplate>
-											<Grid>
-												<Grid.RowDefinitions>
-													<RowDefinition Height="*"/>
-													<RowDefinition Height="*"/>
-												</Grid.RowDefinitions>
+									<!--Load-->
+									<DataGridTextColumn
+										Header="Load"
+										Width="110"
+										Binding="{Binding Load}"
+										ElementStyle="{StaticResource PDF_DataGrid_TextBlock_Style}"
+										/>
 
-												<TextBlock
-													Grid.Row="0"
-													Text="{Binding Count_M}"
-													Style="{StaticResource DataGrid_TextBlock_Style}"
-													/>
+									<!--Count-->
+									<DataGridTemplateColumn
+										Header="Quantity"
+										Width="110"
+										>
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate>
+												<Grid>
+													<Grid.RowDefinitions>
+														<RowDefinition Height="*"/>
+														<RowDefinition Height="*"/>
+													</Grid.RowDefinitions>
 
-												<TextBlock
-													Grid.Row="1"
-													Text="{Binding Count_A}"
-													Style="{StaticResource DataGrid_TextBlock_Style}"
-													/>
+													<TextBlock
+														Grid.Row="0"
+														Text="{Binding Count_M}"
+														Style="{StaticResource PDF_DataGrid_TextBlock_Style}"
+														/>
 
-											</Grid>
-										</DataTemplate>
-									</DataGridTemplateColumn.CellTemplate>
-								</DataGridTemplateColumn>
+													<TextBlock
+														Grid.Row="1"
+														Text="{Binding Count_A}"
+														Style="{StaticResource PDF_DataGrid_TextBlock_Style}"
+														/>
 
-							</DataGrid.Columns>
+												</Grid>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
 
-						</DataGrid>
+								</DataGrid.Columns>
+
+							</DataGrid>
+
+						</Grid>
+
+						<!--
+						row 1
+						Pallet statistics
+						-->
+						<Grid
+							x:Name="PalleteStatGrid"
+							Grid.Row="1"
+							>
+							<Grid.Style>
+								<Style TargetType="{x:Type Grid}">
+									<Setter Property="Visibility" Value="Collapsed"/>
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding DisplayPalleteStatistics}" Value="True">
+											<Setter Property="Visibility" Value="Visible"/>
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</Grid.Style>
+
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+							</Grid.RowDefinitions>
+
+							<Border
+								Grid.Row="0"
+								BorderThickness="{StaticResource PDF_StatisticHeaderBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								>
+								<TextBlock
+									Text="Pallet Statistics:"
+									VerticalAlignment="Center"
+									HorizontalAlignment="Center"
+									/>
+							</Border>
+
+							<DataGrid
+								Grid.Row="1"
+								
+								Style="{StaticResource PDFExportDataGrid}"
+								ItemsSource="{Binding PalletsStatisticsView}"
+								>
+
+								<DataGrid.Columns>
+									<!--INDEX-->
+									<DataGridTextColumn
+										Binding="{Binding DisplayIndex}"
+										Header="Sr.No."
+										Width="110"
+										ElementStyle="{StaticResource PDF_DataGrid_TextBlock_Style}"
+										/>
+
+									<!--TYPE-->
+									<DataGridTextColumn
+										Binding="{Binding DisplayName}"
+										Header="Type"
+										Width="110"
+										ElementStyle="{StaticResource PDF_DataGrid_TextBlock_Style}"
+										/>
+
+									<!--Length-->
+									<DataGridTextColumn
+										Binding="{Binding Length}"
+										Header="Width"
+										Width="110"
+										ElementStyle="{StaticResource PDF_DataGrid_TextBlock_Style}"
+										/>
+
+
+									<!--Depth-->
+									<DataGridTextColumn
+										Binding="{Binding Width}"
+										Header="Depth"
+										Width="110"
+										ElementStyle="{StaticResource PDF_DataGrid_TextBlock_Style}"
+										/>
+
+									<!--Height-->
+									<DataGridTextColumn
+										Binding="{Binding Height}"
+										Header="Height"
+										Width="110"
+										ElementStyle="{StaticResource PDF_DataGrid_TextBlock_Style}"
+										/>
+
+									<!--Weight-->
+									<DataGridTextColumn
+										Binding="{Binding Load}"
+										Header="Capacity"
+										Width="110"
+										ElementStyle="{StaticResource PDF_DataGrid_TextBlock_Style}"
+										/>
+
+									<!--Count-->
+									<DataGridTextColumn
+										Binding="{Binding Count}"
+										Header="Quantity"
+										Width="110"
+										ElementStyle="{StaticResource PDF_DataGrid_TextBlock_Style}"
+										/>
+
+								</DataGrid.Columns>
+
+							</DataGrid>
+
+						</Grid>
+
+						<!--
+						row 2
+						MHE details
+						-->
+						<Grid
+							x:Name="MHEDetailsGrid"
+							Grid.Row="2"
+							>
+
+							<Grid.Style>
+								<Style TargetType="{x:Type Grid}">
+									<Setter Property="Visibility" Value="Collapsed"/>
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding DisplayMHEDetails}" Value="True">
+											<Setter Property="Visibility" Value="Visible"/>
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</Grid.Style>
+
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+							</Grid.RowDefinitions>
+
+							<!--
+							header
+							-->
+							<Border
+								Grid.Row="0"
+								Grid.Column="0"
+								Grid.ColumnSpan="2"
+								
+								BorderThickness="{StaticResource PDF_StatisticHeaderBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								>
+								<TextBlock
+									Text="MHE details"
+									VerticalAlignment="Center"
+									HorizontalAlignment="Center"
+									/>
+							</Border>
+							
+							<!--
+							row 1
+							90 Aisle
+							-->
+							<Border
+								Grid.Row="1"
+								Grid.Column="0"
+								Grid.ColumnSpan="2"
+								
+								VerticalAlignment="Stretch"
+								HorizontalAlignment="Stretch"
+								
+								BorderThickness="{StaticResource PDF_BottomBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								/>
+							<TextBlock
+								Grid.Row="1"
+								Grid.Column="0"
+								
+								Text="90° Aisle (with pallets)"
+								VerticalAlignment="Center"
+								HorizontalAlignment="Left"
+								Margin="8, 2, 0, 2"
+								/>
+							<Border
+								Grid.Row="1"
+								Grid.Column="1"
+								
+								BorderThickness="{StaticResource PDF_LeftBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								>
+									<TextBlock
+										Text="{Binding PickingAisleWidth}"
+										VerticalAlignment="Center"
+										HorizontalAlignment="Center"
+										/>
+							</Border>
+
+							<!--
+							row 2
+							Cross Aisle
+							-->
+							<Border
+								Grid.Row="2"
+								Grid.Column="0"
+								Grid.ColumnSpan="2"
+								
+								VerticalAlignment="Stretch"
+								HorizontalAlignment="Stretch"
+								
+								BorderThickness="{StaticResource PDF_BottomBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								/>
+							<TextBlock
+								Grid.Row="2"
+								Grid.Column="0"
+								
+								Text="Cross Aisle"
+								VerticalAlignment="Center"
+								HorizontalAlignment="Left"
+								Margin="8, 2, 0, 2"
+								/>
+							<Border
+								Grid.Row="2"
+								Grid.Column="1"
+								
+								BorderThickness="{StaticResource PDF_LeftBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								>
+								<TextBlock
+										Text="{Binding CrossAisleWidth}"
+										VerticalAlignment="Center"
+										HorizontalAlignment="Center"
+										/>
+							</Border>
+
+							<!--
+							row 3
+							Max Fork Height
+							-->
+							<Border
+								Grid.Row="3"
+								Grid.Column="0"
+								Grid.ColumnSpan="2"
+								
+								VerticalAlignment="Stretch"
+								HorizontalAlignment="Stretch"
+								
+								BorderThickness="{StaticResource PDF_BottomBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								/>
+							<TextBlock
+								Grid.Row="3"
+								Grid.Column="0"
+								
+								Text="Max Fork Height"
+								VerticalAlignment="Center"
+								HorizontalAlignment="Left"
+								Margin="8, 2, 0, 2"
+								/>
+							<Border
+								Grid.Row="3"
+								Grid.Column="1"
+								
+								BorderThickness="{StaticResource PDF_LeftBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								>
+								<TextBlock
+										Text="{Binding MaxLoadingHeight}"
+										VerticalAlignment="Center"
+										HorizontalAlignment="Center"
+										/>
+							</Border>
+
+							<!--
+							row 4
+							Capacity
+							-->
+							<Border
+								Grid.Row="4"
+								Grid.Column="0"
+								Grid.ColumnSpan="2"
+								
+								VerticalAlignment="Stretch"
+								HorizontalAlignment="Stretch"
+								
+								BorderThickness="{StaticResource PDF_BottomBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								/>
+							<TextBlock
+								Grid.Row="4"
+								Grid.Column="0"
+								
+								Text="Capacity @ MFH"
+								VerticalAlignment="Center"
+								HorizontalAlignment="Left"
+								Margin="8, 2, 0, 2"
+								/>
+							<Border
+								Grid.Row="4"
+								Grid.Column="1"
+								
+								BorderThickness="{StaticResource PDF_LeftBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								>
+								<TextBlock
+										Text="{Binding PalletTruckMaxCapacity}"
+										VerticalAlignment="Center"
+										HorizontalAlignment="Center"
+										/>
+							</Border>
+
+							<!--
+							row 5
+							text
+							-->
+							<Border
+								Grid.Row="5"
+								Grid.Column="0"
+								Grid.ColumnSpan="2"
+								
+								BorderThickness="{StaticResource PDF_BottomBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								>
+								<TextBlock
+									Text="The customer should ensure MHE specs as per above table"
+									VerticalAlignment="Center"
+									HorizontalAlignment="Left"
+									Margin="8, 2, 0, 2"
+									
+									TextWrapping="Wrap"
+									/>
+							</Border>
+
+							<!--
+							row 6
+							MHE types
+							-->
+							<Border
+								Grid.Row="6"
+								Grid.Column="0"
+								Grid.ColumnSpan="2"
+								
+								VerticalAlignment="Stretch"
+								HorizontalAlignment="Stretch"
+								
+								BorderThickness="{StaticResource PDF_BottomBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								/>
+							<TextBlock
+								Grid.Row="6"
+								Grid.Column="0"
+								
+								Text="MHE Type (Existing/New)"
+								VerticalAlignment="Center"
+								HorizontalAlignment="Left"
+								Margin="8, 2, 0, 2"
+								/>
+							<Border
+								Grid.Row="6"
+								Grid.Column="1"
+								
+								BorderThickness="{StaticResource PDF_LeftBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								>
+								<TextBlock
+									Text="{Binding EnbaledMHETypes}"
+									VerticalAlignment="Center"
+									HorizontalAlignment="Center"
+									TextWrapping="Wrap"
+									/>
+							</Border>
+
+						</Grid>
+
+						<!--
+						row 3
+						Important notes on flooring
+						-->
+						<Grid
+							x:Name="ImportantNotesOnFlooringGrid"
+							Grid.Row="3"
+							>
+
+							<Grid.Style>
+								<Style TargetType="{x:Type Grid}">
+									<Setter Property="Visibility" Value="Collapsed"/>
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding DisplayImportantNotesOnFlooring}" Value="True">
+											<Setter Property="Visibility" Value="Visible"/>
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</Grid.Style>
+
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+							</Grid.RowDefinitions>
+
+							<!--
+							border
+							-->
+							<Border
+								Grid.Row="0"
+								Grid.RowSpan="4"
+								Grid.Column="0"
+								Grid.ColumnSpan="3"
+								
+								BorderThickness="{StaticResource PDF_StatisticHeaderBorderThickness}"
+								BorderBrush="{StaticResource PDF_BorderBrushKey}"
+								/>
+							<!--
+							header
+							-->
+							<TextBlock
+								Grid.Row="0"
+								Grid.Column="0"
+								Grid.ColumnSpan="3"
+								
+								VerticalAlignment="Center"
+								HorizontalAlignment="Left"
+							
+								Margin="8, 0, 0, 0"
+							
+								Text="IMPORTANT NOTES ON FLOORING."
+								TextDecorations="Underline"
+								/>
+
+							<TextBlock
+								Grid.Row="1"
+								Grid.Column="0"
+								
+								Margin="8, 0, 0, 0"
+								Text="1."
+								/>
+							<TextBlock
+								Grid.Row="1"
+								Grid.Column="2"
+								
+								TextWrapping="Wrap"
+								Text="Floor Load bearing capacity should ensured by the customer."
+								/>
+
+							<TextBlock
+								Grid.Row="2"
+								Grid.Column="0"
+								
+								Margin="8, 0, 0, 0"
+								Text="2."
+								/>
+							<TextBlock
+								Grid.Row="2"
+								Grid.Column="2"
+								
+								TextWrapping="Wrap"
+								Text="For a min grid size of 1mx1m, the difference in floor level between any two survey point should be less than 4mm."
+								/>
+
+							<TextBlock
+								Grid.Row="3"
+								Grid.Column="0"
+								
+								Margin="8, 0, 0, 0"
+								Text="3."
+								/>
+							<TextBlock
+								Grid.Row="3"
+								Grid.Column="2"
+								
+								TextWrapping="Wrap"
+								Text="The max variation between any two survey points should not exceed 10mm."
+								/>
+
+						</Grid>
 
 					</Grid>
-					
-					<!--
-					COLUMN 1
-					VERTICAL GUTTER
-					-->
 
 					<!--
-					COLUMN 2
-					pallets statistics
+					row 1
+					NOTES
 					-->
 					<Grid
-						Grid.Column="2"
-						HorizontalAlignment="Right"
+						x:Name="NotesGrid"
+						Grid.Row="1"
+						MinHeight="300"
+						Margin="8"
 						>
 						<Grid.Style>
 							<Style TargetType="{x:Type Grid}">
 								<Setter Property="Visibility" Value="Visible"/>
 								<Style.Triggers>
-									<DataTrigger Binding="{Binding PalletStatisticsEmpty}" Value="True">
+									<DataTrigger Binding="{Binding DisplayNotes}" Value="False">
 										<Setter Property="Visibility" Value="Collapsed"/>
 									</DataTrigger>
 								</Style.Triggers>
@@ -390,311 +839,244 @@
 
 						<Grid.RowDefinitions>
 							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="*"/>
 						</Grid.RowDefinitions>
+
+						<!--
+						border
+						-->
+						<Border
+							Grid.Row="0"
+							Grid.RowSpan="2"
+							
+							BorderThickness="{StaticResource PDF_StampBorderThickness}"
+							BorderBrush="{StaticResource PDF_BorderBrushKey}"
+							CornerRadius="{StaticResource PDF_StampCornerRadius}"
+							/>
 
 						<TextBlock
 							Grid.Row="0"
-							Text="Pallet Statistics:"
+							
+							VerticalAlignment="Top"
+							HorizontalAlignment="Left"
+							
+							Margin="8, 0, 0, 0"
+							
+							Text="NOTES:"
+							TextDecorations="Underline"
 							/>
-
-						<DataGrid
+						<TextBlock
 							Grid.Row="1"
-							
-							materialDesign:DataGridAssist.CellPadding="4 2 2 2"
-							materialDesign:DataGridAssist.ColumnHeaderPadding="4 2 2 2"
-							
-							FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ExportLayoutTemplate02_Sheet01}}}"
-							
-							Style="{StaticResource PDFExportDataGrid}"
-
-							AutoGenerateColumns="False"
-							
-							HorizontalAlignment="Stretch"
-							VerticalAlignment="Stretch"
-							
-							ScrollViewer.CanContentScroll="True" 
-							ScrollViewer.VerticalScrollBarVisibility="Auto"
-							ScrollViewer.HorizontalScrollBarVisibility="Auto"
-							
-							Foreground="Black"
-							Background="Transparent"
-							
-							ItemsSource="{Binding PalletsStatisticsView}"
-							>
-
-							<DataGrid.Columns>
-								<!--INDEX-->
-								<DataGridTextColumn
-									Binding="{Binding DisplayIndex}"
-									Header="#   "
-									IsReadOnly="True"
-									ElementStyle="{StaticResource DataGrid_TextBlock_Style}"
-									/>
-
-								<!--TYPE-->
-								<DataGridTextColumn
-									Binding="{Binding DisplayName}"
-									Header="Type  "
-									IsReadOnly="True"
-									ElementStyle="{StaticResource DataGrid_TextBlock_Style}"
-									/>
-
-								<!--Length-->
-								<DataGridTextColumn
-									Binding="{Binding Length}"
-									IsReadOnly="True"
-									ElementStyle="{StaticResource DataGrid_TextBlock_Style}"
-									>
-									<DataGridTextColumn.Header>
-										<Grid>
-											<Grid.RowDefinitions>
-												<RowDefinition Height="Auto"/>
-												<RowDefinition Height="Auto"/>
-											</Grid.RowDefinitions>
-											<TextBlock
-												Grid.Row="0"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="Length"
-												/>
-											<TextBlock
-												Grid.Row="1"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="(mm)"
-												/>
-										</Grid>
-									</DataGridTextColumn.Header>
-								</DataGridTextColumn>
-
-								<!--Depth-->
-								<DataGridTextColumn
-									Binding="{Binding Width}"
-									IsReadOnly="True"
-									ElementStyle="{StaticResource DataGrid_TextBlock_Style}"
-									>
-									<DataGridTextColumn.Header>
-										<Grid>
-											<Grid.RowDefinitions>
-												<RowDefinition Height="Auto"/>
-												<RowDefinition Height="Auto"/>
-											</Grid.RowDefinitions>
-											<TextBlock
-												Grid.Row="0"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="Depth"
-												/>
-											<TextBlock
-												Grid.Row="1"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="(mm)"
-												/>
-										</Grid>
-									</DataGridTextColumn.Header>
-								</DataGridTextColumn>
-
-								<!--Height-->
-								<DataGridTextColumn
-									Binding="{Binding Height}"
-									IsReadOnly="True"
-									ElementStyle="{StaticResource DataGrid_TextBlock_Style}"
-									>
-									<DataGridTextColumn.Header>
-										<Grid>
-											<Grid.RowDefinitions>
-												<RowDefinition Height="Auto"/>
-												<RowDefinition Height="Auto"/>
-											</Grid.RowDefinitions>
-											<TextBlock
-												Grid.Row="0"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="Height"
-												/>
-											<TextBlock
-												Grid.Row="1"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="(mm)"
-												/>
-										</Grid>
-									</DataGridTextColumn.Header>
-								</DataGridTextColumn>
-
-								<!--Weight-->
-								<DataGridTextColumn
-									Binding="{Binding Load}"
-									IsReadOnly="True"
-									ElementStyle="{StaticResource DataGrid_TextBlock_Style}"
-									>
-									<DataGridTextColumn.Header>
-										<Grid>
-											<Grid.RowDefinitions>
-												<RowDefinition Height="Auto"/>
-												<RowDefinition Height="Auto"/>
-											</Grid.RowDefinitions>
-											<TextBlock
-												Grid.Row="0"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="Weight"
-												/>
-											<TextBlock
-												Grid.Row="1"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Center"
-												Text="(kg)"
-												/>
-										</Grid>
-									</DataGridTextColumn.Header>
-								</DataGridTextColumn>
-
-								<!--Count-->
-								<DataGridTextColumn
-									Binding="{Binding Count}"
-									Header="Quantity"
-									IsReadOnly="True"
-									ElementStyle="{StaticResource DataGrid_TextBlock_Style}"
-									/>
-
-							</DataGrid.Columns>
-
-						</DataGrid>
-
+							Margin="8, 0, 8, 0"
+							MaxWidth="1000"
+							TextWrapping="Wrap"
+							Text="{Binding Notes, Mode=OneWay}"
+							/>
 					</Grid>
-
 				</Grid>
 
-			</Grid>
-			
-			<!--
-			COLUMN 1
-			VERTICAL GUTTER
-			-->
-			
-			<!--
-			COLUMN 2
-			STAMP
-			-->
-			<Grid
-				Grid.Column="2"
-				VerticalAlignment="Bottom"
-				>
-
-				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto" MinHeight="400"/>
-					<RowDefinition Height="{StaticResource HorizontalGutter_x3}"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto" MinHeight="400"/>
-					<RowDefinition Height="{StaticResource HorizontalGutter_x3}"/>
-					<RowDefinition Height="Auto"/>
-				</Grid.RowDefinitions>
-
 				<!--
-				ROW 0
-				NOTES
+				row 2
+				rack and level accessories
 				-->
-				<TextBlock
-					Grid.Row="0"
-					
-					VerticalAlignment="Top"
-					HorizontalAlignment="Left"
-					
-					Margin="8, 0, 0, 0"
-					
-					Text="NOTES:"
-					TextDecorations="Underline"
-					Foreground="Red"
+				<Grid
+					Grid.Row="2"
+					Margin="8"
 					>
-					<TextBlock.Style>
-						<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-							<Setter Property="Visibility" Value="Visible"/>
-							<Style.Triggers>
-								<DataTrigger Binding="{Binding DisplayNotes}" Value="False">
-									<Setter Property="Visibility" Value="Hidden"/>
-								</DataTrigger>
-							</Style.Triggers>
-						</Style>
-					</TextBlock.Style>
-				</TextBlock>
-				<TextBlock
-					Grid.Row="1"
-					Margin="8, 0, 8, 0"
-					MaxWidth="1000"
-					TextWrapping="Wrap"
-					Text="{Binding Notes, Mode=OneWay}">
-					<TextBlock.Style>
-						<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-							<Setter Property="Visibility" Value="Visible"/>
-							<Style.Triggers>
-								<DataTrigger Binding="{Binding DisplayNotes}" Value="False">
-									<Setter Property="Visibility" Value="Hidden"/>
-								</DataTrigger>
-							</Style.Triggers>
-						</Style>
-					</TextBlock.Style>
-				</TextBlock>
-				
-				<!--
-				ROW 2
-				HORIZONTAL GUTTER
-				-->
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="8"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+
+					<!--
+					column 0
+					rack accessories
+					-->
+					<Grid
+						Grid.Column="0"
+						>
+
+						<Grid.Style>
+							<Style TargetType="{x:Type Grid}">
+								<Setter Property="Visibility" Value="Collapsed"/>
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding DisplayRackAccessories}" Value="True">
+										<Setter Property="Visibility" Value="Visible"/>
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</Grid.Style>
+						
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+
+						<Border
+							Grid.Row="0"
+							Grid.RowSpan="2"
+							
+							BorderThickness="{StaticResource PDF_StampBorderThickness}"
+							BorderBrush="{StaticResource PDF_BorderBrushKey}"
+							CornerRadius="{StaticResource PDF_StampCornerRadius}"
+							/>
+
+						<TextBlock
+							Grid.Row="0"
+							
+							VerticalAlignment="Top"
+							HorizontalAlignment="Left"
+							
+							Margin="8, 0, 0, 0"
+							
+							Text="RACK ACCESSORIES:"
+							TextDecorations="Underline"
+							/>
+						<TextBlock
+							Grid.Row="1"
+							Margin="8, 0, 8, 0"
+							TextWrapping="Wrap"
+							Text="{Binding RackAccessories, Mode=OneWay}"
+							/>
+					</Grid>
+
+					<!--
+					column 1
+					vertical gutter
+					-->
+					
+					<!--
+					column 2
+					level accessories (right column)
+					-->
+					<Grid
+						Grid.Column="2"
+						>
+						
+						<Grid.Style>
+							<Style TargetType="{x:Type Grid}">
+								<Setter Property="Visibility" Value="Collapsed"/>
+								<Style.Triggers>
+									<MultiDataTrigger>
+										<MultiDataTrigger.Conditions>
+											<Condition Binding="{Binding DisplayRackAccessories}" Value="True"/>
+											<Condition Binding="{Binding DisplayRackLevelAccessories}" Value="True"/>
+										</MultiDataTrigger.Conditions>
+										<MultiDataTrigger.Setters>
+											<Setter Property="Visibility" Value="Visible"/>
+										</MultiDataTrigger.Setters>
+									</MultiDataTrigger>
+								</Style.Triggers>
+							</Style>
+						</Grid.Style>
+						
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+
+						<Border
+							Grid.Row="0"
+							Grid.RowSpan="2"
+							
+							BorderThickness="{StaticResource PDF_StampBorderThickness}"
+							BorderBrush="{StaticResource PDF_BorderBrushKey}"
+							CornerRadius="{StaticResource PDF_StampCornerRadius}"
+							/>
+
+						<TextBlock
+							Grid.Row="0"
+							
+							VerticalAlignment="Top"
+							HorizontalAlignment="Left"
+							
+							Margin="8, 0, 0, 0"
+							
+							Text="LEVEL ACCESSORIES:"
+							TextDecorations="Underline"
+							/>
+						<TextBlock
+							Grid.Row="1"
+							Margin="8, 0, 8, 0"
+							TextWrapping="Wrap"
+							Text="{Binding RackLevelAccessories, Mode=OneWay}"
+							/>
+					</Grid>
+
+					<!--
+					column 0-3
+					level accessories (3 columns)
+					-->
+					<Grid
+						Grid.Column="0"
+						Grid.ColumnSpan="3"
+						>
+
+						<Grid.Style>
+							<Style TargetType="{x:Type Grid}">
+								<Setter Property="Visibility" Value="Collapsed"/>
+								<Style.Triggers>
+									<MultiDataTrigger>
+										<MultiDataTrigger.Conditions>
+											<Condition Binding="{Binding DisplayRackAccessories}" Value="False"/>
+											<Condition Binding="{Binding DisplayRackLevelAccessories}" Value="True"/>
+										</MultiDataTrigger.Conditions>
+										<MultiDataTrigger.Setters>
+											<Setter Property="Visibility" Value="Visible"/>
+										</MultiDataTrigger.Setters>
+									</MultiDataTrigger>
+								</Style.Triggers>
+							</Style>
+						</Grid.Style>
+
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+
+						<Border
+							Grid.Row="0"
+							Grid.RowSpan="2"
+							
+							BorderThickness="{StaticResource PDF_StampBorderThickness}"
+							BorderBrush="{StaticResource PDF_BorderBrushKey}"
+							CornerRadius="{StaticResource PDF_StampCornerRadius}"
+							/>
+
+						<TextBlock
+							Grid.Row="0"
+							
+							VerticalAlignment="Top"
+							HorizontalAlignment="Left"
+							
+							Margin="8, 0, 0, 0"
+							
+							Text="LEVEL ACCESSORIES:"
+							TextDecorations="Underline"
+							/>
+						<TextBlock
+							Grid.Row="1"
+							Margin="8, 0, 8, 0"
+							TextWrapping="Wrap"
+							Text="{Binding RackLevelAccessories, Mode=OneWay}"
+							/>
+					</Grid>
+				</Grid>
 
 				<!--
-				ROW 3
-				ACCESSORY
-				-->
-				<TextBlock
-					Grid.Row="3"
-					
-					VerticalAlignment="Top"
-					HorizontalAlignment="Left"
-					
-					Margin="8, 0, 0, 0"
-					
-					Text="ACCESSORY DETAILS:"
-					TextDecorations="Underline"
-					Foreground="Red"
-					/>
-				<TextBlock
-					Grid.Row="4"
-					Margin="8, 0, 8, 0"
-					MaxWidth="1000"
-					TextWrapping="Wrap"
-					Text="{Binding Accessory, Mode=OneWay}">
-					<TextBlock.Style>
-						<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-							<Setter Property="Visibility" Value="Visible"/>
-							<Style.Triggers>
-								<DataTrigger Binding="{Binding DisplayAccessory}" Value="False">
-									<Setter Property="Visibility" Value="Hidden"/>
-								</DataTrigger>
-							</Style.Triggers>
-						</Style>
-					</TextBlock.Style>
-				</TextBlock>
-
-				<!--
-				ROW 5
-				HORIZONTAL GUTTER
-				-->
-
-				<!--
-				ROW 6
+				row 3
 				STAMP
 				-->
 				<Border
-					Grid.Row="6"
+					Grid.Row="3"
 					
 					HorizontalAlignment="Stretch"
+					VerticalAlignment="Bottom"
 					
-					BorderThickness="{StaticResource StampBorderThickness}"
-					BorderBrush="{StaticResource BorderBrushKey}"
-					CornerRadius="8"
+					BorderThickness="{StaticResource PDF_StampBorderThickness}"
+					BorderBrush="{StaticResource PDF_BorderBrushKey}"
 					>
 
 					<Grid
@@ -727,9 +1109,10 @@
 							Grid.Column="1"
 							Grid.ColumnSpan="3"
 							
+							Margin="{StaticResource PDF_StampTextBlockMargin}"
 							VerticalAlignment="Top"
 							
-							Text="CUSTOMER APPROVAL:"
+							Text="CUSTOMER APPROVAL:        "
 							/>
 						
 						<!--
@@ -741,29 +1124,36 @@
 							Grid.Column="1"
 							Orientation="Horizontal"
 							>
-							<TextBlock Text="DRAWN: "/>
 							<TextBlock
-								Text="{Binding Drawn, Mode=OneWay}"
-								Style="{StaticResource InfoValueTextBlock}"/>
+								Margin="{StaticResource PDF_StampTextBlockMargin}"
+								VerticalAlignment="Center"
+								Text="DRAWN:        "
+								/>
+							<TextBlock
+								VerticalAlignment="Center"
+								Text="{Binding Drawn, Mode=OneWay}"/>
 						</StackPanel>
 						<StackPanel
 							Grid.Row="1"
 							Grid.Column="3"
 							Orientation="Horizontal"
 							>
-							<TextBlock Text="DATE: "/>
 							<TextBlock
-								Text="{Binding Date, Mode=OneWay}"
-								Style="{StaticResource InfoValueTextBlock}"/>
+								Margin="{StaticResource PDF_StampTextBlockMargin}"
+								VerticalAlignment="Center"
+								Text="DATE: "/>
+							<TextBlock
+								VerticalAlignment="Center"
+								Text="{Binding Date, Mode=OneWay}"/>
 						</StackPanel>
 						<Border
 							Grid.Row="1"
 							Grid.Column="0"
 							Grid.ColumnSpan="5"
 							
-							BorderThickness="{StaticResource StampBorderThickness}"
-							BorderBrush="{StaticResource BorderBrushKey}"
-							CornerRadius="8"
+							BorderThickness="{StaticResource PDF_StampBorderThickness}"
+							BorderBrush="{StaticResource PDF_BorderBrushKey}"
+							CornerRadius="{StaticResource PDF_StampCornerRadius}"
 							/>
 						
 						<!--
@@ -775,16 +1165,19 @@
 							Grid.Column="1"
 							Grid.ColumnSpan="3"
 							
-							Text="SYSTEM: SELECTIVE PALLET RACKING"
+							Margin="{StaticResource PDF_StampTextBlockMargin}"
+							VerticalAlignment="Center"
+							
+							Text="SYSTEM:        SELECTIVE PALLET RACKING"
 							/>
 						<Border
 							Grid.Row="2"
 							Grid.Column="0"
 							Grid.ColumnSpan="5"
 							
-							BorderThickness="{StaticResource StampBorderThickness}"
-							BorderBrush="{StaticResource BorderBrushKey}"
-							CornerRadius="8"
+							BorderThickness="{StaticResource PDF_StampBorderThickness}"
+							BorderBrush="{StaticResource PDF_BorderBrushKey}"
+							CornerRadius="{StaticResource PDF_StampCornerRadius}"
 							/>
 						
 						<!--
@@ -797,24 +1190,27 @@
 							Grid.ColumnSpan="3"
 							Orientation="Horizontal"
 							>
-							<TextBlock Text="CUSTOMER NAME: "/>
 							<TextBlock
-								Text="{Binding CustomerName, Mode=OneWay}"
-								Style="{StaticResource InfoValueTextBlock}"/>
+								Margin="{StaticResource PDF_StampTextBlockMargin}"
+								VerticalAlignment="Center"
+								Text="CUSTOMER NAME:        "/>
+							<TextBlock
+								VerticalAlignment="Center"
+								Text="{Binding CustomerName, Mode=OneWay}"/>
 						</StackPanel>
 						<Border
 							Grid.Row="3"
 							Grid.Column="0"
 							Grid.ColumnSpan="5"
 							
-							BorderThickness="{StaticResource StampBorderThickness}"
-							BorderBrush="{StaticResource BorderBrushKey}"
-							CornerRadius="8"
+							BorderThickness="{StaticResource PDF_StampBorderThickness}"
+							BorderBrush="{StaticResource PDF_BorderBrushKey}"
+							CornerRadius="{StaticResource PDF_StampCornerRadius}"
 							/>
 
 						<!--
 						ROW 4
-						CUSTOMER NAME
+						PROJECT SITE
 						-->
 						<StackPanel
 							Grid.Row="4"
@@ -822,24 +1218,27 @@
 							Grid.ColumnSpan="3"
 							Orientation="Horizontal"
 							>
-							<TextBlock Text="Project SITE: "/>
 							<TextBlock
-								Text="{Binding ProjectSite, Mode=OneWay}"
-								Style="{StaticResource InfoValueTextBlock}"/>
+								Margin="{StaticResource PDF_StampTextBlockMargin}"
+								VerticalAlignment="Center"
+								Text="Project SITE:        "/>
+							<TextBlock
+								VerticalAlignment="Center"
+								Text="{Binding ProjectSite, Mode=OneWay}"/>
 						</StackPanel>
 						<Border
 							Grid.Row="4"
 							Grid.Column="0"
 							Grid.ColumnSpan="5"
 							
-							BorderThickness="{StaticResource StampBorderThickness}"
-							BorderBrush="{StaticResource BorderBrushKey}"
-							CornerRadius="8"
+							BorderThickness="{StaticResource PDF_StampBorderThickness}"
+							BorderBrush="{StaticResource PDF_BorderBrushKey}"
+							CornerRadius="{StaticResource PDF_StampCornerRadius}"
 							/>
 
 						<!--
 						ROW 5
-						CUSTOMER NAME
+						ENQ NO
 						-->
 						<StackPanel
 							Grid.Row="5"
@@ -847,19 +1246,22 @@
 							Grid.ColumnSpan="3"
 							Orientation="Horizontal"
 							>
-							<TextBlock Text="ENQ. NO.: "/>
 							<TextBlock
-								Text="{Binding ENQNo, Mode=OneWay}"
-								Style="{StaticResource InfoValueTextBlock}"/>
+								Margin="{StaticResource PDF_StampTextBlockMargin}"
+								VerticalAlignment="Center"
+								Text="DRG. NO:        "/>
+							<TextBlock
+								VerticalAlignment="Center"
+								Text="{Binding ENQNo, Mode=OneWay}"/>
 						</StackPanel>
 						<Border
 							Grid.Row="5"
 							Grid.Column="0"
 							Grid.ColumnSpan="5"
 							
-							BorderThickness="{StaticResource StampBorderThickness}"
-							BorderBrush="{StaticResource BorderBrushKey}"
-							CornerRadius="8"
+							BorderThickness="{StaticResource PDF_StampBorderThickness}"
+							BorderBrush="{StaticResource PDF_BorderBrushKey}"
+							CornerRadius="{StaticResource PDF_StampCornerRadius}"
 							/>
 						
 						<!--
@@ -879,11 +1281,11 @@
 							StretchDirection="DownOnly"
 							Stretch="Uniform"
 							
-							MaxHeight="100"
-							MaxWidth="400"
+							MaxHeight="125"
+							MaxWidth="700"
 							>
 							<Image
-								Source="/DrawingFactoryApp;component/Properties/Logo_DevelopedBy.TIF"
+								Source="/DrawingFactoryApp;component/Properties/PDF_RightColumnBottomPicture.TIF"
 								/>
 						</Viewbox>
 						<Border
@@ -891,9 +1293,9 @@
 							Grid.Column="0"
 							Grid.ColumnSpan="5"
 							
-							BorderThickness="{StaticResource StampBorderThickness}"
-							BorderBrush="{StaticResource BorderBrushKey}"
-							CornerRadius="8"
+							BorderThickness="{StaticResource PDF_StampBorderThickness}"
+							BorderBrush="{StaticResource PDF_BorderBrushKey}"
+							CornerRadius="{StaticResource PDF_StampCornerRadius}"
 							/>
 
 					</Grid>

@@ -29,12 +29,30 @@ namespace DrawingControl
 			IsNewSheet = true;
 
 			_InitName();
+			_InitRoofList();
 			CheckSheetElevationGeometry();
 		}
 		public DrawingSheet(DrawingSheet sheet)
 		{
 			if(sheet != null)
 			{
+				// Clone roofs
+				m_RoofsList.Clear();
+				if(sheet.RoofsList != null)
+				{
+					foreach(Roof roof in sheet.RoofsList)
+					{
+						if (roof == null)
+							continue;
+
+						Roof roofClone = roof.Clone() as Roof;
+						if (roofClone == null)
+							continue;
+
+						m_RoofsList.Add(roofClone);
+					}
+				}
+
 				// Dictionary with old rack as a key and cloned rack as a value.
 				// It is used for restore RacksGroups list, because RacksGroups list cant be cloned.
 				Dictionary<Rack, Rack> oldRackToClondedRackDict = new Dictionary<Rack, Rack>();
@@ -113,7 +131,7 @@ namespace DrawingControl
 				this.m_CameraOffset = sheet.m_CameraOffset;
 
 				// Clone tie beams
-				if (sheet.TieBeamsList != null)
+				if(sheet.TieBeamsList != null)
 				{
 					foreach (TieBeam tieBeamGeom in sheet.TieBeamsList)
 					{
@@ -153,6 +171,7 @@ namespace DrawingControl
 						newItem.Length_A = rackStatItem.Length_A;
 						newItem.Length_M = rackStatItem.Length_M;
 						newItem.Width = rackStatItem.Width;
+						newItem.Load = rackStatItem.Load;
 						m_RackStatistics.Add(newItem);
 					}
 				}
@@ -234,28 +253,13 @@ namespace DrawingControl
 
 		//=============================================================================
 		/// <summary>
-		/// Guid of this sheet. SheetGeometry(at Warehouse sheet) uses this guid to bind to this sheet.
+		/// Guid of this sheet.
 		/// </summary>
 		private Guid m_GUID = Guid.Empty;
 		public Guid GUID { get { return m_GUID; } }
 
 		//=============================================================================
 		public DrawingDocument Document { get; set; }
-
-		//=============================================================================
-		/// <summary>
-		/// Returns SheetGemetry at Warehouse sheet, which is bound to this DrawingSheet.
-		/// </summary>
-		public SheetGeometry BoundSheetGeometry
-		{
-			get
-			{
-				if (Document != null)
-					return Document.GetBoundSheetGeometry(this);
-
-				return null;
-			}
-		}
 
 		//=============================================================================
 		private string m_Name = string.Empty;
@@ -420,20 +424,128 @@ namespace DrawingControl
 		public ICollectionView PalletsStatisticsCollectionView { get { return m_PalletsStatisticsCollectionView; } }
 
 		//=============================================================================
-		protected UInt32 m_Length = 30000;
+		private UInt32 m_Length = 30000;
 		public UInt32 Length
 		{
 			get { return m_Length; }
-			set { Set_Length(value, true, true); }
+			set
+			{
+				if (m_Length != value)
+				{
+					bool bSetValue = false;
+
+					if (IsThereRectanglesOutsideGraphicsArea(value, m_Width, true))
+					{
+						if (DrawingDocument._sDrawing != null)
+						{
+							DrawingDocument._sDrawing.PreviewGlobalLength = (int)value;
+							DrawingDocument._sDrawing.UpdateDrawing(false);
+						}
+
+						// ask user
+						if (MessageBox.Show("The updated length cannot fit some of the block(s).These blocks will be deleted.Do you want to continue?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+						{
+							// delete
+							IsThereRectanglesOutsideGraphicsArea(value, m_Width, false);
+							bSetValue = true;
+						}
+
+						//
+						if (DrawingDocument._sDrawing != null)
+						{
+							DrawingDocument._sDrawing.PreviewGlobalLength = -1;
+							DrawingDocument._sDrawing.PreviewGlobalWidth = -1;
+						}
+					}
+					else
+						bSetValue = true;
+
+					if (bSetValue)
+					{
+						m_Length = value;
+
+						// If length is increased then it affect on the roof and max height for all rectangles.
+						this.CheckRackHeight(Rectangles, true);
+						this.CheckTieBeams();
+
+						this.CheckSheetElevationGeometry();
+
+						MarkStateChanged();
+					}
+
+					NotifyPropertyChanged(() => Length);
+
+					if (Document != null)
+						Document.OnCurrentSheetSizeChanged();
+				}
+			}
 		}
 
 		//=============================================================================
-		protected UInt32 m_Width = 20000;
+		private UInt32 m_Width = 20000;
 		public UInt32 Width
 		{
 			get { return m_Width; }
-			set { Set_Width(value, true, true); }
+			set
+			{
+				if (m_Width != value)
+				{
+					bool bSetValue = false;
+
+					if (IsThereRectanglesOutsideGraphicsArea(m_Length, value, true))
+					{
+						if (DrawingDocument._sDrawing != null)
+						{
+							DrawingDocument._sDrawing.PreviewGlobalWidth = (int)value;
+							DrawingDocument._sDrawing.UpdateDrawing(false);
+						}
+						// ask user
+						if (MessageBox.Show("The updated width cannot fit some of the block(s).These blocks will be deleted.Do you want to continue?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+						{
+							// delete
+							IsThereRectanglesOutsideGraphicsArea(m_Length, value, false);
+							bSetValue = true;
+						}
+
+						//
+						if (DrawingDocument._sDrawing != null)
+						{
+							DrawingDocument._sDrawing.PreviewGlobalLength = -1;
+							DrawingDocument._sDrawing.PreviewGlobalWidth = -1;
+						}
+					}
+					else
+						bSetValue = true;
+
+					if (bSetValue)
+					{
+						m_Width = value;
+
+						// If width is increased then it affect on the roof and max height for all rectangles.
+						this.CheckRackHeight(Rectangles, true);
+						this.CheckTieBeams();
+
+						this.CheckSheetElevationGeometry();
+
+						MarkStateChanged();
+					}
+
+					NotifyPropertyChanged(() => Width);
+
+					if (Document != null)
+						Document.OnCurrentSheetSizeChanged();
+				}
+			}
 		}
+
+		//=============================================================================
+		// List with available roofs.
+		private List<Roof> m_RoofsList = new List<Roof>();
+		public List<Roof> RoofsList { get { return m_RoofsList; } }
+
+		//=============================================================================
+		// Selected roof from RoofsList.
+		public Roof SelectedRoof { get { return m_RoofsList.FirstOrDefault(r => r != null && r.IsSelected); } }
 
 		//=============================================================================
 		/// <summary>
@@ -547,37 +659,6 @@ namespace DrawingControl
 
 		//=============================================================================
 		/// <summary>
-		/// Calculates camera scale based on 
-		/// </summary>
-		public double CameraScale
-		{
-			get
-			{
-				if (!this.Is_UnitsPerCameraPixel_Init)
-					return 1.0;
-
-				return this.MaxUnitsPerCameraPixel / this.UnitsPerCameraPixel;
-			}
-		}
-
-		//=============================================================================
-		/// <summary>
-		/// Read comment to _cameraPadding.
-		/// </summary>
-		public double AdditionalPadding
-		{
-			get
-			{
-				double cameraPadding = DrawingSheet.GetCameraPadding();
-				if (this.IsSheetFullyDisplayed)
-					cameraPadding = 0.0;
-
-				return cameraPadding;
-			}
-		}
-
-		//=============================================================================
-		/// <summary>
 		/// If true then this sheet is fully displayed in the DrawingControl.
 		/// </summary>
 		public bool IsSheetFullyDisplayed
@@ -633,17 +714,6 @@ namespace DrawingControl
 				{
 					m_TemporaryCameraOffset = value;
 
-					double cameraPadding = DrawingSheet.GetCameraPadding();
-					// user cant move outside the sheet
-					//if (Utils.FLT(CameraOffset.X + m_TemporaryCameraOffset.X, 0.0 - cameraPadding))
-					//	m_TemporaryCameraOffset.X = 0.0 - cameraPadding - CameraOffset.X;
-					//if (Utils.FLT(CameraOffset.Y + m_TemporaryCameraOffset.Y, 0.0 - cameraPadding))
-					//	m_TemporaryCameraOffset.Y = 0.0 - cameraPadding - CameraOffset.Y;
-					//if (Utils.FGT(CameraOffset.X + m_TemporaryCameraOffset.X + Length / CameraScale, Length + cameraPadding))
-					//	m_TemporaryCameraOffset.X = Length + cameraPadding - Length / CameraScale - CameraOffset.X;
-					//if (Utils.FGT(CameraOffset.Y + m_TemporaryCameraOffset.Y + Width / CameraScale, Width + cameraPadding))
-					//	m_TemporaryCameraOffset.Y = Width + cameraPadding - Width / CameraScale - CameraOffset.Y;
-
 					NotifyPropertyChanged(() => TemporaryCameraOffset);
 				}
 			}
@@ -654,7 +724,7 @@ namespace DrawingControl
 		#region IGeomDisplaySettings implementation
 
 		// use default geometry display settings
-		private IGeomDisplaySettings m_DefaultDisplaSettings = new DefaultGeomDisplaySettings();
+		private IGeomDisplaySettings m_DefaultDisplaSettings = DefaultGeomDisplaySettings.GetInstance();
 
 		//=============================================================================
 		public double FillBrushOpacity
@@ -872,178 +942,6 @@ namespace DrawingControl
 
 
 		//=============================================================================
-		public void Set_Length(UInt32 length, bool bDrawBordersOnGraphicsArea, bool bMarkStateChanged)
-		{
-			if (Utils.FNE(m_Length, length))
-			{
-				bool bSetValue = false;
-
-				if (IsThereRectanglesOutsideGraphicsArea(new Vector(0.0, 0.0), length, m_Width, true))
-				{
-					if (DrawingDocument._sDrawing != null && bDrawBordersOnGraphicsArea)
-					{
-						// Set UnitsPerCameraPixel to MaxUnitsPerCameraPixel and fully display sheet.
-						// Probably camera is placed at the small area at the bot left part of the sheet, so
-						// it doesnt display new sheet size.
-						this.FullyDisplaySheet();
-
-						DrawingDocument._sDrawing.PreviewGlobalLength = (int)length;
-						DrawingDocument._sDrawing.UpdateDrawing(false);
-					}
-
-					// ask user
-					if (MessageBox.Show("The updated length cannot fit some of the block(s).These blocks will be deleted.Do you want to continue?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-					{
-						// delete
-						IsThereRectanglesOutsideGraphicsArea(new Vector(0.0, 0.0), length, m_Width, false);
-						bSetValue = true;
-					}
-
-					//
-					if (DrawingDocument._sDrawing != null && bDrawBordersOnGraphicsArea)
-					{
-						DrawingDocument._sDrawing.PreviewGlobalLength = -1;
-						DrawingDocument._sDrawing.PreviewGlobalWidth = -1;
-					}
-				}
-				else
-					bSetValue = true;
-
-				if (bSetValue)
-				{
-					// Reset UnitsPerCameraPixel and Offset.
-					this.Is_UnitsPerCameraPixel_Init = false;
-					this.FullyDisplaySheet();
-
-					double oldLengthValue = m_Length;
-					m_Length = length;
-
-					this.CheckSheetElevationGeometry();
-
-					// If this sheet is placed in WarehouseSheet than need to check result WarehouseSheet layout.
-					SheetGeometry boundSheetGeometry = this.BoundSheetGeometry;
-					WarehouseSheet whSheet = null;
-					if (this.Document != null)
-						whSheet = this.Document.WarehouseSheet;
-					if (whSheet != null && whSheet != this && boundSheetGeometry != null)
-					{
-						bSetValue = boundSheetGeometry.IsCorrect(whSheet.Length, whSheet.Width, BaseRectangleGeometry.GRIP_CENTER, false, true, false);
-						// Probably SheetGeometry bound to this sheet was moved, so
-						// need to check drawing sheet geometry. Probably max available height was changed.
-						if (bSetValue)
-						{
-							this.CheckRackHeight(Rectangles, true);
-							this.CheckTieBeams();
-							this.CheckBlocksShuttersHeight();
-						}
-					}
-
-					if (bSetValue)
-					{
-						if(bMarkStateChanged)
-							MarkStateChanged();
-					}
-					else
-					{
-						this.Document.SetTheLastState();
-						this.Document.DocumentError = "This sheet is placed at Warehouse sheet and after change the size Warehouse sheet layout is not correct. Size is not changed.";
-					}
-				}
-
-
-				if (Document != null)
-					Document.OnCurrentSheetSizeChanged();
-			}
-
-			NotifyPropertyChanged(() => Length);
-		}
-		//=============================================================================
-		public void Set_Width(UInt32 width, bool bDrawBordersOnGraphicsArea, bool bMarkStateChanged)
-		{
-			if (Utils.FNE(m_Width, width))
-			{
-				bool bSetValue = false;
-
-				if (IsThereRectanglesOutsideGraphicsArea(new Vector(0.0, 0.0), m_Length, width, true))
-				{
-					if (DrawingDocument._sDrawing != null && bDrawBordersOnGraphicsArea)
-					{
-						// Set UnitsPerCameraPixel to MaxUnitsPerCameraPixel and fully display sheet.
-						// Probably camera is placed at the small area at the bot left part of the sheet, so
-						// it doesnt display new sheet size.
-						this.FullyDisplaySheet();
-
-						DrawingDocument._sDrawing.PreviewGlobalWidth = (int)width;
-						DrawingDocument._sDrawing.UpdateDrawing(false);
-					}
-					// ask user
-					if (MessageBox.Show("The updated width cannot fit some of the block(s).These blocks will be deleted.Do you want to continue?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-					{
-						// delete
-						IsThereRectanglesOutsideGraphicsArea(new Vector(0.0, 0.0), m_Length, width, false);
-						bSetValue = true;
-					}
-
-					//
-					if (DrawingDocument._sDrawing != null && bDrawBordersOnGraphicsArea)
-					{
-						DrawingDocument._sDrawing.PreviewGlobalLength = -1;
-						DrawingDocument._sDrawing.PreviewGlobalWidth = -1;
-					}
-				}
-				else
-					bSetValue = true;
-
-				if (bSetValue)
-				{
-					// Reset UnitsPerCameraPixel and Offset.
-					this.Is_UnitsPerCameraPixel_Init = false;
-					this.FullyDisplaySheet();
-
-					double oldWidthValue = m_Width;
-					m_Width = width;
-
-					this.CheckSheetElevationGeometry();
-
-					// If this sheet is placed in WarehouseSheet than need to check result WarehouseSheet layout.
-					SheetGeometry boundSheetGeometry = this.BoundSheetGeometry;
-					WarehouseSheet whSheet = null;
-					if (this.Document != null)
-						whSheet = this.Document.WarehouseSheet;
-					if (whSheet != null && whSheet != this && boundSheetGeometry != null)
-					{
-						bSetValue = boundSheetGeometry.IsCorrect(whSheet.Length, whSheet.Width, BaseRectangleGeometry.GRIP_CENTER, false, true, false);
-						// Probably SheetGeometry bound to this sheet was moved, so
-						// need to check drawing sheet geometry. Probably max available height was changed.
-						if (bSetValue)
-						{
-							this.CheckRackHeight(Rectangles, true);
-							this.CheckTieBeams();
-							this.CheckBlocksShuttersHeight();
-						}
-					}
-
-					if (bSetValue)
-					{
-						if(bMarkStateChanged)
-							MarkStateChanged();
-					}
-					else
-					{
-						this.Document.SetTheLastState();
-						this.Document.DocumentError = "This sheet is placed at Warehouse sheet and after change the size Warehouse sheet layout is not correct. Size is not changed.";
-					}
-				}
-
-				if (Document != null)
-					Document.OnCurrentSheetSizeChanged();
-			}
-
-			NotifyPropertyChanged(() => Width);
-		}
-
-
-		//=============================================================================
 		/// <summary>
 		/// Add BaseRectangleGemetry to the Rectangles collection.
 		/// </summary>
@@ -1097,9 +995,6 @@ namespace DrawingControl
 		public void CopySelectedGeometry()
 		{
 			if (Document == null)
-				return;
-
-			if (this is WarehouseSheet)
 				return;
 
 			List<BaseRectangleGeometry> copyList = new List<BaseRectangleGeometry>();
@@ -1272,9 +1167,6 @@ namespace DrawingControl
 				return;
 
 			if (Document == null)
-				return;
-
-			if (this is WarehouseSheet)
 				return;
 
 			//
@@ -2360,16 +2252,6 @@ namespace DrawingControl
 			if (grip.Geometry != null && grip.Geometry != null && !grip.Geometry.IsInit)
 				bMovingTempGeom = true;
 
-			// If user moves SheetGeometry which is bound to DrawingSheet then
-			// need to check drawing sheet geometry. Probably max available height was changed.
-			SheetGeometry sheetGeometry = grip.Geometry as SheetGeometry;
-			if (sheetGeometry != null && sheetGeometry.BoundSheet != null)
-			{
-				sheetGeometry.BoundSheet.CheckRackHeight(sheetGeometry.BoundSheet.Rectangles, true);
-				sheetGeometry.BoundSheet.CheckTieBeams();
-				sheetGeometry.BoundSheet.CheckBlocksShuttersHeight();
-			}
-
 			if (!bMovingTempGeom)
 				MarkStateChanged();
 
@@ -2400,7 +2282,7 @@ namespace DrawingControl
 		/// <param name="rGlobalHeight"></param>
 		/// <param name="bJustCheck"> true - just check, false - delete all rectangles outside graphics area</param>
 		/// <returns></returns>
-		public bool IsThereRectanglesOutsideGraphicsArea(Vector topLeftPointOffset, UInt32 length, UInt32 width, bool bJustCheck)
+		public bool IsThereRectanglesOutsideGraphicsArea(UInt32 _length, UInt32 _width, bool bJustCheck)
 		{
 			if (DrawingDocument._sDrawing == null)
 				return false;
@@ -2420,72 +2302,9 @@ namespace DrawingControl
 				if (geom is Wall)
 					continue;
 
-				Shutter shutterGeom = geom as Shutter;
-				if(shutterGeom != null)
-				{
-					if(shutterGeom.IsHorizontal)
-					{
-						//if (Utils.FLT(shutterGeom.TopLeft_GlobalPoint.Y, -shutterGeom.Length_Y) || Utils.FGT(shutterGeom.TopLeft_GlobalPoint.Y, width))
-						//{
-						//	if (bJustCheck)
-						//		return true;
-						//	else
-						//		geomForDelete.Add(geom);
-						//
-						//	continue;
-						//}
-
-						if(Utils.FLT(shutterGeom.TopLeft_GlobalPoint.X, topLeftPointOffset.X) || Utils.FGT(shutterGeom.BottomRight_GlobalPoint.X, topLeftPointOffset.X + length))
-						{
-							if (bJustCheck)
-								return true;
-							else
-								geomForDelete.Add(geom);
-
-							continue;
-						}
-					}
-					else
-					{
-						//if(Utils.FLT(shutterGeom.TopLeft_GlobalPoint.X, -shutterGeom.Length_X) || Utils.FGT(shutterGeom.TopLeft_GlobalPoint.X, length))
-						//{
-						//	if (bJustCheck)
-						//		return true;
-						//	else
-						//		geomForDelete.Add(geom);
-						//
-						//	continue;
-						//}
-
-						if(Utils.FLT(shutterGeom.TopLeft_GlobalPoint.Y, topLeftPointOffset.Y) || Utils.FGT(shutterGeom.BottomRight_GlobalPoint.Y, topLeftPointOffset.Y + width))
-						{
-							if (bJustCheck)
-								return true;
-							else
-								geomForDelete.Add(geom);
-
-							continue;
-						}
-					}
-
-					continue;
-				}
-
-				double geomMarginX = geom.MarginX;
-				double geomMarginY = geom.MarginY;
-
-				// Check top left point
-				if (Utils.FLT(geom.TopLeft_GlobalPoint.X - geomMarginX, topLeftPointOffset.X) || Utils.FLT(geom.TopLeft_GlobalPoint.Y - geomMarginY, topLeftPointOffset.Y))
-				{
-					if (bJustCheck)
-						return true;
-					else
-						geomForDelete.Add(geom);
-
-					continue;
-				}
-				// Check bottom right point
-				if (Utils.FGT(geom.BottomRight_GlobalPoint.X + geomMarginX, topLeftPointOffset.X + length) || Utils.FGT(geom.BottomRight_GlobalPoint.Y + geomMarginY, topLeftPointOffset.Y + width))
+				// Check only bottom right point, because grpahics layout top left point is (0, 0)-point.
+				// X-axis is directed to the right, Y-axis is directed to the bottom.
+				if (geom.BottomRight_GlobalPoint.X > _length || geom.BottomRight_GlobalPoint.Y > _width)
 				{
 					if (bJustCheck)
 						return true;
@@ -3234,17 +3053,11 @@ namespace DrawingControl
 		// This function checks rack height.
 		public void CheckRackHeight(List<BaseRectangleGeometry> geometryList, bool bRecalcRackUniquesSize)
 		{
-			List<BaseRectangleGeometry> geomList = new List<BaseRectangleGeometry>();
 			if (geometryList == null)
-			{
-				if (this.Rectangles != null)
-					geomList.AddRange(this.Rectangles);
-			}
-			else
-				geomList.AddRange(geometryList);
+				return;
 
 			List<Rack> racksList = new List<Rack>();
-			foreach (BaseRectangleGeometry geom in geomList)
+			foreach (BaseRectangleGeometry geom in geometryList)
 			{
 				if (geom == null)
 					continue;
@@ -3273,28 +3086,6 @@ namespace DrawingControl
 					continue;
 
 				rack.CheckRackHeight();
-			}
-		}
-
-		//=============================================================================
-		/// <summary>
-		/// Check blocks and shutters height. It depends on the roof.
-		/// </summary>
-		public void CheckBlocksShuttersHeight()
-		{
-			foreach(BaseRectangleGeometry geom in this.Rectangles)
-			{
-				if (geom == null)
-					continue;
-
-				if(geom is Shutter || geom is Block)
-				{
-					if (Utils.FLT(geom.Length_Z, geom.MinLength_Z))
-						geom.Length_Z = geom.MinLength_Z;
-
-					if (Utils.FGT(geom.Length_Z, geom.MaxLength_Z))
-						geom.Length_Z = geom.MaxLength_Z;
-				}
 			}
 		}
 
@@ -4089,75 +3880,6 @@ namespace DrawingControl
 		}
 
 		//=============================================================================
-		public void ChangeSize(Vector topLeftPointOffset, UInt32 newLength, UInt32 newWidth)
-		{
-			m_Length = newLength;
-			m_Width = newWidth;
-
-			this.CheckWalls();
-			if (Rectangles != null)
-			{
-				foreach (BaseRectangleGeometry geom in Rectangles)
-				{
-					if (geom == null)
-						continue;
-
-					//
-					if (geom is Wall)
-						continue;
-
-					//
-					Shutter shutterGeom = geom as Shutter;
-					if (shutterGeom != null)
-					{
-						Point shutterTopLeftPnt = geom.TopLeft_GlobalPoint;
-						if (shutterGeom.IsHorizontal)
-						{
-							shutterTopLeftPnt.X -= topLeftPointOffset.X;
-							if (Utils.FGT(shutterTopLeftPnt.Y, 0.0))
-								shutterTopLeftPnt.Y = newWidth;
-						}
-						else
-						{
-							shutterTopLeftPnt.Y -= topLeftPointOffset.Y;
-							if (Utils.FGT(shutterTopLeftPnt.X, 0.0))
-								shutterTopLeftPnt.X = newLength;
-						}
-
-						shutterGeom.TopLeft_GlobalPoint = shutterTopLeftPnt;
-						continue;
-					}
-
-					geom.TopLeft_GlobalPoint = geom.TopLeft_GlobalPoint - topLeftPointOffset;
-				}
-
-				CheckSheetElevationGeometry();
-
-				// Check layout, probably some rectangles can have a margin.
-				List<BaseRectangleGeometry> incorrectGeomList;
-				if (!this.IsLayoutCorrect(out incorrectGeomList) && incorrectGeomList != null && incorrectGeomList.Count > 0)
-				{
-					this.DeleteGeometry(incorrectGeomList, false, false);
-				}
-
-				// Recalculate M and A racks in the groups.
-				// Call CheckRacksGroups() before _UpdateRackRowsColumns(), because
-				// _UpdateRackRowsColumns() only change IsFirstInRowColumn flag and dont change rack's size if result layout is not correct.
-				// CheckRacksGroups() try to change rack's size and make result layout correct.
-				List<Rack> deletedRacks;
-				this.CheckRacksGroups(out deletedRacks);
-
-				// CheckRacksColumnSizeAndBracingType() calculates column for racks group, so need to update racks groups before call it.
-				// Probably new rack was inserted to the drawing.
-				this._UpdateRackRowsColumns();
-				CheckRacksColumnSizeAndBracingType(false);
-
-				// update tie beams
-				CheckTieBeams();
-			}
-		}
-
-		//=============================================================================
 		/// <summary>
 		/// Creates new GUID for this sheet.
 		/// Use this function only when open default document template.
@@ -4165,14 +3887,7 @@ namespace DrawingControl
 		/// </summary>
 		public void CreateNewGUID()
 		{
-			// Replace GUID on the BoundSheetGeometry too.
-			// Otherwise binding will be broken.
-			// Take SheetGeometry before set new GUID, otherwise it returns null(beacuse GUID is already changed).
-			SheetGeometry boundSheetGeom = this.BoundSheetGeometry;
-
 			m_GUID = Guid.NewGuid();
-			if (boundSheetGeom != null)
-				boundSheetGeom.BoundSheetGUID = m_GUID;
 		}
 
 		//=============================================================================
@@ -4328,33 +4043,31 @@ namespace DrawingControl
 				if (geom == null)
 					continue;
 
-				// SheetGeometry is placed at warehouse sheet only.
-				// Need to get sheet elevations from the bound sheet using Warehouse sheet elevation point.
-				SheetGeometry sheetGeometry = geom as SheetGeometry;
-				if (sheetGeometry != null)
-				{
-					DrawingSheet boundSheet = sheetGeometry.BoundSheet;
-					if(boundSheet != null)
-					{
-						Point boundSheet_SheetElevationPoint = new Point(0.0, 0.0) + (sheetElevationPoint - sheetGeometry.TopLeft_GlobalPoint);
-						// Point can be outside of the bound sheet
-						//if (Utils.FGT(boundSheet_SheetElevationPoint.X, boundSheet.Length) || Utils.FGT(boundSheet_SheetElevationPoint.Y, boundSheet.Width))
-						//	continue;
-
-						List<Rack> boundSheet_horizontalRacksElevationList;
-						List<Rack> boundSheet_verticalRacksElevationList;
-						double horizElevBiggestRackHeight;
-						double vertElevBiggestRackHeight;
-						boundSheet.GetSheetElevations(boundSheet_SheetElevationPoint, out boundSheet_horizontalRacksElevationList, out boundSheet_verticalRacksElevationList, out horizElevBiggestRackHeight, out vertElevBiggestRackHeight);
-
-						if (boundSheet_horizontalRacksElevationList != null && boundSheet_horizontalRacksElevationList.Count > 0)
-							horizontalRacksElevationList.AddRange(boundSheet_horizontalRacksElevationList);
-						if (boundSheet_verticalRacksElevationList != null && boundSheet_verticalRacksElevationList.Count > 0)
-							verticalRacksElevationList.AddRange(boundSheet_verticalRacksElevationList);
-					}
-
-					continue;
-				}
+				//// SheetGeometry is placed at warehouse sheet only.
+				//// Need to get sheet elevations from the bound sheet using Warehouse sheet elevation point.
+				//SheetGeometry sheetGeometry = geom as SheetGeometry;
+				//if (sheetGeometry != null)
+				//{
+				//	DrawingSheet boundSheet = sheetGeometry.BoundSheet;
+				//	if(boundSheet != null)
+				//	{
+				//		Point boundSheet_SheetElevationPoint = new Point(0.0, 0.0) + (sheetElevationPoint - sheetGeometry.TopLeft_GlobalPoint);
+				//		// Point can be outside of the bound sheet
+				//		//if (Utils.FGT(boundSheet_SheetElevationPoint.X, boundSheet.Length) || Utils.FGT(boundSheet_SheetElevationPoint.Y, boundSheet.Width))
+				//		//	continue;
+				//
+				//		List<Rack> boundSheet_horizontalRacksElevationList;
+				//		List<Rack> boundSheet_verticalRacksElevationList;
+				//		boundSheet.GetSheetElevations(boundSheet_SheetElevationPoint, out boundSheet_horizontalRacksElevationList, out boundSheet_verticalRacksElevationList);
+				//
+				//		if (boundSheet_horizontalRacksElevationList != null && boundSheet_horizontalRacksElevationList.Count > 0)
+				//			horizontalRacksElevationList.AddRange(boundSheet_horizontalRacksElevationList);
+				//		if (boundSheet_verticalRacksElevationList != null && boundSheet_verticalRacksElevationList.Count > 0)
+				//			verticalRacksElevationList.AddRange(boundSheet_verticalRacksElevationList);
+				//	}
+				//
+				//	continue;
+				//}
 
 				Rack rackGeom = geom as Rack;
 				if (rackGeom == null)
@@ -4369,31 +4082,31 @@ namespace DrawingControl
 			}
 
 			// sort lists
-			if (this is WarehouseSheet)
-			{
-				horizontalRacksElevationList = horizontalRacksElevationList.OrderBy(
-					rack =>
-					{
-						double offsetX = rack.TopLeft_GlobalPoint.X;
-						if (rack.Sheet != null && rack.Sheet.BoundSheetGeometry != null)
-							offsetX += rack.Sheet.BoundSheetGeometry.TopLeft_GlobalPoint.X;
-
-						return offsetX;
-					}
-					).ToList();
-
-				verticalRacksElevationList = verticalRacksElevationList.OrderByDescending(
-					rack =>
-					{
-						double offsetY = rack.BottomRight_GlobalPoint.Y;
-						if (rack.Sheet != null && rack.Sheet.BoundSheetGeometry != null)
-							offsetY += rack.Sheet.BoundSheetGeometry.BottomRight_GlobalPoint.Y;
-
-						return offsetY;
-					}
-					).ToList();
-			}
-			else
+			//if (this is WarehouseSheet)
+			//{
+			//	horizontalRacksElevationList = horizontalRacksElevationList.OrderBy(
+			//		rack =>
+			//		{
+			//			double offsetX = rack.TopLeft_GlobalPoint.X;
+			//			if (rack.Sheet != null && rack.Sheet.BoundSheetGeometry != null)
+			//				offsetX += rack.Sheet.BoundSheetGeometry.TopLeft_GlobalPoint.X;
+			//
+			//			return offsetX;
+			//		}
+			//		).ToList();
+			//
+			//	verticalRacksElevationList = verticalRacksElevationList.OrderByDescending(
+			//		rack =>
+			//		{
+			//			double offsetY = rack.BottomRight_GlobalPoint.Y;
+			//			if (rack.Sheet != null && rack.Sheet.BoundSheetGeometry != null)
+			//				offsetY += rack.Sheet.BoundSheetGeometry.BottomRight_GlobalPoint.Y;
+			//
+			//			return offsetY;
+			//		}
+			//		).ToList();
+			//}
+			//else
 			{
 				horizontalRacksElevationList = horizontalRacksElevationList.OrderBy(rack => rack.TopLeft_GlobalPoint.X).ToList();
 				verticalRacksElevationList = verticalRacksElevationList.OrderByDescending(rack => rack.BottomRight_GlobalPoint.Y).ToList();
@@ -4451,7 +4164,7 @@ namespace DrawingControl
 			geometry.IsInit = false;
 		}
 		//=============================================================================
-		protected void _AfterCreateNewGeom(BaseRectangleGeometry newGeom)
+		private void _AfterCreateNewGeom(BaseRectangleGeometry newGeom)
 		{
 			if (newGeom == null)
 				return;
@@ -4880,6 +4593,8 @@ namespace DrawingControl
 					foundedItem.Width = Utils.GetWholeNumber(rackGeom.Depth);
 					// init height
 					foundedItem.Height = rackGeom.Length_Z;
+					// init load
+					foundedItem.Load = (int)rackGeom.RackLoad;
 
 					m_RackStatistics.Add(foundedItem);
 				}
@@ -5079,7 +4794,6 @@ namespace DrawingControl
 
 			CheckWalls();
 			CheckAisleSpaces();
-			CheckBlocksShuttersHeight();
 
 			//
 			foreach(BaseRectangleGeometry geom in NonInitSelectedGeometryList)
@@ -5111,8 +4825,6 @@ namespace DrawingControl
 					newRack.SizeIndex = Document.AddRackUniqueSize(newRack);
 				}
 			}
-			//
-			this.DeleteNonInitializedGeometry(false, false);
 			// dont clear selected geometry
 			// SelectedGeometryCollection.Clear();
 
@@ -5353,6 +5065,18 @@ namespace DrawingControl
 		}
 
 		//=============================================================================
+		// default roof list
+		private void _InitRoofList()
+		{
+			FlatRoof flatRoof = new FlatRoof();
+			flatRoof.IsSelected = true;
+			m_RoofsList.Add(flatRoof);
+			m_RoofsList.Add(new GableRoof());
+			m_RoofsList.Add(new ShedRoof());
+		}
+
+
+		//=============================================================================
 		private static bool _isCameraPaddingInit = false;
 		/// <summary>
 		/// Additional padding around sheet.
@@ -5458,12 +5182,11 @@ namespace DrawingControl
 		// 1.4 Add roofs list
 		// 1.5 Add tie beams list
 		// 1.6 Add GUID
-		// 2.6 Remove roofs list property. It is placed to the WarehouseSheet.
-		// 2.7 Add Notes
-		// 2.8 Add UnitsPerCameraPixel, CameraOffset and Is_UnitsPerCameraPixel_Init
-		// 3.8 Add SheetElevationGeometry
+		// 1.7 Add Notes
+		// 1.8 Add UnitsPerCameraPixel, CameraOffset and Is_UnitsPerCameraPixel_Init
+		// 2.8 Add SheetElevationGeometry
 		protected static string _sSheet_strMajor = "Sheet_MAJOR";
-		protected static int _sSheet_MAJOR = 3;
+		protected static int _sSheet_MAJOR = 2;
 		protected static string _sSheet_strMinor = "Sheet_MINOR";
 		protected static int _sSheet_MINOR = 8;
 		//=============================================================================
@@ -5504,11 +5227,17 @@ namespace DrawingControl
 						m_Width = (UInt32)info.GetValue("Width", typeof(UInt32));
 					}
 
-					// Removed in 2.6
-					//if (iMajor >= 1 && iMinor >= 4)
-					//	m_RoofsList = (List<Roof>)info.GetValue("RoofsList", typeof(List<Roof>));
-					//else
-					//	_InitRoofList();
+					//
+					if (iMajor >= 1 && iMinor >= 4)
+					{
+						m_RoofsList = (List<Roof>)info.GetValue("RoofsList", typeof(List<Roof>));
+						if (m_RoofsList == null)
+							m_RoofsList = new List<Roof>();
+						if (m_RoofsList.Count == 0)
+							_InitRoofList();
+					}
+					else
+						_InitRoofList();
 
 					if (iMajor >= 1 && iMinor >= 5)
 						TieBeamsList = (List<TieBeam>)info.GetValue("TieBeamsList", typeof(List<TieBeam>));
@@ -5518,10 +5247,10 @@ namespace DrawingControl
 					else if (iMajor <= 1 && iMinor < 6)
 						m_GUID = Guid.NewGuid();
 
-					if (iMajor >= 2 && iMinor >= 7)
+					if (iMajor >= 1 && iMinor >= 7)
 						m_Notes = (string)info.GetValue("Notes", typeof(string));
 
-					if(iMajor >= 2 && iMinor >= 8)
+					if(iMajor >= 1 && iMinor >= 8)
 					{
 						m_UnitsPerCameraPixel = (double)info.GetValue("UnitsPerCameraPixel", typeof(double));
 						m_CameraOffset = (Vector)info.GetValue("CameraOffset", typeof(Vector));
@@ -5562,8 +5291,7 @@ namespace DrawingControl
 			info.AddValue("Width", m_Width);
 
 			// 1.4
-			// Removed in 2.6
-			//info.AddValue("RoofsList", m_RoofsList);
+			info.AddValue("RoofsList", m_RoofsList);
 
 			// 1.5
 			info.AddValue("TieBeamsList", TieBeamsList);
@@ -5571,10 +5299,10 @@ namespace DrawingControl
 			// 1.6
 			info.AddValue("GUID", m_GUID);
 
-			// 2.7
+			// 1.7
 			info.AddValue("Notes", m_Notes);
 
-			// 2.8
+			// 1.8
 			info.AddValue("UnitsPerCameraPixel", m_UnitsPerCameraPixel);
 			info.AddValue("CameraOffset", m_CameraOffset);
 			info.AddValue("Is_UnitsPerCameraPixel_Init", m_Is_UnitsPerCameraPixel_Init);

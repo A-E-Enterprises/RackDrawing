@@ -32,6 +32,15 @@
 		/// 0 - full transparent image
 		/// 1 - not transparent at all
 		/// </summary>
-		public static double Opacity { get { return 0.1; } }
+		private static double m_Opacity = 0.1;
+		public static double Opacity
+		{
+			get { return m_Opacity; }
+			set
+			{
+				if (Utils.FGE(value, 0.0))
+					m_Opacity = value;
+			}
+		}
 	}
 }

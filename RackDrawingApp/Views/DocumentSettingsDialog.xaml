@@ -541,7 +541,7 @@
 					LENGTH
 					-->
 					<GridViewColumn
-						Header="Length(mm)"
+						Header="Width(mm)"
 						>
 						<GridViewColumn.CellTemplate>
 							<DataTemplate>

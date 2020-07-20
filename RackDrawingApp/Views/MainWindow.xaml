@@ -13,8 +13,6 @@
 	xmlns:mdWPF="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf" 
 	xmlns:mdConverters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
 	
-	xmlns:HT="http://helix-toolkit.org/wpf"
-	
 	TextElement.Foreground="{DynamicResource MaterialDesignBody}"
 	TextElement.FontWeight="Medium"
 	TextElement.FontSize="14"
@@ -335,73 +333,6 @@
 					</Setter.Value>
 				</Setter>
 			</Style>
-
-			<DataTemplate x:Key="PropertiesListBoxGroupTemplate">
-				<TextBlock
-					Margin="0, 3, 0, 3"
-					
-					Text="{Binding Name}"
-					Foreground="{DynamicResource SecondaryAccentBrush}"
-					Opacity="0.8"
-					/>
-			</DataTemplate>
-			<DataTemplate x:Key="PropertyItemTemplate">
-				<Border>
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="Auto" SharedSizeGroup="PropertyName"/>
-							<ColumnDefinition Width="Auto" SharedSizeGroup="PropertyValue" />
-						</Grid.ColumnDefinitions>
-
-						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto"/>
-						</Grid.RowDefinitions>
-
-						<TextBlock
-							Grid.Column="0"
-							
-							Margin="0, 0, 16, 0"
-							VerticalAlignment="Center"
-							
-							KeyboardNavigation.IsTabStop="False"
-							
-							Text="{Binding Name}"
-							TextWrapping="Wrap"
-							MaxWidth="150"
-							/>
-
-						<ContentPresenter
-							Grid.Column="2"
-							ContentTemplateSelector="{StaticResource PropertyTemplateSelector_Key}"
-							
-							Margin="16, 0, 16, 0"
-							VerticalAlignment="Center"
-							
-							Content="{Binding .}"
-							/>
-					</Grid>
-				</Border>
-			</DataTemplate>
-			<Style x:Key="PropertyItemStyle" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-				<Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
-			</Style>
-			<Style x:Key="PropertiesListBox" TargetType="{x:Type ListBox}" BasedOn="{StaticResource {x:Type ListBox}}">
-				<Setter Property="Margin" Value="16, 3, 0, 32"/>
-				<Setter Property="VerticalAlignment" Value="Stretch"/>
-				<Setter Property="HorizontalAlignment" Value="Stretch"/>
-				
-				<Setter Property="Background" Value="Transparent"/>
-
-				<Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
-				<Setter Property="KeyboardNavigation.TabNavigation" Value="Cycle"/>
-				<Setter Property="KeyboardNavigation.ControlTabNavigation" Value="Cycle"/>
-				<Setter Property="KeyboardNavigation.DirectionalNavigation" Value="Cycle"/>
-
-				<Setter Property="Grid.IsSharedSizeScope" Value="True"/>
-
-				<Setter Property="ItemTemplate" Value="{StaticResource PropertyItemTemplate}"/>
-				<Setter Property="ItemContainerStyle" Value="{StaticResource PropertyItemStyle}"/>
-			</Style>
 		</ResourceDictionary>
 	</Window.Resources>
 
@@ -454,24 +385,13 @@
 					<Style TargetType="{x:Type dc:DrawingControl}">
 						<Setter Property="Visibility" Value="Visible"/>
 						<Setter Property="IsEnabled" Value="True"/>
-						<Setter Property="Visibility" Value="Visible"/>
 						<Style.Triggers>
 							<DataTrigger Binding="{Binding Path=IsOpen, ElementName=DlgHost}" Value="True">
 								<Setter Property="IsEnabled" Value="False"/>
 							</DataTrigger>
-							<!--
-							<DataTrigger Binding="{Binding Display3DViewControl}" Value="True">
-								<Setter Property="Visibility" Value="Hidden"/>
-							</DataTrigger>
-							-->
-							<DataTrigger Binding="{Binding Path=Visibility, ElementName=Viewport3DBorder}" Value="Visible">
-								<Setter Property="Visibility" Value="Hidden"/>
-							</DataTrigger>
-							
 							<DataTrigger Binding="{Binding CurrentDocument.ShowAdvancedProperties}" Value="True">
 								<Setter Property="Visibility" Value="Hidden"/>
 							</DataTrigger>
-							
 						</Style.Triggers>
 					</Style>
 				</dc:DrawingControl.Style>
@@ -631,64 +551,6 @@
 			</Grid>
 				
 
-			<!--
-			3D view control.
-			It contains rack or sheet 3D view.
-			-->
-			<Border
-				x:Name="Viewport3DBorder"
-				
-				BorderThickness="1"
-				BorderBrush="{DynamicResource DrawingAreaBorder}"
-				
-				Grid.Row="1"
-				Grid.Column="1"
-				
-				Margin="24"
-				
-				VerticalAlignment="Stretch"
-				HorizontalAlignment="Stretch"
-				>
-				<Border.Style>
-					<Style TargetType="{x:Type Border}">
-						<Setter Property="Visibility" Value="Collapsed"/>
-						<Style.Triggers>
-							<MultiDataTrigger>
-								<MultiDataTrigger.Conditions>
-									<Condition Binding="{Binding CurrentDocument.ShowAdvancedProperties, Mode=OneWay}" Value="True"/>
-									<Condition Binding="{Binding Viewport3DContent, Mode=OneWay}" Value="{x:Static local:RackAppViewport3D+eViewportContent.eSelectedRack}"/>
-									<Condition Binding="{Binding Display3DViewControl, Mode=OneWay}" Value="True"/>
-								</MultiDataTrigger.Conditions>
-								<MultiDataTrigger.Setters>
-									<Setter Property="Visibility" Value="Visible"/>
-								</MultiDataTrigger.Setters>
-							</MultiDataTrigger>
-							<MultiDataTrigger>
-								<MultiDataTrigger.Conditions>
-									<Condition Binding="{Binding Viewport3DContent, Mode=OneWay}" Value="{x:Static local:RackAppViewport3D+eViewportContent.eSelectedSheet}"/>
-									<Condition Binding="{Binding Display3DViewControl, Mode=OneWay}" Value="True"/>
-								</MultiDataTrigger.Conditions>
-								<MultiDataTrigger.Setters>
-									<Setter Property="Visibility" Value="Visible"/>
-								</MultiDataTrigger.Setters>
-							</MultiDataTrigger>
-						</Style.Triggers>
-					</Style>
-				</Border.Style>
-				<!--
-				ShowViewCube="False"
-				-->
-				<local:RackAppViewport3D
-					x:Name="Viewport3D"
-					
-					Background="{DynamicResource AppBackground}"
-					Visibility="{Binding Path=Visibility, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Border}}}"
-					Sheet="{Binding Path=CurrentDocument.CurrentSheet}"
-					ViewportContent="{Binding Viewport3DContent, Mode=OneWay}"
-					/>
-
-			</Border>
-
 			<!-- SAVE LOAD and CREATE buttons-->
 			<materialDesign:Card
 				Grid.Row="0"
@@ -700,17 +562,6 @@
 				
 				<Grid
 					Margin="8, 3, 8, 3">
-
-					<Grid.Style>
-						<Style TargetType="{x:Type Grid}">
-							<Setter Property="IsEnabled" Value="True"/>
-							<Style.Triggers>
-								<DataTrigger Binding="{Binding CurrentDocument.IsInCommand}" Value="True">
-									<Setter Property="IsEnabled" Value="False"/>
-								</DataTrigger>
-							</Style.Triggers>
-						</Style>
-					</Grid.Style>
 
 					<Grid.RowDefinitions>
 						<RowDefinition Height="auto"/>
@@ -733,11 +584,7 @@
 						<ItemsControl
 							Margin="0, 0, 24, 0"
 							ItemsSource="{Binding Commands}"
-							Style="{StaticResource CommandsToolbarStyle}"
 							>
-							<!--
-							Move it to parent grid.
-							Otherwise user can change the sheet during command.
 							<ItemsControl.Style>
 								<Style TargetType="{x:Type ItemsControl}" BasedOn="{StaticResource CommandsToolbarStyle}">
 									<Setter Property="IsEnabled" Value="True"/>
@@ -748,7 +595,6 @@
 									</Style.Triggers>
 								</Style>
 							</ItemsControl.Style>
-							-->
 						</ItemsControl>
 
 						<Grid
@@ -947,20 +793,8 @@
 										Height="12"
 										
 										Click="CloseSheettButton_Click"
+										IsEnabled="{Binding Path=DataContext.CurrentDocument.IsCloseSheetButtonEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
 										>
-										<Button.Style>
-											<Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-												<Setter Property="IsEnabled" Value="True"/>
-												<Style.Triggers>
-													<DataTrigger Binding="{Binding Path=DataContext.CurrentDocument.IsCloseSheetButtonEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" Value="False">
-														<Setter Property="IsEnabled" Value="False"/>
-													</DataTrigger>
-													<DataTrigger Binding="{Binding ., Converter={StaticResource ObjectTypeConverter}}" Value="{x:Type dc:WarehouseSheet}">
-														<Setter Property="IsEnabled" Value="False"/>
-													</DataTrigger>
-												</Style.Triggers>
-											</Style>
-										</Button.Style>
 										<Viewbox
 											Stretch="Uniform"
 											StretchDirection="DownOnly"
@@ -1023,10 +857,7 @@
 				</Grid>
 			</materialDesign:Card>
 
-			<!--
-			PROPS and STATS
-			CREATE GEOMETRY BUTTONS
-			-->
+			<!--PROPS and STATS-->
 			<Grid
 				Grid.Row="1"
 				Grid.Column="0"
@@ -1039,9 +870,6 @@
 					<ColumnDefinition Width="auto"/>
 				</Grid.ColumnDefinitions>
 
-				<!--
-				PROPS and STATS
-				-->
 				<materialDesign:Card
 					Grid.Row="0"
 					Grid.Column="0"
@@ -1085,12 +913,6 @@
 											<DataTrigger Binding="{Binding CurrentDocument.ShowAdvancedProperties}" Value="True">
 												<Setter Property="Visibility" Value="Collapsed"/>
 											</DataTrigger>
-											<DataTrigger Binding="{Binding Path=CurrentDocument.CurrentSheet, Converter={StaticResource ObjectTypeConverter}}" Value="{x:Type dc:WarehouseSheet}">
-												<Setter Property="Visibility" Value="Collapsed"/>
-											</DataTrigger>
-											<DataTrigger Binding="{Binding Path=Visibility, ElementName=Viewport3DBorder}" Value="Visible">
-												<Setter Property="Visibility" Value="Collapsed"/>
-											</DataTrigger>
 										</Style.Triggers>
 									</Style>
 								</Grid.Style>
@@ -1115,24 +937,24 @@
 								SIMPLE PROPERTIES HEADER and ADVANCE PROPERTIES BUTTON
 								-->
 								<TextBlock
-									Grid.Row="0"
-									Grid.Column="0"
-									
-									Margin="0, 0, 0, 3"
-									HorizontalAlignment="Left"
-									VerticalAlignment="Center"
-									
-									Style="{DynamicResource MaterialDesignHeadlineTextBlock}"
-									Foreground="{DynamicResource SecondaryAccentBrush}"
-									Text="Properties"/>
+										Grid.Row="0"
+										Grid.Column="0"
+										
+										Margin="0, 0, 0, 3"
+										HorizontalAlignment="Left"
+										VerticalAlignment="Center"
+										
+										Style="{DynamicResource MaterialDesignHeadlineTextBlock}"
+										Foreground="{DynamicResource SecondaryAccentBrush}"
+										Text="Properties"/>
 								<Button
-									Grid.Row="0"
-									Grid.Column="1"
-									
-									ToolTip="Advanced properties"
-									
-									Click="AdvancedPropertiesButton_Click"
-									>
+										Grid.Row="0"
+										Grid.Column="1"
+										
+										ToolTip="Advanced properties"
+										
+										Click="AdvancedPropertiesButton_Click"
+										>
 
 									<Button.Style>
 										<Style TargetType="{x:Type Button}" BasedOn="{StaticResource PropertiesCommandButtonStyle}">
@@ -1159,16 +981,87 @@
 								SIMPLE PROPERTIES LIST
 								-->
 								<ListBox
-									Grid.Row="1"
-									Grid.Column="0"
-									Grid.ColumnSpan="2"
-									
-									ItemsSource="{Binding CurrentDocument.CurrentSheet.SingleSelectedGeometry.PropertiesCollection}"
-									Style="{StaticResource PropertiesListBox}"
-									>
+										Grid.Row="1"
+										Grid.Column="0"
+										Grid.ColumnSpan="2"
+										
+										Grid.IsSharedSizeScope="True"
+										VerticalAlignment="Stretch"
+										HorizontalAlignment="Stretch"
+										
+										Margin="16, 3, 0, 32"
+										
+										Background="Transparent"
+										ItemsSource="{Binding CurrentDocument.CurrentSheet.SingleSelectedGeometry.PropertiesCollection}"
+										
+										KeyboardNavigation.IsTabStop="False"
+										KeyboardNavigation.TabNavigation="Cycle"
+										KeyboardNavigation.ControlTabNavigation="Cycle"
+										KeyboardNavigation.DirectionalNavigation="Cycle"
+										>
+
 									<ListBox.GroupStyle>
-										<GroupStyle HeaderTemplate="{StaticResource PropertiesListBoxGroupTemplate}"/>
+										<GroupStyle>
+											<GroupStyle.HeaderTemplate>
+												<DataTemplate>
+													<TextBlock
+														Margin="0, 3, 0, 3"
+														
+														Text="{Binding Name}"
+														Foreground="{DynamicResource SecondaryAccentBrush}"
+														Opacity="0.8"
+														/>
+												</DataTemplate>
+											</GroupStyle.HeaderTemplate>
+										</GroupStyle>
 									</ListBox.GroupStyle>
+
+									<ListBox.ItemContainerStyle>
+										<Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+											<Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+											<Setter Property="Background" Value="Transparent"/>
+										</Style>
+									</ListBox.ItemContainerStyle>
+
+									<ListBox.ItemTemplate>
+										<DataTemplate>
+											<Border>
+												<Grid>
+													<Grid.ColumnDefinitions>
+														<ColumnDefinition Width="Auto" SharedSizeGroup="PropertyName"/>
+														<ColumnDefinition Width="Auto" SharedSizeGroup="PropertyValue" />
+													</Grid.ColumnDefinitions>
+
+													<Grid.RowDefinitions>
+														<RowDefinition Height="Auto"/>
+													</Grid.RowDefinitions>
+
+													<TextBlock
+															Grid.Column="0"
+															
+															Margin="0, 0, 16, 0"
+															VerticalAlignment="Center"
+															
+															KeyboardNavigation.IsTabStop="False"
+															
+															Text="{Binding Name}"
+															TextWrapping="Wrap"
+															MaxWidth="150"
+															/>
+
+													<ContentPresenter
+															Grid.Column="2"
+															ContentTemplateSelector="{StaticResource PropertyTemplateSelector_Key}"
+															
+															Margin="16, 0, 16, 0"
+															VerticalAlignment="Center"
+															
+															Content="{Binding .}"
+															/>
+												</Grid>
+											</Border>
+										</DataTemplate>
+									</ListBox.ItemTemplate>
 								</ListBox>
 								<!--
 								Display it in DEBUG only
@@ -1263,44 +1156,44 @@
 								STATISTICS HEADER
 								-->
 								<TextBlock
-									Grid.Row="2"
-									Grid.Column="0"
-									Grid.ColumnSpan="2"
-									
-									Margin="0, 16, 0, 12"
-									HorizontalAlignment="Left"
-									VerticalAlignment="Center"
-									
-									Style="{DynamicResource MaterialDesignHeadlineTextBlock}"
-									Foreground="{DynamicResource SecondaryAccentBrush}"
-									Text="Statistics"/>
+										Grid.Row="2"
+										Grid.Column="0"
+										Grid.ColumnSpan="2"
+										
+										Margin="0, 16, 0, 12"
+										HorizontalAlignment="Left"
+										VerticalAlignment="Center"
+										
+										Style="{DynamicResource MaterialDesignHeadlineTextBlock}"
+										Foreground="{DynamicResource SecondaryAccentBrush}"
+										Text="Statistics"/>
 
 								<!--
 								ROW 3 and 4
 								RACKS STATISTIC
 								-->
 								<TextBlock
-									Grid.Row="3"
-									Grid.Column="0"
-									Grid.ColumnSpan="2"
-									
-									Opacity="0.7"
-									Text="Racks"
-									FontWeight="Regular"
-									Style="{DynamicResource MaterialDesignTitleTextBlock}"
-									Foreground="{DynamicResource SecondaryAccentBrush}"
-									Margin="16, 3, 0, 0"
-									/>
+										Grid.Row="3"
+										Grid.Column="0"
+										Grid.ColumnSpan="2"
+										
+										Opacity="0.7"
+										Text="Racks"
+										FontWeight="Regular"
+										Style="{DynamicResource MaterialDesignTitleTextBlock}"
+										Foreground="{DynamicResource SecondaryAccentBrush}"
+										Margin="16, 3, 0, 0"
+										/>
 								<ScrollViewer
-									Grid.Row="4"
-									Grid.Column="0"
-									Grid.ColumnSpan="2"
-									
-									HorizontalScrollBarVisibility="Auto"
-									VerticalScrollBarVisibility="Auto"
-									
-									Margin="16, 3, 0, 0"
-									>
+										Grid.Row="4"
+										Grid.Column="0"
+										Grid.ColumnSpan="2"
+										
+										HorizontalScrollBarVisibility="Auto"
+										VerticalScrollBarVisibility="Auto"
+										
+										Margin="16, 3, 0, 0"
+										>
 
 									<DataGrid
 										Grid.Row="1"
@@ -1574,7 +1467,7 @@
 											<!--Length-->
 											<DataGridTextColumn
 												Binding="{Binding Length}"
-												Header="L"
+												Header="W"
 												IsReadOnly="True"
 												ElementStyle="{StaticResource DataGrid_TextBlock_Style}"
 												/>
@@ -1633,7 +1526,6 @@
 									<Style TargetType="{x:Type Grid}">
 										<Setter Property="Visibility" Value="Collapsed"/>
 										<Style.Triggers>
-
 											<MultiDataTrigger>
 												<MultiDataTrigger.Conditions>
 													<Condition Binding="{Binding CurrentDocument.ShowAdvancedProperties}" Value="True"/>
@@ -1641,7 +1533,6 @@
 												</MultiDataTrigger.Conditions>
 												<Setter Property="Visibility" Value="Visible"/>
 											</MultiDataTrigger>
-
 										</Style.Triggers>
 									</Style>
 								</Grid.Style>
@@ -1660,31 +1551,20 @@
 									Style="{DynamicResource MaterialDesignHeadlineTextBlock}"
 									Foreground="{DynamicResource SecondaryAccentBrush}"
 									Text="Advanced properties"/>
-								<StackPanel
+								<Button
 									Grid.Row="0"
 									Grid.Column="1"
 									
-									Orientation="Horizontal"
+									Style="{StaticResource PropertiesCommandButtonStyle}"
+									ToolTip="Back"
+									
+									Click="BackToSimplePropertiesButton_Click"
 									>
-									<ToggleButton
-										Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
-										Foreground="{DynamicResource SecondaryAccentBrush}"
-										Content="3D"
-										IsChecked="{Binding Display3DViewControl, Mode=TwoWay}"
-										Click="Rack3DViewToggleButton_Click"
+									<materialDesign:PackIcon
+										Kind="ArrowLeft"
+										Style="{StaticResource PackIcon_Style}"
 										/>
-									<Button
-										Style="{StaticResource PropertiesCommandButtonStyle}"
-										ToolTip="Back"
-										
-										Click="BackToSimplePropertiesButton_Click"
-										>
-										<materialDesign:PackIcon
-											Kind="ArrowLeft"
-											Style="{StaticResource PackIcon_Style}"
-											/>
-									</Button>
-								</StackPanel>
+								</Button>
 								
 								<Viewbox
 									Grid.Row="1"
@@ -2521,186 +2401,6 @@
 
 								</Viewbox>
 							</Grid>
-							
-							<!--Warehouse sheet properties-->
-							<Grid>
-								<Grid.Style>
-									<Style TargetType="{x:Type Grid}">
-										<Setter Property="Visibility" Value="Collapsed"/>
-										<Style.Triggers>
-
-											<MultiDataTrigger>
-												<MultiDataTrigger.Conditions>
-													<Condition Binding="{Binding Display3DViewControl, Mode=OneWay}" Value="False"/>
-													<Condition Binding="{Binding CurrentDocument.ShowAdvancedProperties}" Value="False"/>
-													<Condition Binding="{Binding Path=CurrentDocument.CurrentSheet, Converter={StaticResource ObjectTypeConverter}}" Value="{x:Type dc:WarehouseSheet}"/>
-												</MultiDataTrigger.Conditions>
-												<MultiDataTrigger.Setters>
-													<Setter Property="Visibility" Value="Visible"/>
-												</MultiDataTrigger.Setters>
-											</MultiDataTrigger>
-
-										</Style.Triggers>
-									</Style>
-								</Grid.Style>
-
-								<Grid.RowDefinitions>
-									<RowDefinition Height="auto"/>
-									<RowDefinition Height="auto"/>
-									<RowDefinition Height="auto"/>
-								</Grid.RowDefinitions>
-
-								<!--
-								ROW 0
-								HEADER
-								-->
-								<TextBlock
-									Grid.Row="0"
-									
-									HorizontalAlignment="Left"
-									VerticalAlignment="Center"
-									
-									Style="{DynamicResource MaterialDesignHeadlineTextBlock}"
-									Foreground="{DynamicResource SecondaryAccentBrush}"
-									Text="Properties"/>
-
-								<!--
-								ROW 2
-								SELECTED GEOMETRY PROPERTIES
-								-->
-								<ListBox
-									Grid.Row="1"
-									
-									ItemsSource="{Binding CurrentDocument.CurrentSheet.SingleSelectedGeometry.PropertiesCollection}"
-									Style="{StaticResource PropertiesListBox}"
-									>
-									<ListBox.GroupStyle>
-										<GroupStyle HeaderTemplate="{StaticResource PropertiesListBoxGroupTemplate}"/>
-									</ListBox.GroupStyle>
-								</ListBox>
-								
-								<!--
-								ROW 3
-								GO TO BOUND SHEET or CREATE SHEET buttons
-								-->
-								<Grid
-									Grid.Row="3"
-									>
-									<Grid.Style>
-										<Style TargetType="{x:Type Grid}">
-											<Setter Property="Visibility" Value="Hidden"/>
-											<Style.Triggers>
-												<DataTrigger Binding="{Binding CurrentDocument.CurrentSheet.SingleSelectedGeometry, Converter={StaticResource ObjectTypeConverter}}" Value="{x:Type dc:SheetGeometry}">
-													<Setter Property="Visibility" Value="Visible"/>
-												</DataTrigger>
-											</Style.Triggers>
-										</Style>
-									</Grid.Style>
-									
-									<!--
-									GO TO BOUND SHEET
-									-->
-									<Button
-										Grid.Row="2"
-										Content="GO TO BOUND SHEET"
-										Click="GoToBoundSheetButton_Click">
-										<Button.Style>
-											<Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-												<Setter Property="Visibility" Value="Visible"/>
-												<Style.Triggers>
-													<DataTrigger Binding="{Binding CurrentDocument.CurrentSheet.SingleSelectedGeometry.BoundSheet}" Value="{x:Null}">
-														<Setter Property="Visibility" Value="Collapsed"/>
-													</DataTrigger>
-													<DataTrigger Binding="{Binding CurrentDocument.CurrentSheet.SingleSelectedGeometry.IsInit}" Value="False">
-														<Setter Property="Visibility" Value="Collapsed"/>
-													</DataTrigger>
-												</Style.Triggers>
-											</Style>
-										</Button.Style>
-									</Button>
-
-									<!--
-									CREATE SHEET
-									-->
-									<Button
-										Grid.Row="2"
-										Content="CREATE SHEET"
-										Click="CreateSheetButton_Click">
-										<Button.Style>
-											<Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-												<Setter Property="Visibility" Value="Collapsed"/>
-												<Style.Triggers>
-													<DataTrigger Binding="{Binding CurrentDocument.CurrentSheet.SingleSelectedGeometry.BoundSheet}" Value="{x:Null}">
-														<Setter Property="Visibility" Value="Visible"/>
-													</DataTrigger>
-													<DataTrigger Binding="{Binding CurrentDocument.CurrentSheet.SingleSelectedGeometry.IsInit}" Value="False">
-														<Setter Property="Visibility" Value="Collapsed"/>
-													</DataTrigger>
-												</Style.Triggers>
-											</Style>
-										</Button.Style>
-									</Button>
-
-								</Grid>
-
-							</Grid>
-
-							<!--Sheet 3D viewport properties-->
-							<Grid>
-
-								<Grid.Style>
-									<Style TargetType="{x:Type Grid}">
-										<Setter Property="Visibility" Value="Collapsed"/>
-										<Style.Triggers>
-											<MultiDataTrigger>
-												<MultiDataTrigger.Conditions>
-													<Condition Binding="{Binding Viewport3DContent, Mode=OneWay}" Value="{x:Static local:RackAppViewport3D+eViewportContent.eSelectedSheet}"/>
-													<Condition Binding="{Binding Path=Visibility, ElementName=Viewport3DBorder}" Value="Visible"/>
-												</MultiDataTrigger.Conditions>
-												<Setter Property="Visibility" Value="Visible"/>
-											</MultiDataTrigger>
-										</Style.Triggers>
-									</Style>
-								</Grid.Style>
-
-								<StackPanel
-									Margin="16, 16, 0, 0"
-									Orientation="Vertical"
-									>
-
-									<CheckBox
-										Content="Show walls"
-										IsChecked="{Binding Path=ShowWalls, ElementName=Viewport3D}"
-										/>
-
-									<CheckBox
-										Content="Show roof"
-										IsChecked="{Binding Path=ShowRoof, ElementName=Viewport3D}"
-										>
-										<CheckBox.Style>
-											<Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
-												<Setter Property="Visibility" Value="Collapsed"/>
-												<Style.Triggers>
-													<DataTrigger Binding="{Binding CurrentDocument.CurrentSheet, Converter={StaticResource ObjectTypeConverter}}" Value="{x:Type dc:WarehouseSheet}">
-														<Setter Property="Visibility" Value="Visible"/>
-													</DataTrigger>
-												</Style.Triggers>
-											</Style>
-										</CheckBox.Style>
-									</CheckBox>
-
-									<!--
-									CLOSE 3D VIEW BUTTON
-									-->
-									<Button
-										Margin="3"
-										Content="CLOSE"
-										Click="CloseSheet3DViewButton_Click"
-										/>
-
-								</StackPanel>
-
-							</Grid>
 
 						</Grid>
 
@@ -2708,110 +2408,68 @@
 
 				</materialDesign:Card>
 
-				<!--
-				CREATE GEOMETRY BUTTONS
-				-->
 				<materialDesign:Card
 					Grid.Row="0"
 					Grid.Column="1"
 					
 					Margin="6, 0, 0, 0"
 					>
-					<materialDesign:Card.Resources>
-						<Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-							<Setter Property="Padding" Value="10, 5, 10, 5"/>
 
-							<Setter Property="BorderBrush" Value="Transparent"/>
-							<Setter Property="Background" Value="Transparent"/>
-							<Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+					<StackPanel
+						Orientation="Vertical">
 
-							<Setter Property="IsEnabled" Value="True"/>
+						<StackPanel.Resources>
+							<Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+								<Setter Property="Padding" Value="10, 5, 10, 5"/>
 
-							<Style.Triggers>
-								<DataTrigger Binding="{Binding CurrentDocument.IsInCommand}" Value="True">
-									<Setter Property="IsEnabled" Value="False"/>
-								</DataTrigger>
+								<Setter Property="BorderBrush" Value="Transparent"/>
+								<Setter Property="Background" Value="Transparent"/>
+								<Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
 
-								<DataTrigger Binding="{Binding CurrentDocument.ShowAdvancedProperties}" Value="True">
-									<Setter Property="IsEnabled" Value="False"/>
-								</DataTrigger>
-							</Style.Triggers>
-						</Style>
-					</materialDesign:Card.Resources>
+								<Setter Property="IsEnabled" Value="True"/>
 
-					<Grid>
-						<!--
-						Simple sheet create geometry buttons:
-						block, aisle space, rack and etc
-						-->
-						<StackPanel
-							Orientation="Vertical">
-							<StackPanel.Style>
-								<Style TargetType="{x:Type StackPanel}">
-									<Setter Property="Visibility" Value="Visible"/>
-									<Style.Triggers>
-										<DataTrigger Binding="{Binding Path=CurrentDocument.CurrentSheet, Converter={StaticResource ObjectTypeConverter}}" Value="{x:Type dc:WarehouseSheet}">
-											<Setter Property="Visibility" Value="Collapsed"/>
-										</DataTrigger>
-									</Style.Triggers>
-								</Style>
-							</StackPanel.Style>
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding CurrentDocument.IsInCommand}" Value="True">
+										<Setter Property="IsEnabled" Value="False"/>
+									</DataTrigger>
 
-							<Button
-								Click="BlockButton_Click"
-								Content="B"
-								ToolTip="Block"
-								/>
-							<Button
-								Click="ColumnButton_Click"
-								Content="C"
-								ToolTip="Column"
-								/>
-							<Button
-								Click="RackButton_Click"
-								Content="R"
-								ToolTip="Rack"
-								/>
-							<Button
-								Click="AisleSpaceButton_Click"
-								Content="AS"
-								ToolTip="Aisle Space"/>
-							<Button
-								Click="ShutterButton_Click"
-								Content="S"
-								ToolTip="Shutter"/>
-							<Button
-								Click="WallButton_Click"
-								Content="W"
-								ToolTip="Wall"
-								/>
+									<DataTrigger Binding="{Binding CurrentDocument.ShowAdvancedProperties}" Value="True">
+										<Setter Property="IsEnabled" Value="False"/>
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</StackPanel.Resources>
 
-						</StackPanel>
-						
-						<!--
-						Warehouse sheet create geometry buttons
-						-->
-						<StackPanel
-							Orientation="Vertical">
-							<StackPanel.Style>
-								<Style TargetType="{x:Type StackPanel}">
-									<Setter Property="Visibility" Value="Collapsed"/>
-									<Style.Triggers>
-										<DataTrigger Binding="{Binding Path=CurrentDocument.CurrentSheet, Converter={StaticResource ObjectTypeConverter}}" Value="{x:Type dc:WarehouseSheet}">
-											<Setter Property="Visibility" Value="Visible"/>
-										</DataTrigger>
-									</Style.Triggers>
-								</Style>
-							</StackPanel.Style>
+						<Button
+							Click="BlockButton_Click"
+							Content="B"
+							ToolTip="Block"
+							/>
+						<Button
+							Click="ColumnButton_Click"
+							Content="C"
+							ToolTip="Column"
+							/>
+						<Button
+							Click="RackButton_Click"
+							Content="R"
+							ToolTip="Rack"
+							/>
+						<Button
+							Click="AisleSpaceButton_Click"
+							Content="AS"
+							ToolTip="Aisle Space"/>
+						<Button
+							Click="ShutterButton_Click"
+							Content="S"
+							ToolTip="Shutter"/>
+						<Button
+							Click="WallButton_Click"
+							Content="W"
+							ToolTip="Wall"
+							/>
 
-							<Button
-								Click="PlaceSheetButton_Click"
-								Content="PS"
-								ToolTip="Place sheet"
-								/>
-
-						</StackPanel>
-					</Grid>
+					</StackPanel>
 
 				</materialDesign:Card>
 

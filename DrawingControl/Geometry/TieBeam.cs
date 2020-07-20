@@ -110,6 +110,12 @@ namespace DrawingControl
 		}
 
 		//=============================================================================
+		public override void OnMouseMove(Point mousePoint, double DrawingLength, double DrawingWidth)
+		{
+			// dont do anything
+		}
+
+		//=============================================================================
 		public override bool SetGripPoint(int gripIndex, Point globalPoint, double DrawingLength, double DrawingWidth)
 		{
 			// dont do anything
@@ -130,7 +136,7 @@ namespace DrawingControl
 
 			IGeomDisplaySettings displaySettings = geomDisplaySettings;
 			if (displaySettings == null)
-				displaySettings = new DefaultGeomDisplaySettings();
+				displaySettings = DefaultGeomDisplaySettings.GetInstance();
 			if (displaySettings == null)
 				return;
 

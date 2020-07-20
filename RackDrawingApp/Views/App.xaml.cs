@@ -108,7 +108,7 @@ namespace RackDrawingApp
 				}
 			}
 
-			if(bShowLoginWindows)
+			if (bShowLoginWindows)
 			{
 				LoginWindow loginWnd = new LoginWindow();
 				loginWnd.Show();
