@@ -709,7 +709,7 @@ namespace DrawingControl
 			// dont correct value if it was setted via properties
 			if (!bTryToFixIncorrectValues)
 			{
-				if (bChangeDepth)
+				if (bChangeLength)
 				{
 					if (Utils.FLT(newLength, minLengthValue))
 						return false;
