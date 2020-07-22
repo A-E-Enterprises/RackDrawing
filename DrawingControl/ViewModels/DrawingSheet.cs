@@ -4908,8 +4908,11 @@ namespace DrawingControl
 			List<Rack> deletedRacks;
 			this.CheckRacksGroups(out deletedRacks);
 
-			// Search collisions of aisle spaces with racks for row and column guards directions
-			CheckAisleSpacesAndRacksCollisions();
+            // Search collisions of aisle spaces with racks for row and column guards directions
+            if (Document.Rack_Accessories.RowGuard || Document.Rack_Accessories.UprightGuard)
+            {
+				CheckAisleSpacesAndRacksCollisions();
+			}
 
 			// CheckRacksColumnSizeAndBracingType() calculates column for racks group, so need to update racks groups before call it.
 			// Probably new rack was inserted to the drawing.

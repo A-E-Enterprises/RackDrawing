@@ -3836,9 +3836,17 @@ namespace DrawingControl
 				dc.DrawRectangle(null, frameErrorPen, frameErrorRect);
 			}
 
-			// draw guards if Rack has grip aisle space
-			_TryDrawColumnGuards(dc, cs, geomDisplaySettings);
-			_TryDrawRowGuards(dc, cs, geomDisplaySettings);
+            // draw column guards if Rack has grip aisle space and upright guards enabled
+            if (this.Accessories.UprightGuard)
+            {
+				_TryDrawColumnGuards(dc, cs, geomDisplaySettings);
+			}
+
+            // draw row guards if Rack has grip aisle space and row guards enabled
+			if (this.Accessories.RowGuard)
+            {
+				_TryDrawRowGuards(dc, cs, geomDisplaySettings);
+			}
 		}
 
 		//=============================================================================
