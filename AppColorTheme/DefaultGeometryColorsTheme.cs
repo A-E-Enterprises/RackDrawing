@@ -76,6 +76,8 @@ namespace AppColorTheme
 			SetGeometryColor(eColorType.eRackAdvProp_PalletRiserBorderColor, Colors.SaddleBrown);
 			SetGeometryColor(eColorType.eRackAdvProp_PalletRiserFillColor, Colors.Sienna);
 			SetGeometryColor(eColorType.eRackAdvProp_DeckingPlateFillColor, Colors.DarkSlateGray);
+			SetGeometryColor(eColorType.eRackColumnGuardDefault, Colors.Red);
+			SetGeometryColor(eColorType.eRackRowGuardDefault, Colors.Orange);
 		}
 	}
 }

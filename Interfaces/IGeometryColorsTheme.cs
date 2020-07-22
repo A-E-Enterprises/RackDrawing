@@ -164,6 +164,15 @@ namespace AppColorTheme
 		/// Rack advanced properties decking plate fill color
 		/// </summary>
 		eRackAdvProp_DeckingPlateFillColor,
+
+		/// <summary>
+		/// Rack column guard color
+		/// </summary>
+		eRackColumnGuardDefault,
+		/// <summary>
+		/// Rack column guard color
+		/// </summary>
+		eRackRowGuardDefault,
 	}
 
 	/// <summary>

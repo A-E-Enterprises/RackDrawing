@@ -8027,6 +8027,13 @@ namespace DrawingControl
 			int guardAngleElevation = 15;
 
 			Color rackColGuardColor = Colors.Red;
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackColumnGuardDefault, out color))
+					rackColGuardColor = color;
+			}
+
 			SolidColorBrush rackColGuardBrush = new SolidColorBrush(rackColGuardColor);
 			Pen pen = new Pen(rackColGuardBrush, 2.0);
 
@@ -8121,6 +8128,13 @@ namespace DrawingControl
 			double guardBeamOffset = offset + ((smallGuardSupportWidth - guardBeamWidth) / 2);
 
 			Color rackRowGuardColor = Colors.Orange;
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackRowGuardDefault, out color))
+					rackRowGuardColor = color;
+			}
+
 			SolidColorBrush rackRowGuardBrush = new SolidColorBrush(rackRowGuardColor);
 			Pen pen = new Pen(rackRowGuardBrush, 1.0);
 
