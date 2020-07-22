@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -48,6 +47,16 @@ namespace DrawingControl
 		eNone = 0,
 		eStartFrame = 1,
 		eEndFrame = 2
+	}
+
+	[Flags]
+	public enum ConectedAisleSpaceDirection
+	{
+		NONE = 1,
+		TOP = 2,
+		BOTTOM = 4,
+		RIGHT = 8,
+		LEFT = 16
 	}
 
 	[Serializable]
@@ -2243,6 +2252,8 @@ namespace DrawingControl
 			this.RackHeightWithTieBeam_IsMoreThan_MaxHeight = rack.RackHeightWithTieBeam_IsMoreThan_MaxHeight;
 
 			this.IsColumnSetManually = rack.IsColumnSetManually;
+
+			this.ConectedAisleSpaceDirections = rack.ConectedAisleSpaceDirections;
 		}
 		public Rack_State(Rack_State state)
 			: base(state)
@@ -2295,6 +2306,8 @@ namespace DrawingControl
 			this.RackHeightWithTieBeam_IsMoreThan_MaxHeight = state.RackHeightWithTieBeam_IsMoreThan_MaxHeight;
 
 			this.IsColumnSetManually = state.IsColumnSetManually;
+
+			this.ConectedAisleSpaceDirections = state.ConectedAisleSpaceDirections;
 		}
 
 		#region Properties
@@ -2334,6 +2347,9 @@ namespace DrawingControl
 		public eTieBeamFrame TieBeamFrame { get; private set; }
 		public eTieBeamFrame RequiredTieBeamFrames { get; private set; }
 		public bool RackHeightWithTieBeam_IsMoreThan_MaxHeight { get; private set; }
+
+		//
+		public ConectedAisleSpaceDirection ConectedAisleSpaceDirections { get; private set; }
 
 		#endregion
 
@@ -2597,12 +2613,14 @@ namespace DrawingControl
 		private UInt32 m_Column_SecondPartLength = 500;
 
 
-		#endregion
+        #endregion
 
-		#region Properties
+        #region Properties
 
-		//=============================================================================
-		public override double MinLength_X
+        //=============================================================================
+        public ConectedAisleSpaceDirection ConectedAisleSpaceDirections { get; set; }
+        //=============================================================================
+        public override double MinLength_X
 		{
 			get
 			{
@@ -3696,7 +3714,6 @@ namespace DrawingControl
 				return;
 
 			base.Draw(dc, cs, displaySettings);
-
 			// draw underpass symbol
 			if (this.IsUnderpassAvailable)
 			{
@@ -3818,6 +3835,10 @@ namespace DrawingControl
 				Rect frameErrorRect = new Rect(GetLocalPoint(cs, frameError_TopLeftPnt), GetLocalPoint(cs, frameError_BotRightPnt));
 				dc.DrawRectangle(null, frameErrorPen, frameErrorRect);
 			}
+
+			// draw guards if Rack has grip aisle space
+			_TryDrawColumnGuards(dc, cs, geomDisplaySettings);
+			_TryDrawRowGuards(dc, cs, geomDisplaySettings);
 		}
 
 		//=============================================================================
@@ -7908,6 +7929,277 @@ namespace DrawingControl
 			}
 		}
 
+		private void _TryDrawColumnGuards(DrawingContext dc, ICoordinateSystem cs, IGeomDisplaySettings geomDisplaySettings = null)
+		{
+			double colSize = Column.Length;
+
+			if (IsHorizontal)
+			{
+				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+				{
+					if (IsFirstInRowColumn)
+					{
+						_DrawColumnGuard(new Point(this.TopLeft_GlobalPoint.X + colSize, this.TopLeft_GlobalPoint.Y), ConectedAisleSpaceDirection.TOP, dc, cs, geomDisplaySettings);
+					}
+
+					_DrawColumnGuard(this.TopRight_GlobalPoint, ConectedAisleSpaceDirection.TOP, dc, cs, geomDisplaySettings);
+				}
+
+				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
+				{
+					if (IsFirstInRowColumn)
+					{
+						_DrawColumnGuard(new Point(this.BottomLeft_GlobalPoint.X + colSize, this.BottomLeft_GlobalPoint.Y), ConectedAisleSpaceDirection.BOTTOM, dc, cs, geomDisplaySettings);
+					}
+
+					_DrawColumnGuard(this.BottomRight_GlobalPoint, ConectedAisleSpaceDirection.BOTTOM, dc, cs, geomDisplaySettings);
+				}
+			}
+			else
+			{
+				// for vertical top is left and bottom is right
+				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+				{
+					if (IsFirstInRowColumn)
+					{
+						_DrawColumnGuard(this.TopLeft_GlobalPoint, ConectedAisleSpaceDirection.LEFT, dc, cs, geomDisplaySettings);
+					}
+
+					_DrawColumnGuard(new Point(this.BottomLeft_GlobalPoint.X, this.BottomLeft_GlobalPoint.Y - colSize), ConectedAisleSpaceDirection.LEFT, dc, cs, geomDisplaySettings);
+				}
+
+				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
+				{
+					if (IsFirstInRowColumn)
+					{
+						_DrawColumnGuard(this.TopRight_GlobalPoint, ConectedAisleSpaceDirection.RIGHT, dc, cs, geomDisplaySettings);
+					}
+
+					_DrawColumnGuard(new Point(this.BottomRight_GlobalPoint.X, this.BottomRight_GlobalPoint.Y - colSize), ConectedAisleSpaceDirection.RIGHT, dc, cs, geomDisplaySettings);
+				}
+			}
+		}
+
+		private void _TryDrawRowGuards(DrawingContext dc, ICoordinateSystem cs, IGeomDisplaySettings geomDisplaySettings = null)
+		{
+			if (IsHorizontal)
+			{
+				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+				{
+					_DrawRowGuard(this.TopLeft_GlobalPoint, ConectedAisleSpaceDirection.LEFT, dc, cs, geomDisplaySettings);
+				}
+
+				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
+				{
+					_DrawRowGuard(this.TopRight_GlobalPoint, ConectedAisleSpaceDirection.RIGHT, dc, cs, geomDisplaySettings);
+				}
+			}
+			else
+			{
+				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+				{
+					_DrawRowGuard(this.TopLeft_GlobalPoint, ConectedAisleSpaceDirection.TOP, dc, cs, geomDisplaySettings);
+				}
+
+				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
+				{
+					_DrawRowGuard(this.BottomLeft_GlobalPoint, ConectedAisleSpaceDirection.BOTTOM, dc, cs, geomDisplaySettings);
+				}
+			}
+		}
+
+
+		private void _DrawColumnGuard(Point originPoint, ConectedAisleSpaceDirection dimPlacement, DrawingContext dc, ICoordinateSystem cs, IGeomDisplaySettings geomDisplaySettings = null)
+		{
+			double colSize = Column.Length;
+
+			int xOffset = 40;
+			int yOffset = 45;
+			int guardHeight = 105;
+			int guardAngleElevation = 15;
+
+			Color rackColGuardColor = Colors.Red;
+			SolidColorBrush rackColGuardBrush = new SolidColorBrush(rackColGuardColor);
+			Pen pen = new Pen(rackColGuardBrush, 2.0);
+
+			List<Point> path = new List<Point>();
+
+			Point step;
+
+			switch (dimPlacement)
+			{
+				case ConectedAisleSpaceDirection.TOP:
+					step = new Point(originPoint.X + xOffset, originPoint.Y - yOffset);
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X, step.Y - (guardHeight - guardAngleElevation)); ;
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X - xOffset - (colSize / 2), step.Y - guardAngleElevation);
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X - xOffset - (colSize / 2), step.Y + guardAngleElevation);
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X, step.Y + (guardHeight - guardAngleElevation));
+					path.Add(GetLocalPoint(cs, step));
+					break;
+
+				case ConectedAisleSpaceDirection.BOTTOM:
+					step = new Point(originPoint.X + xOffset, originPoint.Y + yOffset);
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X, step.Y + (guardHeight - guardAngleElevation)); ;
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X - xOffset - (colSize / 2), step.Y + guardAngleElevation);
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X - xOffset - (colSize / 2), step.Y - guardAngleElevation);
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X, step.Y - (guardHeight - guardAngleElevation));
+					path.Add(GetLocalPoint(cs, step));
+					break;
+
+				case ConectedAisleSpaceDirection.LEFT:
+					step = new Point(originPoint.X - yOffset, originPoint.Y - xOffset);
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X - (guardHeight - guardAngleElevation), step.Y); ;
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X - guardAngleElevation, step.Y + xOffset + (colSize / 2));
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X + guardAngleElevation, step.Y + xOffset + (colSize / 2));
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X + (guardHeight - guardAngleElevation), step.Y);
+					path.Add(GetLocalPoint(cs, step));
+					break;
+
+				case ConectedAisleSpaceDirection.RIGHT:
+					step = new Point(originPoint.X + yOffset, originPoint.Y - xOffset);
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X + (guardHeight - guardAngleElevation), step.Y); ;
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X + guardAngleElevation, step.Y + xOffset + (colSize / 2));
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X - guardAngleElevation, step.Y + xOffset + (colSize / 2));
+					path.Add(GetLocalPoint(cs, step));
+
+					step = new Point(step.X - (guardHeight - guardAngleElevation), step.Y);
+					path.Add(GetLocalPoint(cs, step));
+					break;
+			}
+
+			for (int i = 0; i < path.Count - 1; i++)
+			{
+				dc.DrawLine(pen, path[i], path[i + 1]);
+			}
+		}
+
+		private void _DrawRowGuard(Point topPoint, ConectedAisleSpaceDirection dimPlacement, DrawingContext dc, ICoordinateSystem cs, IGeomDisplaySettings geomDisplaySettings = null)
+		{
+			int offset = 50;
+			double smallGuardSupportWidth = 160;
+			double smallGuardSupportDepth = 70;
+			double guardBeamLength = this.Depth - 100;
+			double guardBeamWidth = 58;
+			double guardBeamOffset = offset + ((smallGuardSupportWidth - guardBeamWidth) / 2);
+
+			Color rackRowGuardColor = Colors.Orange;
+			SolidColorBrush rackRowGuardBrush = new SolidColorBrush(rackRowGuardColor);
+			Pen pen = new Pen(rackRowGuardBrush, 1.0);
+
+			Point right;
+			Point left;
+
+			int underpassDim = 1;
+
+            if (IsUnderpassAvailable)
+            {
+				underpassDim = -1;
+				rackRowGuardBrush.Opacity = 0.8;
+			}
+
+			switch (dimPlacement)
+			{
+				case ConectedAisleSpaceDirection.LEFT:
+					right = new Point(topPoint.X - (underpassDim * offset), topPoint.Y + offset);
+					left = new Point(topPoint.X - (underpassDim * offset) - (underpassDim * smallGuardSupportWidth), topPoint.Y + offset + smallGuardSupportDepth);
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+
+					right = new Point(topPoint.X - (underpassDim * offset), topPoint.Y + offset + (guardBeamLength - smallGuardSupportDepth));
+					left = new Point(topPoint.X - (underpassDim * offset) - (underpassDim * smallGuardSupportWidth), topPoint.Y + offset + guardBeamLength);
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+
+					right = new Point(topPoint.X - (underpassDim * guardBeamOffset), topPoint.Y + offset);
+					left = new Point(topPoint.X - (underpassDim * guardBeamOffset) - (underpassDim * guardBeamWidth), topPoint.Y + offset + guardBeamLength);
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+					break;
+
+				case ConectedAisleSpaceDirection.TOP:
+					right = new Point(topPoint.X + offset, topPoint.Y - (underpassDim * offset));
+					left = new Point(topPoint.X + offset + smallGuardSupportDepth, topPoint.Y - (underpassDim * offset) - (underpassDim * smallGuardSupportWidth));
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+
+					right = new Point(topPoint.X + offset + (guardBeamLength - smallGuardSupportDepth), topPoint.Y - (underpassDim * offset));
+					left = new Point(topPoint.X + offset + guardBeamLength, topPoint.Y - (underpassDim * offset) - (underpassDim * smallGuardSupportWidth));
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+
+					right = new Point(topPoint.X + offset, topPoint.Y - (underpassDim * guardBeamOffset));
+					left = new Point(topPoint.X + offset + guardBeamLength, topPoint.Y - (underpassDim * offset) - (underpassDim * guardBeamOffset));
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+					break;
+
+
+				case ConectedAisleSpaceDirection.RIGHT:
+					right = new Point(topPoint.X + (underpassDim * offset), topPoint.Y + offset);
+					left = new Point(topPoint.X + (underpassDim * offset) + (underpassDim * smallGuardSupportWidth), topPoint.Y + offset + smallGuardSupportDepth);
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+
+					right = new Point(topPoint.X + (underpassDim * offset), topPoint.Y + offset + guardBeamLength - smallGuardSupportDepth);
+					left = new Point(topPoint.X + (underpassDim * offset) + (underpassDim * smallGuardSupportWidth), topPoint.Y + offset + guardBeamLength);
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+
+					right = new Point(topPoint.X + (underpassDim * guardBeamOffset), topPoint.Y + offset);
+					left = new Point(topPoint.X + (underpassDim * guardBeamOffset) + (underpassDim * guardBeamWidth), topPoint.Y + offset + guardBeamLength);
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+					break;
+
+				case ConectedAisleSpaceDirection.BOTTOM:
+					right = new Point(topPoint.X + offset, topPoint.Y + (underpassDim * offset));
+					left = new Point(topPoint.X + offset + smallGuardSupportDepth, topPoint.Y + (underpassDim * offset) + (underpassDim * smallGuardSupportWidth));
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+
+					right = new Point(topPoint.X + offset + guardBeamLength - smallGuardSupportDepth, topPoint.Y + (underpassDim * offset));
+					left = new Point(topPoint.X + offset + guardBeamLength, topPoint.Y + (underpassDim * offset) + (underpassDim * smallGuardSupportWidth));
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+
+					right = new Point(topPoint.X + offset, topPoint.Y + (underpassDim * guardBeamOffset));
+					left = new Point(topPoint.X + offset + guardBeamLength, topPoint.Y + (underpassDim * offset) + (underpassDim * guardBeamOffset));
+
+					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+					break;
+			}
+		}
+
 		#endregion
 
 		#region Serialization
@@ -8001,6 +8293,9 @@ namespace DrawingControl
 
 			// 5.8
 			info.AddValue("RackHeightWithTieBeam_IsMoreThan_MaxHeight", m_RackHeightWithTieBeam_IsMoreThan_MaxHeight);
+
+			//TODO: increase minor to 5.9 ??
+			info.AddValue("ConectedAisleSpaceDirections", ConectedAisleSpaceDirections);
 		}
 		//=============================================================================
 		public Rack(SerializationInfo info, StreamingContext context)
@@ -8082,6 +8377,10 @@ namespace DrawingControl
 
 					if (iMajor >= 5 && iMinor >= 8)
 						m_RackHeightWithTieBeam_IsMoreThan_MaxHeight = (bool)info.GetValue("RackHeightWithTieBeam_IsMoreThan_MaxHeight", typeof(bool));
+					
+					//TODO: increase minor to 5.9 ??
+					if (iMajor >= 5 && iMinor >= 8)
+						ConectedAisleSpaceDirections = (ConectedAisleSpaceDirection)info.GetValue("ConectedAisleSpaceDirections", typeof(ConectedAisleSpaceDirection));
 				}
 				catch
 				{

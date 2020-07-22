@@ -351,5 +351,29 @@ namespace DrawingControl
 
 			return eAdjustedSide.eNotAdjusted;
 		}
+
+		//=============================================================================
+		/// <summary>
+		///	Check if line contains in other line
+		/// </summary>
+		/// <param name="sublineStart"></param>
+		/// <param name="sublineEnd"></param>
+		/// <param name="lineStart"></param>
+		/// <param name="lineEnd"></param>
+		/// <returns></returns>
+		public static bool IsSubline(Point sublineStart, Point sublineEnd, Point lineStart, Point lineEnd)
+		{
+			bool isContains = false;
+			// is line horizontal
+            if (lineStart.X == lineEnd.X)
+            {
+				isContains = sublineStart.X == lineStart.X && sublineEnd.X == lineEnd.X && sublineStart.Y >= lineStart.Y && sublineEnd.Y <= lineEnd.Y;
+			}
+            else
+            {
+				isContains = sublineStart.Y == lineStart.Y && sublineEnd.Y == lineEnd.Y && sublineStart.X >= lineStart.X && sublineEnd.X <= lineEnd.X;
+			}
+			return isContains;
+		}
 	}
 }

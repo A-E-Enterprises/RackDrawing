@@ -3154,6 +3154,79 @@ namespace DrawingControl
 				DeleteGeometry(incorrectAisleSpaceList, false, true);
 		}
 
+		public void CheckAisleSpacesAndRacksCollisions()
+		{
+			List<AisleSpace> aisleSpaceList = new List<AisleSpace>();
+			List<Rack> racksList = new List<Rack>();
+
+			foreach (BaseRectangleGeometry geom in Rectangles)
+			{
+				if (geom == null)
+					continue;
+
+				AisleSpace aiGeom = geom as AisleSpace;
+				if (aiGeom != null)
+				{
+					aisleSpaceList.Add(aiGeom);
+					continue;
+				}
+
+				Rack rackGeom = geom as Rack;
+				if (rackGeom != null)
+				{
+					rackGeom.ConectedAisleSpaceDirections = ConectedAisleSpaceDirection.NONE;
+					racksList.Add(rackGeom);
+					continue;
+				}
+			}
+
+			foreach (AisleSpace aiGeom in aisleSpaceList)
+			{
+				foreach (Rack rack in racksList)
+				{
+					// Check is rack right edge contains in aisle space left edge
+					if (Utils.IsSubline(
+						Utils.GetWholePoint(rack.TopRight_GlobalPoint), Utils.GetWholePoint(rack.BottomRight_GlobalPoint),
+						Utils.GetWholePoint(aiGeom.TopLeft_GlobalPoint), Utils.GetWholePoint(aiGeom.BottomLeft_GlobalPoint)))
+					{
+						rack.ConectedAisleSpaceDirections = rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE 
+							? ConectedAisleSpaceDirection.RIGHT 
+							: rack.ConectedAisleSpaceDirections | ConectedAisleSpaceDirection.RIGHT;
+					}
+
+					// Check is rack left edge contains in aisle space right edge
+					if (Utils.IsSubline(
+						Utils.GetWholePoint(rack.TopLeft_GlobalPoint), Utils.GetWholePoint(rack.BottomLeft_GlobalPoint),
+						Utils.GetWholePoint(aiGeom.TopRight_GlobalPoint), Utils.GetWholePoint(aiGeom.BottomRight_GlobalPoint)))
+					{
+						rack.ConectedAisleSpaceDirections = rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE
+							? ConectedAisleSpaceDirection.LEFT
+							: rack.ConectedAisleSpaceDirections | ConectedAisleSpaceDirection.LEFT;
+					}
+
+					// Check is rack top edge contains in aisle space bottom edge
+					if (Utils.IsSubline(
+						Utils.GetWholePoint(rack.TopLeft_GlobalPoint), Utils.GetWholePoint(rack.TopRight_GlobalPoint),
+						Utils.GetWholePoint(aiGeom.BottomLeft_GlobalPoint), Utils.GetWholePoint(aiGeom.BottomRight_GlobalPoint)))
+					{
+						rack.ConectedAisleSpaceDirections = rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE
+							? ConectedAisleSpaceDirection.TOP
+							: rack.ConectedAisleSpaceDirections | ConectedAisleSpaceDirection.TOP;
+					}
+
+					// Check is rack bottom edge contains in aisle space top edge
+					if (Utils.IsSubline(
+						Utils.GetWholePoint(rack.BottomLeft_GlobalPoint), Utils.GetWholePoint(rack.BottomRight_GlobalPoint),
+						Utils.GetWholePoint(aiGeom.TopLeft_GlobalPoint), Utils.GetWholePoint(aiGeom.TopRight_GlobalPoint)))
+                    {
+						rack.ConectedAisleSpaceDirections = rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE
+							? ConectedAisleSpaceDirection.BOTTOM
+							: rack.ConectedAisleSpaceDirections | ConectedAisleSpaceDirection.BOTTOM;
+					}
+				}
+			}
+        }
+
 		//=============================================================================
 		/// <summary>
 		/// Check rack's column size and bracing. It depends on the level weight and neighboring racks level weight.
@@ -4834,6 +4907,9 @@ namespace DrawingControl
 			// CheckRacksGroups() try to change rack's size and make result layout correct.
 			List<Rack> deletedRacks;
 			this.CheckRacksGroups(out deletedRacks);
+
+			// Search collisions of aisle spaces with racks for row and column guards directions
+			CheckAisleSpacesAndRacksCollisions();
 
 			// CheckRacksColumnSizeAndBracingType() calculates column for racks group, so need to update racks groups before call it.
 			// Probably new rack was inserted to the drawing.
