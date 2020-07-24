@@ -1209,7 +1209,7 @@ namespace RackDrawingApp
 							// display length of the rack
 							System.Windows.Point pnt_01 = new System.Windows.Point();
 							System.Windows.Point pnt_02 = new System.Windows.Point();
-							string strDimText = rack.Length.ToString(); ;
+							string strDimText = rack.Length.ToString();
 							if(RackAdvancedPropertiesControl.eDimensionPlacement.eLeft == lengthDimPlacement)
 							{
 								pnt_01 = rack.BottomLeft_GlobalPoint;
@@ -1230,20 +1230,20 @@ namespace RackDrawingApp
 								pnt_01 = rack.BottomLeft_GlobalPoint;
 								pnt_02 = rack.BottomRight_GlobalPoint;
 							}
-							// draw length dim
-							RackAdvancedPropertiesControl._DrawDimension(
-									dc,
-									pnt_01,
-									pnt_02,
-									strDimText,
-									m_DimensionOffsetInPixels,
-									geomDisplaySettings.TextFontSize,
-									geomDisplaySettings.TextFontSize / 4,
-									lengthDimPlacement,
-									ics
-									);
-							// for the first rack in the group need to display its depth
-							int iRackIndex = rackGroup.IndexOf(rack);
+                            // draw length dim
+                            RackAdvancedPropertiesControl._DrawDimension(
+                                    dc,
+                                    pnt_01,
+                                    pnt_02,
+                                    strDimText,
+                                    m_DimensionOffsetInPixels,
+                                    geomDisplaySettings.TextFontSize,
+                                    geomDisplaySettings.TextFontSize / 4,
+                                    lengthDimPlacement,
+                                    ics
+                                    );
+                            // for the first rack in the group need to display its depth
+                            int iRackIndex = rackGroup.IndexOf(rack);
 							if(iRackIndex == 0)
 							{
 								pnt_01 = rack.BottomLeft_GlobalPoint;
@@ -1271,6 +1271,58 @@ namespace RackDrawingApp
 									);
 							}
 						}
+
+						// draw rack group length dimensions here
+						var first = rackGroup[0];
+						var last = rackGroup[rackGroup.Count - 1];
+
+						double length = 0;
+						System.Windows.Point startPoint = new System.Windows.Point();
+						System.Windows.Point endPoint = new System.Windows.Point();
+
+						double dimPixelsOffest = m_DimensionOffsetInPixels + 1.5 * geomDisplaySettings.TextFontSize;
+
+						if (RackAdvancedPropertiesControl.eDimensionPlacement.eLeft == lengthDimPlacement)
+						{
+							startPoint = first.TopLeft_GlobalPoint;
+							endPoint = last.BottomLeft_GlobalPoint;
+						}
+						else if (RackAdvancedPropertiesControl.eDimensionPlacement.eRight == lengthDimPlacement)
+						{
+							startPoint = first.TopRight_GlobalPoint;
+							endPoint = last.BottomRight_GlobalPoint;
+						}
+						else if (RackAdvancedPropertiesControl.eDimensionPlacement.eTop == lengthDimPlacement)
+						{
+							startPoint = first.TopLeft_GlobalPoint;
+							endPoint = last.TopRight_GlobalPoint;
+						}
+						else if (RackAdvancedPropertiesControl.eDimensionPlacement.eBot == lengthDimPlacement)
+						{
+							startPoint = first.BottomLeft_GlobalPoint;
+							endPoint = last.BottomRight_GlobalPoint;
+						}
+
+						if (first.IsHorizontal)
+						{
+							length = Math.Abs(endPoint.X - startPoint.X);
+						}
+						else
+						{
+							length = Math.Abs(endPoint.Y - startPoint.Y);
+						}
+						
+						RackAdvancedPropertiesControl._DrawDimension(dc,
+							startPoint,
+							endPoint,
+							length.ToString(),
+							dimPixelsOffest,
+							geomDisplaySettings.TextFontSize,
+							geomDisplaySettings.TextFontSize / 4,
+							lengthDimPlacement,
+							ics,
+							true
+							);
 					}
 
 					// sheet can have rack placed at (0,0), so rack's dim will be displayed at the top and overlap sheet's length dim
