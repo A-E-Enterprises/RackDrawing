@@ -837,8 +837,6 @@ namespace RackDrawingApp
 			GC.WaitForPendingFinalizers();
 
 			IGeomDisplaySettings geomDisplaySettings = DefaultGeomDisplaySettings.GetInstance();
-			//if (bExportGeometryDimensions)
-			//	geomDisplaySettings = DimensionsMode_GeomDisplaySettings.GetInstance();
 			geomDisplaySettings.TextFontSize = exportFontSize;
 
 			//
@@ -901,6 +899,9 @@ namespace RackDrawingApp
 					sheetBorder,
 					new Rect(ics.GetLocalPoint(new System.Windows.Point(0.0, 0.0), 1.0, new Vector(0.0, 0.0)), ics.GetLocalPoint(new System.Windows.Point(sheet.Length, sheet.Width), 1.0, new Vector(0.0, 0.0))));
 
+
+
+
 				// draw geometry
 				foreach (BaseRectangleGeometry geom in sheet.Rectangles)
 				{
@@ -913,7 +914,7 @@ namespace RackDrawingApp
 
 					// draw pallets for the main racks
 					Rack rackGeom = geom as Rack;
-					if (rackGeom != null && bExportGeometryDimensions && sheet.Document != null && rackGeom.ShowPallet && rackGeom.IsFirstInRowColumn && rackGeom.Levels != null)
+					if (rackGeom != null && bExportGeometryDimensions && sheet.Document != null && rackGeom.ShowPallet && rackGeom.IsFirstInRowColumn && rackGeom.Levels != null) 
 					{
 						RackLevel lastLevel = rackGeom.Levels.LastOrDefault();
 						if (lastLevel != null)
@@ -940,172 +941,172 @@ namespace RackDrawingApp
 					}
 
 					//
-					if(bExportGeometryDimensions)
-					{
-						// export the size of the smallest side of AisleSpace
-						AisleSpace asGeom = geom as AisleSpace;
-						if(asGeom != null)
-						{
-							bool bIsXSmallest = false;
-							if (Utils.FLT(asGeom.Length_X, asGeom.Length_Y))
-								bIsXSmallest = true;
+                    if(bExportGeometryDimensions)
+                    {
+                        // export the size of the smallest side of AisleSpace
+                        AisleSpace asGeom = geom as AisleSpace;
+                        if(asGeom != null)
+                        {
+                            bool bIsXSmallest = false;
+                            if (Utils.FLT(asGeom.Length_X, asGeom.Length_Y))
+                                bIsXSmallest = true;
 
-							// display PTP-distance - it is distance without rack's overhang offset
-							bool bDisplayPTP = false;
-							bool bTopOvehang = false;
-							bool bBotOverhang = false;
-							bool bLeftOverhang = false;
-							bool bRightOverhang = false;
-							// DrawingDocument.RacksPalletType drives pallet types for all racks.
-							// If it is not overhang then all racks doesnt have overhang pallets.
-							if (sheet.Document.RacksPalletType == ePalletType.eOverhang)
-							{
-								// Find rack with overhang pallets connected to this AisleSpace.
-								// Overhang property is stored in the sheet and applied to all racks in the document.
-								// So check document for overhang property.
-								foreach (List<Rack> rackGroup in sheet.RacksGroups)
-								{
-									if (rackGroup == null)
-										continue;
+                            // display PTP-distance - it is distance without rack's overhang offset
+                            bool bDisplayPTP = false;
+                            bool bTopOvehang = false;
+                            bool bBotOverhang = false;
+                            bool bLeftOverhang = false;
+                            bool bRightOverhang = false;
+                            // DrawingDocument.RacksPalletType drives pallet types for all racks.
+                            // If it is not overhang then all racks doesnt have overhang pallets.
+                            if (sheet.Document.RacksPalletType == ePalletType.eOverhang)
+                            {
+                                // Find rack with overhang pallets connected to this AisleSpace.
+                                // Overhang property is stored in the sheet and applied to all racks in the document.
+                                // So check document for overhang property.
+                                foreach (List<Rack> rackGroup in sheet.RacksGroups)
+                                {
+                                    if (rackGroup == null)
+                                        continue;
 
-									foreach (Rack rack in rackGroup)
-									{
-										if (rack == null)
-											continue;
+                                    foreach (Rack rack in rackGroup)
+                                    {
+                                        if (rack == null)
+                                            continue;
 
-										if (bIsXSmallest)
-										{
-											// rack should be rotated
-											if (rack.IsHorizontal)
-												continue;
+                                        if (bIsXSmallest)
+                                        {
+                                            // rack should be rotated
+                                            if (rack.IsHorizontal)
+                                                continue;
 
-											// they should be intersected in Y-axis
-											if (Utils.FLT(asGeom.BottomLeft_GlobalPoint.Y, rack.TopLeft_GlobalPoint.Y) || Utils.FGT(asGeom.TopLeft_GlobalPoint.Y, rack.BottomLeft_GlobalPoint.Y))
-												continue;
+                                            // they should be intersected in Y-axis
+                                            if (Utils.FLT(asGeom.BottomLeft_GlobalPoint.Y, rack.TopLeft_GlobalPoint.Y) || Utils.FGT(asGeom.TopLeft_GlobalPoint.Y, rack.BottomLeft_GlobalPoint.Y))
+                                                continue;
 
-											if (Utils.FEQ(rack.TopLeft_GlobalPoint.X, asGeom.TopRight_GlobalPoint.X))
-											{
-												bRightOverhang = true;
-												break;
-											}
-											else if (Utils.FEQ(rack.TopRight_GlobalPoint.X, asGeom.TopLeft_GlobalPoint.X))
-											{
-												bLeftOverhang = true;
-												break;
-											}
-										}
-										else
-										{
-											// rack should be not rotated
-											if (!rack.IsHorizontal)
-												continue;
+                                            if (Utils.FEQ(rack.TopLeft_GlobalPoint.X, asGeom.TopRight_GlobalPoint.X))
+                                            {
+                                                bRightOverhang = true;
+                                                break;
+                                            }
+                                            else if (Utils.FEQ(rack.TopRight_GlobalPoint.X, asGeom.TopLeft_GlobalPoint.X))
+                                            {
+                                                bLeftOverhang = true;
+                                                break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // rack should be not rotated
+                                            if (!rack.IsHorizontal)
+                                                continue;
 
-											// skip if they are not intersected in X-axis
-											if (Utils.FLT(asGeom.TopRight_GlobalPoint.X, rack.TopLeft_GlobalPoint.X) || Utils.FGT(asGeom.TopLeft_GlobalPoint.X, rack.TopRight_GlobalPoint.X))
-												continue;
+                                            // skip if they are not intersected in X-axis
+                                            if (Utils.FLT(asGeom.TopRight_GlobalPoint.X, rack.TopLeft_GlobalPoint.X) || Utils.FGT(asGeom.TopLeft_GlobalPoint.X, rack.TopRight_GlobalPoint.X))
+                                                continue;
 
-											if (Utils.FEQ(rack.TopLeft_GlobalPoint.Y, asGeom.BottomLeft_GlobalPoint.Y))
-											{
-												bBotOverhang = true;
-												break;
-											}
-											else if (Utils.FEQ(rack.BottomLeft_GlobalPoint.Y, asGeom.TopLeft_GlobalPoint.Y))
-											{
-												bTopOvehang = true;
-												break;
-											}
-										}
-									}
-								}
-							}
-							//
-							if (bIsXSmallest && (bLeftOverhang || bRightOverhang))
-								bDisplayPTP = true;
-							else if (!bIsXSmallest && (bTopOvehang || bBotOverhang))
-								bDisplayPTP = true;
+                                            if (Utils.FEQ(rack.TopLeft_GlobalPoint.Y, asGeom.BottomLeft_GlobalPoint.Y))
+                                            {
+                                                bBotOverhang = true;
+                                                break;
+                                            }
+                                            else if (Utils.FEQ(rack.BottomLeft_GlobalPoint.Y, asGeom.TopLeft_GlobalPoint.Y))
+                                            {
+                                                bTopOvehang = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            //
+                            if (bIsXSmallest && (bLeftOverhang || bRightOverhang))
+                                bDisplayPTP = true;
+                            else if (!bIsXSmallest && (bTopOvehang || bBotOverhang))
+                                bDisplayPTP = true;
 
-							// display the smallest side length
-							System.Windows.Point pnt_01 = asGeom.BottomLeft_GlobalPoint;
-							System.Windows.Point pnt_02 = asGeom.TopLeft_GlobalPoint;
-							RackAdvancedPropertiesControl.eDimensionPlacement dimPlacement = RackAdvancedPropertiesControl.eDimensionPlacement.eLeft;
-							string strDimText = asGeom.Length_Y.ToString();
-							if(bIsXSmallest)
-							{
-								pnt_01 = asGeom.TopLeft_GlobalPoint;
-								pnt_02 = asGeom.TopRight_GlobalPoint;
-								dimPlacement = RackAdvancedPropertiesControl.eDimensionPlacement.eTop;
-								strDimText = asGeom.Length_X.ToString();
-							}
+                            // display the smallest side length
+                            System.Windows.Point pnt_01 = asGeom.BottomLeft_GlobalPoint;
+                            System.Windows.Point pnt_02 = asGeom.TopLeft_GlobalPoint;
+                            RackAdvancedPropertiesControl.eDimensionPlacement dimPlacement = RackAdvancedPropertiesControl.eDimensionPlacement.eLeft;
+                            string strDimText = asGeom.Length_Y.ToString();
+                            if(bIsXSmallest)
+                            {
+                                pnt_01 = asGeom.TopLeft_GlobalPoint;
+                                pnt_02 = asGeom.TopRight_GlobalPoint;
+                                dimPlacement = RackAdvancedPropertiesControl.eDimensionPlacement.eTop;
+                                strDimText = asGeom.Length_X.ToString();
+                            }
 
-							//
-							double dimPixelsOffest = m_DimensionOffsetInPixels;
-							// add text size
-							if (bDisplayPTP)
-								dimPixelsOffest += 1.5 * geomDisplaySettings.TextFontSize;
-							RackAdvancedPropertiesControl._DrawDimension(
-								dc,
-								pnt_01,
-								pnt_02,
-								strDimText,
-								dimPixelsOffest,
-								geomDisplaySettings.TextFontSize,
-								geomDisplaySettings.TextFontSize / 4,
-								dimPlacement,
-								ics
-								);
+                            //
+                            double dimPixelsOffest = m_DimensionOffsetInPixels;
+                            // add text size
+                            if (bDisplayPTP)
+                                dimPixelsOffest += 1.5 * geomDisplaySettings.TextFontSize;
+                            RackAdvancedPropertiesControl._DrawDimension(
+                                dc,
+                                pnt_01,
+                                pnt_02,
+                                strDimText,
+                                dimPixelsOffest,
+                                geomDisplaySettings.TextFontSize,
+                                geomDisplaySettings.TextFontSize / 4,
+                                dimPlacement,
+                                ics
+                                );
 
-							// display PTP
-							if (bDisplayPTP)
-							{
-								double ptpDistValue = 0.0;
-								if (bIsXSmallest)
-								{
-									ptpDistValue = asGeom.Length_X;
-									// check left and right overhang
-									if (bLeftOverhang)
-									{
-										pnt_01.X += sheet.Document.RacksPalletsOverhangValue;
-										ptpDistValue -= sheet.Document.RacksPalletsOverhangValue;
-									}
-									if (bRightOverhang)
-									{
-										pnt_02.X -= sheet.Document.RacksPalletsOverhangValue;
-										ptpDistValue -= sheet.Document.RacksPalletsOverhangValue;
-									}
-								}
-								else
-								{
-									ptpDistValue = asGeom.Length_Y;
-									// check top and bot overhang
-									if(bBotOverhang)
-									{
-										pnt_01.Y -= sheet.Document.RacksPalletsOverhangValue;
-										ptpDistValue -= sheet.Document.RacksPalletsOverhangValue;
-									}
-									if(bTopOvehang)
-									{
-										pnt_02.Y += sheet.Document.RacksPalletsOverhangValue;
-										ptpDistValue -= sheet.Document.RacksPalletsOverhangValue;
-									}
-								}
-								strDimText = "PTP = " + ptpDistValue.ToString();
+                            // display PTP
+                            if (bDisplayPTP)
+                            {
+                                double ptpDistValue = 0.0;
+                                if (bIsXSmallest)
+                                {
+                                    ptpDistValue = asGeom.Length_X;
+                                    // check left and right overhang
+                                    if (bLeftOverhang)
+                                    {
+                                        pnt_01.X += sheet.Document.RacksPalletsOverhangValue;
+                                        ptpDistValue -= sheet.Document.RacksPalletsOverhangValue;
+                                    }
+                                    if (bRightOverhang)
+                                    {
+                                        pnt_02.X -= sheet.Document.RacksPalletsOverhangValue;
+                                        ptpDistValue -= sheet.Document.RacksPalletsOverhangValue;
+                                    }
+                                }
+                                else
+                                {
+                                    ptpDistValue = asGeom.Length_Y;
+                                    // check top and bot overhang
+                                    if (bBotOverhang)
+                                    {
+                                        pnt_01.Y -= sheet.Document.RacksPalletsOverhangValue;
+                                        ptpDistValue -= sheet.Document.RacksPalletsOverhangValue;
+                                    }
+                                    if (bTopOvehang)
+                                    {
+                                        pnt_02.Y += sheet.Document.RacksPalletsOverhangValue;
+                                        ptpDistValue -= sheet.Document.RacksPalletsOverhangValue;
+                                    }
+                                }
+                                strDimText = "PTP = " + ptpDistValue.ToString();
 
-								//
-								RackAdvancedPropertiesControl._DrawDimension(
-									dc,
-									pnt_01,
-									pnt_02,
-									strDimText,
-									m_DimensionOffsetInPixels,
-									geomDisplaySettings.TextFontSize,
-									geomDisplaySettings.TextFontSize / 4,
-									dimPlacement,
-									ics
-									);
-							}
-						}
-					}
-				}
+                                //
+                                RackAdvancedPropertiesControl._DrawDimension(
+                                    dc,
+                                    pnt_01,
+                                    pnt_02,
+                                    strDimText,
+                                    m_DimensionOffsetInPixels,
+                                    geomDisplaySettings.TextFontSize,
+                                    geomDisplaySettings.TextFontSize / 4,
+                                    dimPlacement,
+                                    ics
+                                    );
+                            }
+                        }
+                    }
+                }
 
 				// draw sheet and rack groups dimensions
 				if(bExportGeometryDimensions)
@@ -1241,7 +1242,6 @@ namespace RackDrawingApp
 									lengthDimPlacement,
 									ics
 									);
-
 							// for the first rack in the group need to display its depth
 							int iRackIndex = rackGroup.IndexOf(rack);
 							if(iRackIndex == 0)

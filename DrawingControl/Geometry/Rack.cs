@@ -7992,24 +7992,24 @@ namespace DrawingControl
 		{
 			if (IsHorizontal)
 			{
-				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+				if (IsUnderpassAvailable || this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
 				{
 					_DrawRowGuard(this.TopLeft_GlobalPoint, ConectedAisleSpaceDirection.LEFT, dc, cs, geomDisplaySettings);
 				}
 
-				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
+				if (IsUnderpassAvailable || this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
 				{
 					_DrawRowGuard(this.TopRight_GlobalPoint, ConectedAisleSpaceDirection.RIGHT, dc, cs, geomDisplaySettings);
 				}
 			}
 			else
 			{
-				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+				if (IsUnderpassAvailable || this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
 				{
 					_DrawRowGuard(this.TopLeft_GlobalPoint, ConectedAisleSpaceDirection.TOP, dc, cs, geomDisplaySettings);
 				}
 
-				if (this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
+				if (IsUnderpassAvailable || this.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
 				{
 					_DrawRowGuard(this.BottomLeft_GlobalPoint, ConectedAisleSpaceDirection.BOTTOM, dc, cs, geomDisplaySettings);
 				}
@@ -8137,17 +8137,19 @@ namespace DrawingControl
 
 			SolidColorBrush rackRowGuardBrush = new SolidColorBrush(rackRowGuardColor);
 			Pen pen = new Pen(rackRowGuardBrush, 1.0);
+			Pen guardBeamPen = new Pen(rackRowGuardBrush, 58);
 
 			Point right;
 			Point left;
 
 			int underpassDim = 1;
-
+			
             if (IsUnderpassAvailable)
             {
 				underpassDim = -1;
 				rackRowGuardBrush.Opacity = 0.8;
-			}
+                guardBeamPen.DashStyle = DashStyles.Dash;
+            }
 
 			switch (dimPlacement)
 			{
@@ -8162,11 +8164,18 @@ namespace DrawingControl
 
 					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
 
-					right = new Point(topPoint.X - (underpassDim * guardBeamOffset), topPoint.Y + offset);
-					left = new Point(topPoint.X - (underpassDim * guardBeamOffset) - (underpassDim * guardBeamWidth), topPoint.Y + offset + guardBeamLength);
+					right = new Point(topPoint.X - (underpassDim * guardBeamOffset), topPoint.Y + offset + smallGuardSupportDepth);
+					left = new Point(topPoint.X - (underpassDim * guardBeamOffset) - (underpassDim * guardBeamWidth), topPoint.Y + offset + guardBeamLength - smallGuardSupportDepth);
 
-					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
-					break;
+                    if (IsUnderpassAvailable)
+                    {
+						_FillRectDashed(right, left, true, dc, cs, rackRowGuardBrush, pen);
+                    }
+					else
+                    {
+						dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, left), GetLocalPoint(cs, right)));
+					}
+                    break;
 
 				case ConectedAisleSpaceDirection.TOP:
 					right = new Point(topPoint.X + offset, topPoint.Y - (underpassDim * offset));
@@ -8182,7 +8191,14 @@ namespace DrawingControl
 					right = new Point(topPoint.X + offset, topPoint.Y - (underpassDim * guardBeamOffset));
 					left = new Point(topPoint.X + offset + guardBeamLength, topPoint.Y - (underpassDim * offset) - (underpassDim * guardBeamOffset));
 
-					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+					if (IsUnderpassAvailable)
+					{
+						_FillRectDashed(left, right, false, dc, cs, rackRowGuardBrush, pen);
+					}
+					else
+					{
+						dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+					}
 					break;
 
 
@@ -8197,11 +8213,19 @@ namespace DrawingControl
 
 					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
 
-					right = new Point(topPoint.X + (underpassDim * guardBeamOffset), topPoint.Y + offset);
-					left = new Point(topPoint.X + (underpassDim * guardBeamOffset) + (underpassDim * guardBeamWidth), topPoint.Y + offset + guardBeamLength);
+					right = new Point(topPoint.X + (underpassDim * guardBeamOffset), topPoint.Y + offset + smallGuardSupportDepth);
+					left = new Point(topPoint.X + (underpassDim * guardBeamOffset) + (underpassDim * guardBeamWidth), topPoint.Y + offset + guardBeamLength - smallGuardSupportDepth);
+					
+					if (IsUnderpassAvailable)
+					{
+						_FillRectDashed(right, left, true, dc, cs, rackRowGuardBrush, pen);
+					}
+					else
+					{
+						dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+					}
 
-					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
-					break;
+                    break;
 
 				case ConectedAisleSpaceDirection.BOTTOM:
 					right = new Point(topPoint.X + offset, topPoint.Y + (underpassDim * offset));
@@ -8217,33 +8241,81 @@ namespace DrawingControl
 					right = new Point(topPoint.X + offset, topPoint.Y + (underpassDim * guardBeamOffset));
 					left = new Point(topPoint.X + offset + guardBeamLength, topPoint.Y + (underpassDim * offset) + (underpassDim * guardBeamOffset));
 
-					dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+					if (IsUnderpassAvailable)
+					{
+						_FillRectDashed(left, right, false, dc, cs, rackRowGuardBrush, pen);
+					}
+					else
+					{
+						dc.DrawRectangle(rackRowGuardBrush, pen, new Rect(GetLocalPoint(cs, right), GetLocalPoint(cs, left)));
+					}
+
 					break;
 			}
 		}
 
-		#endregion
+		private void _FillRectDashed(Point higher, Point lower, bool isVertical, DrawingContext dc, ICoordinateSystem cs, Brush brush, Pen pen)
+		{
+			double dashInterval = 100;
 
-		#region Serialization
+			if (isVertical)
+			{
+				double lastY = higher.Y;
 
-		// (!!!) IF YOU WANT TO ADD NEW PROPERTY ALSO ADD IT TO Rack_State (!!!)
-		// Otherwise, it will not be saved\restored after document undo\redo operations.
-		//=============================================================================
-		// 1.1 New UI properties
-		// 2.1 Increase major, old drawing have incorrect min, max length values. Now they are depends on beams list.
-		// 2.2 Increase minor - _On_Height_Changed doesnt calc m_ClearAvailableHeight with pallets height
-		// 3.2 Remove Clear Available Height, it is calculated based on the roof type and rack position.
-		// 4.2 PalletType(Overhang\Flush) is removed and placed in the DrawingDocument.
-		// 5.2 Add ColumnGUID and MinColumnGUID instead ColumnType.
-		//     Add Bracing and X_BracingHeight.
-		//     Remove m_bIsColumnAutoSelectEnabled.
-		// 5.3 Add TieBeamFrame flag.
-		// 5.4 Add m_IsColumnSetManually bool property.
-		// 5.5 Add m_TieBeamShouldBeAdded
-		// 5.6 Add m_StiffenersHeight
-		// 5.7 Remove m_TieBeamShouldBeAdded, add m_RequiredTieBeamFrames
-		// 5.8 Add m_RackHeightWithTieBeam_IsMoreThan_MaxHeight
-		protected static string _sRack_strMajor = "Rack_MAJOR";
+				lower.Y -= dashInterval;
+				while (lower.Y >= lastY)
+				{
+					higher.Y = lower.Y - dashInterval;
+
+					if (higher.Y < lastY)
+						higher.Y = lastY;
+
+					dc.DrawRectangle(brush, pen, new Rect(GetLocalPoint(cs, higher), GetLocalPoint(cs, lower)));
+
+					lower.Y = higher.Y - dashInterval;
+				}
+            }
+            else
+            {
+				double lastX = higher.X;
+
+				lower.X += dashInterval;
+				while (lower.X <= lastX)
+				{
+					higher.X = lower.X + dashInterval;
+
+					if (higher.X > lastX)
+						higher.X = lastX;
+
+					dc.DrawRectangle(brush, pen, new Rect(GetLocalPoint(cs, higher), GetLocalPoint(cs, lower)));
+
+					lower.X = higher.X + dashInterval;
+				}
+			}
+		}
+
+        #endregion
+
+        #region Serialization
+
+        // (!!!) IF YOU WANT TO ADD NEW PROPERTY ALSO ADD IT TO Rack_State (!!!)
+        // Otherwise, it will not be saved\restored after document undo\redo operations.
+        //=============================================================================
+        // 1.1 New UI properties
+        // 2.1 Increase major, old drawing have incorrect min, max length values. Now they are depends on beams list.
+        // 2.2 Increase minor - _On_Height_Changed doesnt calc m_ClearAvailableHeight with pallets height
+        // 3.2 Remove Clear Available Height, it is calculated based on the roof type and rack position.
+        // 4.2 PalletType(Overhang\Flush) is removed and placed in the DrawingDocument.
+        // 5.2 Add ColumnGUID and MinColumnGUID instead ColumnType.
+        //     Add Bracing and X_BracingHeight.
+        //     Remove m_bIsColumnAutoSelectEnabled.
+        // 5.3 Add TieBeamFrame flag.
+        // 5.4 Add m_IsColumnSetManually bool property.
+        // 5.5 Add m_TieBeamShouldBeAdded
+        // 5.6 Add m_StiffenersHeight
+        // 5.7 Remove m_TieBeamShouldBeAdded, add m_RequiredTieBeamFrames
+        // 5.8 Add m_RackHeightWithTieBeam_IsMoreThan_MaxHeight
+        protected static string _sRack_strMajor = "Rack_MAJOR";
 		protected static int _sRack_MAJOR = 5;
 		protected static string _sRack_strMinor = "Rack_MINOR";
 		protected static int _sRack_MINOR = 8;
