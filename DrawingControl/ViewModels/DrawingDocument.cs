@@ -3148,7 +3148,11 @@ namespace DrawingControl
 
 					List<Rack> racksList = sheet.GetAllRacks();
 					if (racksList == null || racksList.Count == 0)
+					{
+						// Update to avoid case that all deleted
+						sheet.UpdateStatisticsCollections();
 						continue;
+					}
 
 					foreach (Rack rack in racksList)
 					{
