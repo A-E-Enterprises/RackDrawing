@@ -8294,28 +8294,29 @@ namespace DrawingControl
 			}
 		}
 
-        #endregion
+		#endregion
 
-        #region Serialization
+		#region Serialization
 
-        // (!!!) IF YOU WANT TO ADD NEW PROPERTY ALSO ADD IT TO Rack_State (!!!)
-        // Otherwise, it will not be saved\restored after document undo\redo operations.
-        //=============================================================================
-        // 1.1 New UI properties
-        // 2.1 Increase major, old drawing have incorrect min, max length values. Now they are depends on beams list.
-        // 2.2 Increase minor - _On_Height_Changed doesnt calc m_ClearAvailableHeight with pallets height
-        // 3.2 Remove Clear Available Height, it is calculated based on the roof type and rack position.
-        // 4.2 PalletType(Overhang\Flush) is removed and placed in the DrawingDocument.
-        // 5.2 Add ColumnGUID and MinColumnGUID instead ColumnType.
-        //     Add Bracing and X_BracingHeight.
-        //     Remove m_bIsColumnAutoSelectEnabled.
-        // 5.3 Add TieBeamFrame flag.
-        // 5.4 Add m_IsColumnSetManually bool property.
-        // 5.5 Add m_TieBeamShouldBeAdded
-        // 5.6 Add m_StiffenersHeight
-        // 5.7 Remove m_TieBeamShouldBeAdded, add m_RequiredTieBeamFrames
-        // 5.8 Add m_RackHeightWithTieBeam_IsMoreThan_MaxHeight
-        protected static string _sRack_strMajor = "Rack_MAJOR";
+		// (!!!) IF YOU WANT TO ADD NEW PROPERTY ALSO ADD IT TO Rack_State (!!!)
+		// Otherwise, it will not be saved\restored after document undo\redo operations.
+		//=============================================================================
+		// 1.1 New UI properties
+		// 2.1 Increase major, old drawing have incorrect min, max length values. Now they are depends on beams list.
+		// 2.2 Increase minor - _On_Height_Changed doesnt calc m_ClearAvailableHeight with pallets height
+		// 3.2 Remove Clear Available Height, it is calculated based on the roof type and rack position.
+		// 4.2 PalletType(Overhang\Flush) is removed and placed in the DrawingDocument.
+		// 5.2 Add ColumnGUID and MinColumnGUID instead ColumnType.
+		//     Add Bracing and X_BracingHeight.
+		//     Remove m_bIsColumnAutoSelectEnabled.
+		// 5.3 Add TieBeamFrame flag.
+		// 5.4 Add m_IsColumnSetManually bool property.
+		// 5.5 Add m_TieBeamShouldBeAdded
+		// 5.6 Add m_StiffenersHeight
+		// 5.7 Remove m_TieBeamShouldBeAdded, add m_RequiredTieBeamFrames
+		// 5.8 Add m_RackHeightWithTieBeam_IsMoreThan_MaxHeight
+		// 5.9 Add ConectedAisleSpaceDirections
+		protected static string _sRack_strMajor = "Rack_MAJOR";
 		protected static int _sRack_MAJOR = 5;
 		protected static string _sRack_strMinor = "Rack_MINOR";
 		protected static int _sRack_MINOR = 8;
@@ -8388,7 +8389,7 @@ namespace DrawingControl
 			// 5.8
 			info.AddValue("RackHeightWithTieBeam_IsMoreThan_MaxHeight", m_RackHeightWithTieBeam_IsMoreThan_MaxHeight);
 
-			//TODO: increase minor to 5.9 ??
+			// 5.9
 			info.AddValue("ConectedAisleSpaceDirections", ConectedAisleSpaceDirections);
 		}
 		//=============================================================================
@@ -8472,8 +8473,7 @@ namespace DrawingControl
 					if (iMajor >= 5 && iMinor >= 8)
 						m_RackHeightWithTieBeam_IsMoreThan_MaxHeight = (bool)info.GetValue("RackHeightWithTieBeam_IsMoreThan_MaxHeight", typeof(bool));
 					
-					//TODO: increase minor to 5.9 ??
-					if (iMajor >= 5 && iMinor >= 8)
+					if (iMajor >= 5 && iMinor >= 9)
 						ConectedAisleSpaceDirections = (ConectedAisleSpaceDirection)info.GetValue("ConectedAisleSpaceDirections", typeof(ConectedAisleSpaceDirection));
 				}
 				catch
