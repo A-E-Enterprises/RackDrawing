@@ -1,4 +1,17 @@
-﻿RackDrawingApp 1.407.040
+﻿RackDrawingApp 1.407.041
+[internal] Increase version of Rack serialization model
+[internal] Rack row width. Commit 2. Show full rack row size for entire selected group
+[internal] Rack row width. Commit 1. Show rack rows width for export
+[internal] Racks Guards. Commit 5. Draw rack guards dynamically when interact with elements
+[fixed] Fix Update document statistic when all racks deleted.
+[fixed] Fix Refresh view elements order after adding new element to avoid aisle space position over racks.
+[internal] Racks Guards. Commit 4. Made dash line for underpass support guard and draw row guards for under pass even without ai space near.
+[internal] Racks Guards. Commit 3. Added guard default colors to color theme settings.
+[internal] Racks Guards. Commit 2. Show guards only when they enabled in racks accessories.
+[internal] Racks Guards. Commit 1. Added drawing of guards for all racks
+[fixed] Fixed bug with Column depth changing in properties form.
+
+RackDrawingApp 1.407.040
 [fixed] PDF export. Add addition space between "DRAWN, SYSTEM, CUSTOMER NAME, Project SITE, DRG.NO." and text. Increase height of the image in bottom right corner by 25%.
 [fixed] PDF export. Watermark was displayed twice.
 
