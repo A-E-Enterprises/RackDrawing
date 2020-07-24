@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 
@@ -43,24 +44,67 @@ namespace DrawingControl
 				if (currSheet.SelectedGeometryCollection == null)
 					return;
 
+				bool isFullRowSelected = IsSelectedFullRackGroupOnly();
+
 				// draw lines with distance value if only single geometry selected
-				if (currSheet.SelectedGeometryCollection.Count != 1)
+				if (currSheet.SelectedGeometryCollection.Count != 1 && !isFullRowSelected)
+                    return;
+
+                BaseRectangleGeometry selectedGeom = currSheet.SelectedGeometryCollection[0];
+                BaseRectangleGeometry lastSelectedGeom = currSheet.SelectedGeometryCollection[currSheet.SelectedGeometryCollection.Count - 1];
+				if (selectedGeom == null || lastSelectedGeom == null)
 					return;
 
-				BaseRectangleGeometry selectedGeom = currSheet.SelectedGeometryCollection[0];
-				if (selectedGeom == null)
-					return;
+				// ignore case when selected only 1 element
+                if (selectedGeom != lastSelectedGeom)
+                {
+					foreach (BaseRectangleGeometry current in currSheet.SelectedGeometryCollection)
+					{
+						if (selectedGeom.IsHorizontal)
+						{
+							if (selectedGeom.Center_GlobalPoint.X > current.Center_GlobalPoint.X)
+								selectedGeom = current;
+
+							if (lastSelectedGeom.Center_GlobalPoint.X < current.Center_GlobalPoint.X)
+								lastSelectedGeom = current;
+						}
+						else
+						{
+							if (selectedGeom.BottomLeft_GlobalPoint.Y > current.BottomLeft_GlobalPoint.Y)
+								selectedGeom = current;
+
+							if (lastSelectedGeom.BottomLeft_GlobalPoint.Y < current.BottomLeft_GlobalPoint.Y)
+								lastSelectedGeom = current;
+						}
+					}
+				}
 
 				// 
 				Pen _DistanceLinesPen = new Pen(m_DC.SelectedGeometryInfoBrush, m_DistanceLineThickness);
 				FontFamily textFontFamily = new FontFamily("Arial");
 				Typeface textTypeFace = new Typeface(textFontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-
+				
 				//
-				Point TopLeft_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.TopLeft_GlobalPoint);
-				Point TopRight_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.TopRight_GlobalPoint);
-				Point BottomRight_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.BottomRight_GlobalPoint);
-				Point BottomLeft_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.BottomLeft_GlobalPoint);
+				Point TopLeft_ScreenPoint;
+				Point TopRight_ScreenPoint;
+				Point BottomRight_ScreenPoint;
+				Point BottomLeft_ScreenPoint;
+
+                if (selectedGeom.IsHorizontal)
+                {
+					TopLeft_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.TopLeft_GlobalPoint);
+					TopRight_ScreenPoint = m_DC.GetLocalPoint(currSheet, lastSelectedGeom.TopRight_GlobalPoint);
+					BottomRight_ScreenPoint = m_DC.GetLocalPoint(currSheet, lastSelectedGeom.BottomRight_GlobalPoint);
+					BottomLeft_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.BottomLeft_GlobalPoint);
+				}
+                else
+                {
+                    TopLeft_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.TopLeft_GlobalPoint);
+                    TopRight_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.TopRight_GlobalPoint);
+                    BottomRight_ScreenPoint = m_DC.GetLocalPoint(currSheet, lastSelectedGeom.BottomRight_GlobalPoint);
+                    BottomLeft_ScreenPoint = m_DC.GetLocalPoint(currSheet, lastSelectedGeom.BottomLeft_GlobalPoint);
+                }
+
 				Point Center_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.Center_GlobalPoint);
 
 				if (Utils.FGE(TopLeft_ScreenPoint.X, 0.0) && Utils.FGE(TopLeft_ScreenPoint.Y, 0.0) && Utils.FLE(TopLeft_ScreenPoint.X, m_DC.ActualWidth) && Utils.FLE(TopLeft_ScreenPoint.Y, m_DC.ActualHeight))
@@ -206,7 +250,20 @@ namespace DrawingControl
 				thisDC.DrawLine(_DistanceLinesPen, RightWidthArrow_ScreenPoint_3, RightWidthArrow_ScreenPoint_1);
 				thisDC.DrawLine(_DistanceLinesPen, RightWidthArrow_ScreenPoint_3, RightWidthArrow_ScreenPoint_2);
 				// text
-				FormattedText widthText = new FormattedText(selectedGeom.Length_X.ToString("."), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, textTypeFace, m_rTextSize, m_DC.SelectedGeometryInfoBrush);
+				double length = 0;
+				foreach (BaseRectangleGeometry current in m_DC.Sheet.SelectedGeometryCollection)
+				{
+					if (selectedGeom.IsHorizontal)
+					{
+						length += current.Length_X;
+					}
+					else
+					{
+						length = current.Length_X;
+						break;
+					}
+				}
+				FormattedText widthText = new FormattedText(length.ToString("."), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, textTypeFace, m_rTextSize, m_DC.SelectedGeometryInfoBrush);
 				widthText.TextAlignment = TextAlignment.Center;
 				Point WidthText_ScreenPoint = BotRight_SizeRack_EndScreenPoint;
 				WidthText_ScreenPoint.X -= (BotRight_SizeRack_EndScreenPoint.X - BotLeft_SizeRack_EndScreenPoint.X) / 2;
@@ -232,7 +289,7 @@ namespace DrawingControl
 				//
 				Point TopHeightLine_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.TopRight_GlobalPoint);
 				TopHeightLine_ScreenPoint.X += 0.75 * m_rSizeLeaderLength;
-				Point BottomHeightLine_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.BottomRight_GlobalPoint);
+				Point BottomHeightLine_ScreenPoint = m_DC.GetLocalPoint(currSheet, lastSelectedGeom.BottomRight_GlobalPoint);
 				BottomHeightLine_ScreenPoint.X += 0.75 * m_rSizeLeaderLength;
 				//
 				if (!bDrawArrowLinesInside)
@@ -299,7 +356,20 @@ namespace DrawingControl
 				thisDC.DrawLine(_DistanceLinesPen, BotHeightArrow_ScreenPoint_2, BotHeightArrow_ScreenPoint_3);
 
 				// text
-				FormattedText heightText = new FormattedText(selectedGeom.Length_Y.ToString("."), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, textTypeFace, m_rTextSize, m_DC.SelectedGeometryInfoBrush);
+				double height = 0;
+				foreach (BaseRectangleGeometry current in m_DC.Sheet.SelectedGeometryCollection)
+				{
+					if (selectedGeom.IsHorizontal)
+					{
+						height = current.Length_Y;
+						break;
+					}
+					else
+					{
+						height += current.Length_Y;
+					}
+				}
+				FormattedText heightText = new FormattedText(height.ToString("."), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, textTypeFace, m_rTextSize, m_DC.SelectedGeometryInfoBrush);
 				heightText.TextAlignment = TextAlignment.Center;
 				Point heightTextPoint = TopRight_SizeRack_ScreenEndPoint;
 				heightTextPoint.Y += (BottomRight_SizeRack_ScreenEndPoint.Y - TopRight_SizeRack_ScreenEndPoint.Y) / 2;
@@ -307,10 +377,58 @@ namespace DrawingControl
 				heightTextPoint.X += heightText.Width / 2;
 				thisDC.DrawText(heightText, heightTextPoint);
 
+				
+
 				// Pop clip
 				if (!isAllSheetDisplayed)
 					thisDC.Pop();
 			}
+		}
+
+		private bool IsSelectedFullRackGroupOnly()
+        {
+            if (m_DC.Sheet.SelectedGeometryCollection.Count <= 1)
+                return false;
+
+            bool bItIsRacksSingleRowCoulumn = true;
+			int iMultiSelectionRacksCount = 0;
+
+			List<List<Rack>> foundedRackGroups = new List<List<Rack>>();
+
+			foreach (BaseRectangleGeometry selectedRect in m_DC.Sheet.SelectedGeometryCollection)
+			{
+				Rack selectedRack = selectedRect as Rack;
+				if (selectedRack != null)
+				{
+					++iMultiSelectionRacksCount;
+					//
+					List<Rack> selectedRackGroup = m_DC.Sheet.GetRackGroup(selectedRack);
+					if (!foundedRackGroups.Contains(selectedRackGroup))
+					{
+						foundedRackGroups.Add(selectedRackGroup);
+						if (foundedRackGroups.Count > 1)
+						{
+							bItIsRacksSingleRowCoulumn = false;
+							break;
+						}
+					}
+				}
+				else
+				{
+					bItIsRacksSingleRowCoulumn = false;
+					break;
+				}
+			}
+
+			if (bItIsRacksSingleRowCoulumn)
+			{
+				// only if selected all racks in the row\column
+				bItIsRacksSingleRowCoulumn = false;
+				if (foundedRackGroups.Count == 1 && foundedRackGroups[0].Count == iMultiSelectionRacksCount)
+					bItIsRacksSingleRowCoulumn = true;
+			}
+
+			return bItIsRacksSingleRowCoulumn;
 		}
 	}
 }
