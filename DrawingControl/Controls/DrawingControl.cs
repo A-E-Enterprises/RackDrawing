@@ -1137,6 +1137,8 @@ namespace DrawingControl
 					// remove selection
 					currSheet.SelectedGeometryCollection.Clear();
 					UpdateDrawing(true);
+					// try reorder wrappers to aviod left ai spaces over racks
+					SortGeometryWrappersCollection();
 					return;
 				}
 
@@ -1938,16 +1940,16 @@ namespace DrawingControl
 				else if (geom_Y is SheetElevationGeometry)
 					return -1;
 
-				// Display not initialized geometry over initialized.
-				if (geom_X.IsInit != geom_Y.IsInit)
-				{
-					if (geom_X.IsInit)
-						return -1;
-					return 1;
-				}
+                // Display not initialized geometry over initialized.
+                if (geom_X.IsInit != geom_Y.IsInit)
+                {
+                    if (geom_X.IsInit)
+                        return -1;
+                    return 1;
+                }
 
-				// From top to bottom: tie beam, rack, shutter, wall, column, aisle space, all other geometry
-				if (geom_X != null && geom_Y != null)
+                // From top to bottom: tie beam, rack, shutter, wall, column, aisle space, all other geometry
+                if (geom_X != null && geom_Y != null)
 				{
 					int index_X = GetGeometryOrderIndex(geom_X);
 					int index_Y = GetGeometryOrderIndex(geom_Y);
