@@ -3030,7 +3030,10 @@ namespace DrawingControl
 			if (currSheet != null)
 				currSheet.Show(true);
 
-			NotifyPropertyChanged(() => CurrentSheet);
+            // notify current sheet to update details for new state
+            currSheet.MarkStateChanged();
+
+            NotifyPropertyChanged(() => CurrentSheet);
 		}
 
 		//=============================================================================

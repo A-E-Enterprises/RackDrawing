@@ -808,6 +808,9 @@ namespace DrawingControl
 					currSheet.CreateColumnPattern(m_gripToMove.Geometry as Column, globalPoint, currSheet.Length, currSheet.Width);
 				else
 					m_gripToMove.Move(globalPoint, currSheet.Length, currSheet.Width);
+
+				// check if need to refresh guards drawing
+				currSheet.CheckAisleSpacesAndRacksCollisions();
 			}
 
 			UpdateDrawing(false);
