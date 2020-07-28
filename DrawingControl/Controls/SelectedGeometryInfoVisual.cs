@@ -287,7 +287,7 @@ namespace DrawingControl
 				bDrawArrowLinesInside = (BottomRight_SizeRack_ScreenEndPoint.Y - TopRight_SizeRack_ScreenEndPoint.Y) > 20;
 
 				//
-				Point TopHeightLine_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.TopRight_GlobalPoint);
+				Point TopHeightLine_ScreenPoint = m_DC.GetLocalPoint(currSheet, selectedGeom.IsHorizontal ? lastSelectedGeom.TopRight_GlobalPoint : selectedGeom.TopRight_GlobalPoint);
 				TopHeightLine_ScreenPoint.X += 0.75 * m_rSizeLeaderLength;
 				Point BottomHeightLine_ScreenPoint = m_DC.GetLocalPoint(currSheet, lastSelectedGeom.BottomRight_GlobalPoint);
 				BottomHeightLine_ScreenPoint.X += 0.75 * m_rSizeLeaderLength;
