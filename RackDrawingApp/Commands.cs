@@ -899,11 +899,13 @@ namespace RackDrawingApp
 					sheetBorder,
 					new Rect(ics.GetLocalPoint(new System.Windows.Point(0.0, 0.0), 1.0, new Vector(0.0, 0.0)), ics.GetLocalPoint(new System.Windows.Point(sheet.Length, sheet.Width), 1.0, new Vector(0.0, 0.0))));
 
-
-
+				// Order geometry to draw aisle space first
+				// Rect that drawn first will be on lowest layer on image
+				BaseRectangleGeometry[] orderedRectangles = sheet.Rectangles.ToArray();
+				Array.Sort(orderedRectangles, new RectanglesComparer());
 
 				// draw geometry
-				foreach (BaseRectangleGeometry geom in sheet.Rectangles)
+				foreach (BaseRectangleGeometry geom in orderedRectangles)
 				{
 					if (geom == null)
 						continue;
@@ -2034,6 +2036,68 @@ namespace RackDrawingApp
 				return 0;
 			}
 		}
+
+		/// <summary>
+		/// Order rectangles to avoid rack and aisle space overlapping
+		/// </summary>
+		public class RectanglesComparer : IComparer<BaseRectangleGeometry>
+		{
+			public int Compare(BaseRectangleGeometry x, BaseRectangleGeometry y)
+			{
+				// Display SheetElevationGeometry over all other geometry, include non initialized geometry.
+				if (x is SheetElevationGeometry)
+					return 1;
+				else if (y is SheetElevationGeometry)
+					return -1;
+
+				// Display not initialized geometry over initialized.
+				if (x.IsInit != y.IsInit)
+				{
+					if (x.IsInit)
+						return -1;
+					return 1;
+				}
+
+				// From top to bottom: tie beam, rack, shutter, wall, column, aisle space, all other geometry
+				if (x != null && y != null)
+				{
+					int index_X = GetGeometryOrderIndex(x);
+					int index_Y = GetGeometryOrderIndex(y);
+					return index_X - index_Y;
+				}
+				else if (x != null)
+					return 1;
+				else if (y != null)
+					return -1;
+
+				return 0;
+			}
+
+			private int GetGeometryOrderIndex(BaseRectangleGeometry geom)
+			{
+				if (geom == null)
+					return 0;
+
+				//if (geom is SheetElevationGeometry)
+				//	return 8;
+				if (geom is TieBeam)
+					return 7;
+				else if (geom is Rack)
+					return 6;
+				else if (geom is Shutter)
+					return 5;
+				else if (geom is Wall)
+					return 4;
+				else if (geom is Column)
+					return 3;
+				else if (geom is AisleSpace)
+					return 2;
+				else if (geom is Block)
+					return 1;
+
+				return 1;
+			}
+		}
 	}
 
 	/// <summary>
@@ -2119,7 +2183,6 @@ namespace RackDrawingApp
 
 			try
 			{
-
 				// create pdf doc
 				PdfDocument pdfDoc = new PdfDocument();
 
