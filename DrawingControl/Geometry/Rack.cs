@@ -8020,6 +8020,7 @@ namespace DrawingControl
 		private void _DrawColumnGuard(Point originPoint, ConectedAisleSpaceDirection dimPlacement, DrawingContext dc, ICoordinateSystem cs, IGeomDisplaySettings geomDisplaySettings = null)
 		{
 			double colSize = Column.Length;
+			double guardSuportLinePixelOffset = 15;
 
 			int xOffset = 40;
 			int yOffset = 45;
@@ -8037,86 +8038,116 @@ namespace DrawingControl
 			SolidColorBrush rackColGuardBrush = new SolidColorBrush(rackColGuardColor);
 			Pen pen = new Pen(rackColGuardBrush, 2.0);
 
-			List<Point> path = new List<Point>();
+			List<Tuple<Point, Point>> lines = new List<Tuple<Point, Point>>(5);
 
 			Point step;
+			Point nextStep;
 
 			switch (dimPlacement)
 			{
 				case ConectedAisleSpaceDirection.TOP:
 					step = new Point(originPoint.X + xOffset, originPoint.Y - yOffset);
-					path.Add(GetLocalPoint(cs, step));
+					nextStep = new Point(step.X, step.Y - (guardHeight - guardAngleElevation));
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X, step.Y - (guardHeight - guardAngleElevation)); ;
-					path.Add(GetLocalPoint(cs, step));
+					step = nextStep;
+					nextStep = new Point(step.X - xOffset - (colSize / 2), step.Y - guardAngleElevation);
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X - xOffset - (colSize / 2), step.Y - guardAngleElevation);
-					path.Add(GetLocalPoint(cs, step));
+					step = nextStep;
+					nextStep = new Point(step.X - xOffset - (colSize / 2), step.Y + guardAngleElevation);
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
+					
+					step = nextStep;
+					nextStep = new Point(step.X, step.Y + (guardHeight - guardAngleElevation));
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X - xOffset - (colSize / 2), step.Y + guardAngleElevation);
-					path.Add(GetLocalPoint(cs, step));
+					step = lines[0].Item1;
+					nextStep = lines[3].Item2;
+					step.Y -= GetWidthInPixels(cs, guardSuportLinePixelOffset);
+					nextStep.Y -= GetWidthInPixels(cs, guardSuportLinePixelOffset);
+					lines.Add(new Tuple<Point, Point>(step, nextStep));
 
-					step = new Point(step.X, step.Y + (guardHeight - guardAngleElevation));
-					path.Add(GetLocalPoint(cs, step));
 					break;
 
 				case ConectedAisleSpaceDirection.BOTTOM:
 					step = new Point(originPoint.X + xOffset, originPoint.Y + yOffset);
-					path.Add(GetLocalPoint(cs, step));
+					nextStep = new Point(step.X, step.Y + (guardHeight - guardAngleElevation)); ;
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X, step.Y + (guardHeight - guardAngleElevation)); ;
-					path.Add(GetLocalPoint(cs, step));
+					step = nextStep;
+					nextStep = new Point(step.X - xOffset - (colSize / 2), step.Y + guardAngleElevation);
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X - xOffset - (colSize / 2), step.Y + guardAngleElevation);
-					path.Add(GetLocalPoint(cs, step));
+					step = nextStep;
+					nextStep = new Point(step.X - xOffset - (colSize / 2), step.Y - guardAngleElevation);
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X - xOffset - (colSize / 2), step.Y - guardAngleElevation);
-					path.Add(GetLocalPoint(cs, step));
+					step = nextStep;
+					nextStep = new Point(step.X, step.Y - (guardHeight - guardAngleElevation));
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X, step.Y - (guardHeight - guardAngleElevation));
-					path.Add(GetLocalPoint(cs, step));
+					step = lines[0].Item1;
+					nextStep = lines[3].Item2;
+					step.Y += GetWidthInPixels(cs, guardSuportLinePixelOffset);
+					nextStep.Y += GetWidthInPixels(cs, guardSuportLinePixelOffset);
+					lines.Add(new Tuple<Point, Point>(step, nextStep));
 					break;
 
 				case ConectedAisleSpaceDirection.LEFT:
 					step = new Point(originPoint.X - yOffset, originPoint.Y - xOffset);
-					path.Add(GetLocalPoint(cs, step));
+					nextStep = new Point(step.X - (guardHeight - guardAngleElevation), step.Y); ;
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X - (guardHeight - guardAngleElevation), step.Y); ;
-					path.Add(GetLocalPoint(cs, step));
+					step = nextStep;
+					nextStep = new Point(step.X - guardAngleElevation, step.Y + xOffset + (colSize / 2));
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X - guardAngleElevation, step.Y + xOffset + (colSize / 2));
-					path.Add(GetLocalPoint(cs, step));
+					step = nextStep;
+					nextStep = new Point(step.X + guardAngleElevation, step.Y + xOffset + (colSize / 2));
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X + guardAngleElevation, step.Y + xOffset + (colSize / 2));
-					path.Add(GetLocalPoint(cs, step));
+					step = nextStep;
+					nextStep = new Point(step.X + (guardHeight - guardAngleElevation), step.Y);
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X + (guardHeight - guardAngleElevation), step.Y);
-					path.Add(GetLocalPoint(cs, step));
+					step = lines[0].Item1;
+					nextStep = lines[3].Item2;
+					step.X -= GetWidthInPixels(cs, guardSuportLinePixelOffset);
+					nextStep.X -= GetWidthInPixels(cs, guardSuportLinePixelOffset);
+					lines.Add(new Tuple<Point, Point>(step, nextStep));
 					break;
 
 				case ConectedAisleSpaceDirection.RIGHT:
 					step = new Point(originPoint.X + yOffset, originPoint.Y - xOffset);
-					path.Add(GetLocalPoint(cs, step));
+					nextStep = new Point(step.X + (guardHeight - guardAngleElevation), step.Y); ;
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X + (guardHeight - guardAngleElevation), step.Y); ;
-					path.Add(GetLocalPoint(cs, step));
+					step = nextStep;
+					nextStep = new Point(step.X + guardAngleElevation, step.Y + xOffset + (colSize / 2));
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X + guardAngleElevation, step.Y + xOffset + (colSize / 2));
-					path.Add(GetLocalPoint(cs, step));
+					step = nextStep;
+					nextStep = new Point(step.X - guardAngleElevation, step.Y + xOffset + (colSize / 2));
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X - guardAngleElevation, step.Y + xOffset + (colSize / 2));
-					path.Add(GetLocalPoint(cs, step));
+					step = nextStep;
+					nextStep = new Point(step.X - (guardHeight - guardAngleElevation), step.Y);
+					lines.Add(new Tuple<Point, Point>(GetLocalPoint(cs, step), GetLocalPoint(cs, nextStep)));
 
-					step = new Point(step.X - (guardHeight - guardAngleElevation), step.Y);
-					path.Add(GetLocalPoint(cs, step));
+					step = lines[0].Item1;
+					nextStep = lines[3].Item2;
+					step.X += GetWidthInPixels(cs, guardSuportLinePixelOffset);
+					nextStep.X += GetWidthInPixels(cs, guardSuportLinePixelOffset);
+					lines.Add(new Tuple<Point, Point>(step, nextStep));
 					break;
 			}
 
-			for (int i = 0; i < path.Count - 1; i++)
-			{
-				dc.DrawLine(pen, path[i], path[i + 1]);
+            foreach (var line in lines)
+            {
+				dc.DrawLine(pen, line.Item1, line.Item2);
 			}
-		}
+        }
 
 		private void _DrawRowGuard(Point topPoint, ConectedAisleSpaceDirection dimPlacement, DrawingContext dc, ICoordinateSystem cs, IGeomDisplaySettings geomDisplaySettings = null)
 		{
