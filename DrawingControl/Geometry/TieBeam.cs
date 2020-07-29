@@ -15,6 +15,7 @@ namespace DrawingControl
 		{
 			if(tieBeam != null)
 				this.AttachedRacksHeightError = tieBeam.AttachedRacksHeightError;
+				this.RackColumnLengthOffset = tieBeam.RackColumnLengthOffset;
 		}
 		public TieBeam_State(TieBeam_State state)
 			: base(state)
@@ -22,10 +23,12 @@ namespace DrawingControl
 			if(state != null)
 			{
 				this.AttachedRacksHeightError = state.AttachedRacksHeightError;
+				this.RackColumnLengthOffset = state.RackColumnLengthOffset;
 			}
 		}
 
 		public bool AttachedRacksHeightError { get; private set; }
+		public double RackColumnLengthOffset { get; private set; }
 
 		//=============================================================================
 		protected override GeometryState MakeDeepCopy()
@@ -79,12 +82,18 @@ namespace DrawingControl
 			set { m_AttachedRacksHeightError = value; }
 		}
 
-		#endregion
+		private double m_RackColumnLengthOffset = 0.0;
+		public double RackColumnLengthOffset {
+			get { return m_RackColumnLengthOffset; } 
+			set { m_RackColumnLengthOffset = value; } 
+		}
 
-		#region Functions
+        #endregion
 
-		//=============================================================================
-		protected override GeometryState _GetOriginalState()
+        #region Functions
+
+        //=============================================================================
+        protected override GeometryState _GetOriginalState()
 		{
 			return new TieBeam_State(this);
 		}
@@ -163,6 +172,22 @@ namespace DrawingControl
 			Point BottomRight_ScreenPoint = GetLocalPoint(cs, BottomRight_GlobalPoint);
 
 			dc.DrawLine(pen, TopLeft_ScreenPoint, BottomRight_ScreenPoint);
+
+			TopLeft_ScreenPoint = TopLeft_GlobalPoint;
+			BottomRight_ScreenPoint = BottomRight_GlobalPoint;
+
+			if (IsHorizontal)
+            {
+				TopLeft_ScreenPoint.Y += RackColumnLengthOffset;
+				BottomRight_ScreenPoint.Y += RackColumnLengthOffset;
+			}
+            else
+            {
+				TopLeft_ScreenPoint.X += RackColumnLengthOffset;
+				BottomRight_ScreenPoint.X += RackColumnLengthOffset;
+			}
+
+			dc.DrawLine(pen, GetLocalPoint(cs, TopLeft_ScreenPoint), GetLocalPoint(cs, BottomRight_ScreenPoint));
 		}
 
 		//=============================================================================

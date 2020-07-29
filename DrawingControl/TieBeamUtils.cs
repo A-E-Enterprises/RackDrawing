@@ -1781,6 +1781,8 @@ namespace DrawingControl
 					tieBeamAtStart.TopLeft_GlobalPoint = topRack.BottomLeft_GlobalPoint;
 					tieBeamAtStart.Length_X = TieBeam.TIE_BEAM_DEPTH;
 					tieBeamAtStart.Length_Y = botRack.TopLeft_GlobalPoint.Y - topRack.BottomLeft_GlobalPoint.Y;
+					tieBeamAtStart.IsHorizontal = !botRack.IsHorizontal;
+					tieBeamAtStart.RackColumnLengthOffset = botRack.Column.Length;
 
 					return tieBeamAtStart;
 				}
@@ -1790,6 +1792,8 @@ namespace DrawingControl
 					tieBeamAtEnd.TopLeft_GlobalPoint = new Point(topRack.BottomRight_GlobalPoint.X - TieBeam.TIE_BEAM_DEPTH, topRack.BottomRight_GlobalPoint.Y);
 					tieBeamAtEnd.Length_X = TieBeam.TIE_BEAM_DEPTH;
 					tieBeamAtEnd.Length_Y = botRack.TopRight_GlobalPoint.Y - topRack.BottomRight_GlobalPoint.Y;
+					tieBeamAtEnd.IsHorizontal = !botRack.IsHorizontal;
+					tieBeamAtEnd.RackColumnLengthOffset = 0 - botRack.Column.Length;
 
 					return tieBeamAtEnd;
 				}
@@ -1817,6 +1821,8 @@ namespace DrawingControl
 					tieBeamAtStart.TopLeft_GlobalPoint = leftRack.TopRight_GlobalPoint;
 					tieBeamAtStart.Length_Y = TieBeam.TIE_BEAM_DEPTH;
 					tieBeamAtStart.Length_X = rightRack.TopLeft_GlobalPoint.X - leftRack.TopRight_GlobalPoint.X;
+					tieBeamAtStart.IsHorizontal = !rightRack.IsHorizontal;
+					tieBeamAtStart.RackColumnLengthOffset = rightRack.Column.Length;
 
 					return tieBeamAtStart;
 				}
@@ -1826,6 +1832,8 @@ namespace DrawingControl
 					tieBeamAtEnd.TopLeft_GlobalPoint = new Point(leftRack.BottomRight_GlobalPoint.X, leftRack.BottomRight_GlobalPoint.Y - TieBeam.TIE_BEAM_DEPTH);
 					tieBeamAtEnd.Length_Y = TieBeam.TIE_BEAM_DEPTH;
 					tieBeamAtEnd.Length_X = rightRack.BottomLeft_GlobalPoint.X - leftRack.BottomRight_GlobalPoint.X;
+					tieBeamAtEnd.IsHorizontal = !rightRack.IsHorizontal;
+					tieBeamAtEnd.RackColumnLengthOffset = 0 - rightRack.Column.Length;
 
 					return tieBeamAtEnd;
 				}
