@@ -3714,6 +3714,9 @@ namespace DrawingControl
 				return;
 
 			base.Draw(dc, cs, displaySettings);
+
+			_DrawColumnSpaceOffset(dc, cs, displaySettings);
+
 			// draw underpass symbol
 			if (this.IsUnderpassAvailable)
 			{
@@ -3848,6 +3851,8 @@ namespace DrawingControl
 				_TryDrawRowGuards(dc, cs, geomDisplaySettings);
 			}
 		}
+
+		
 
 		//=============================================================================
 		public override object GetPropertyValue(string strPropSysName)
@@ -8323,6 +8328,52 @@ namespace DrawingControl
 					lower.X = higher.X + dashInterval;
 				}
 			}
+		}
+
+		private void _DrawColumnSpaceOffset(DrawingContext dc, ICoordinateSystem cs, IGeomDisplaySettings displaySettings)
+		{
+			Point start;
+			Point end;
+			if (IsHorizontal)
+			{
+				if (IsFirstInRowColumn)
+				{
+					start = TopLeft_GlobalPoint;
+					start.X += Column.Length;
+
+					end = BottomLeft_GlobalPoint;
+					end.X += Column.Length;
+
+					dc.DrawLine(BorderPen, GetLocalPoint(cs, start), GetLocalPoint(cs, end));
+				}
+
+				start = TopRight_GlobalPoint;
+				start.X -= Column.Length;
+
+				end = BottomRight_GlobalPoint;
+				end.X -= Column.Length;
+			}
+			else
+			{
+				if (IsFirstInRowColumn)
+				{
+					start = TopLeft_GlobalPoint;
+					start.Y += Column.Length;
+
+					end = TopRight_GlobalPoint;
+					end.Y += Column.Length;
+
+					dc.DrawLine(BorderPen, GetLocalPoint(cs, start), GetLocalPoint(cs, end));
+				}
+
+				start = BottomLeft_GlobalPoint;
+				start.Y -= Column.Length;
+
+				end = BottomRight_GlobalPoint;
+				end.Y -= Column.Length;
+			}
+
+			dc.DrawLine(BorderPen, GetLocalPoint(cs, start), GetLocalPoint(cs, end));
 		}
 
 		#endregion
