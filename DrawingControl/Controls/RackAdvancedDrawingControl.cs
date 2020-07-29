@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AppColorTheme;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -114,6 +115,10 @@ namespace DrawingControl
 
 		public Brush TextBrush { get; protected set; }
 
+		public Brush RackGuardMainBrush { get; protected set; }
+
+		public Brush RackGuardAltBrush { get; protected set; }
+
 		/// <summary>
 		/// If true then need to display text(view name, level name and level load text) and dimensions.
 		/// </summary>
@@ -155,6 +160,9 @@ namespace DrawingControl
 
 			this.TextBrush = CurrentGeometryColorsTheme.GetRackAdvProps_TextBrush();
 
+			this.RackGuardMainBrush = CurrentGeometryColorsTheme.GetRackAdvProps_RackGuardMainBrush();
+
+			this.RackGuardAltBrush = CurrentGeometryColorsTheme.GetRackAdvProps_RackGuardAltBrush();
 		}
 
 		#endregion
@@ -499,8 +507,8 @@ namespace DrawingControl
 			sideViewOffsetInPixels.X += cs.GetWidthInPixels(rackLength, 1.0) + 4.9 * displaySettings.MinDimensionsLinesOffset + distanceBetweenViewsInPixels;
 			//
 			dc.PushTransform(new TranslateTransform(sideViewOffsetInPixels.X, sideViewOffsetInPixels.Y));
-			DrawRackSideView(dc, cs, displaySettings, selectedRack, SideViewText);
-			dc.Pop();
+            DrawRackSideView(dc, cs, displaySettings, selectedRack, SideViewText);
+            dc.Pop();
 		}
 		/// <summary>
 		/// Draw rack front view in (0, 0) point.
@@ -952,12 +960,154 @@ namespace DrawingControl
 					LevelOffset_Y += level.LevelHeight;
 				}
 			}
+
+            if (rack.Accessories.UprightGuard)
+            {
+				_TryDrawFrontColumnGuard(dc, cs, displaySettings, rack);
+			}
+
+            if (rack.Accessories.RowGuard)
+            {
+				_TryDrawFrontRowGuard(dc, cs, displaySettings, rack);
+            }
 		}
-		/// <summary>
-		/// Draws rack side view at (0.0, 0.0) point.
-		/// If rack has overhang pallets then rack's left column will be placed at (pallet_overhang_value, 0.0) point.
-		/// </summary>
-		public static void DrawRackSideView(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack, FormattedText viewNameText)
+
+        private static void _TryDrawFrontRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
+        {
+			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE && !rack.IsUnderpassAvailable)
+				return;
+
+			Color rackGuardFillColor = Colors.Black;
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out color))
+					rackGuardFillColor = color;
+			}
+			Brush rackGuardMainFillBrush = new SolidColorBrush(rackGuardFillColor);
+
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
+					rackGuardFillColor = color;
+			}
+			Brush rackGuardAltFillBrush = new SolidColorBrush(rackGuardFillColor);
+
+			Pen borderPen = new Pen(rackGuardMainFillBrush, 1.0);
+
+			Point start;
+			Point end;
+			double leftOffsetX = 0;
+			double rightOffsetX = 0;
+
+			if (rack.IsUnderpassAvailable)
+            {
+				leftOffsetX = 50;
+				if (rack.IsFirstInRowColumn)
+					leftOffsetX += rack.Column.Length;
+				rightOffsetX = rack.Length_X - rack.Column.Length - 210;
+
+				_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
+
+				_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
+			}
+			else
+            {
+				leftOffsetX = -50;
+				rightOffsetX = rack.Length_X - rack.Column.Length - 210;
+			}
+
+
+
+			// right foundary binding
+			//start = new Point(rightOffsetX, 0);
+			//end = new Point(rack.Length_X - rack.Column.Length - 50, -8);
+			//_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
+
+			//// suport triangles
+			//start.Y -= 8;
+			//_DrawBracingLine(dc, cs, start, new Point(start.X + 50, -68), borderPen);
+			//_DrawBracingLine(dc, cs, new Point(start.X + 50 + 60, -68), end, borderPen);
+
+			//// main right guard body
+			//start.X += 50;
+			//end.X = start.X + 60;
+			//end.Y = -400;
+			//_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+
+			//ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)
+		}
+
+		private static void _DrawRowGuard(Point start, DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Pen borderPen, Brush rackGuardMainFillBrush, Brush rackGuardAltFillBrush)
+        {
+			Point end;
+
+			// foundary binding
+			end = new Point(start.X + 160, -8);
+			_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
+
+			// suport triangles
+			start.Y -= 8;
+			_DrawBracingLine(dc, cs, start, new Point(start.X + 50, -68), borderPen);
+			_DrawBracingLine(dc, cs, new Point(start.X + 50 + 60, -68), end, borderPen);
+
+			// main left guard body
+			start.X += 50;
+			end.X = start.X + 60;
+			end.Y = -400;
+			_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+		}
+
+        private static void _TryDrawFrontColumnGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
+        {
+			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE)
+				return;
+
+			Color rackGuardFillColor = Colors.Black;
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out color))
+					rackGuardFillColor = color;
+			}
+			Brush rackGuardMainFillBrush = new SolidColorBrush(rackGuardFillColor);
+
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
+					rackGuardFillColor = color;
+			}
+			Brush rackGuardAltFillBrush = new SolidColorBrush(rackGuardFillColor);
+
+			Pen levelShelfBorderPen = new Pen(rackGuardMainFillBrush, 1.0);
+			
+			//TODO: draw yellow stripes
+			
+			Point start;
+			Point end;
+
+			if (rack.IsFirstInRowColumn)
+			{
+				start = new Point(-40, 0);
+				end = new Point(rack.Column.Length + 40, -400);
+
+				_DrawRectangle(dc, rackGuardMainFillBrush, levelShelfBorderPen, start, end, cs);
+			}
+
+			start = new Point(rack.Length_X - rack.Column.Length - 40, 0);
+			end = new Point(start.X + rack.Column.Length + 80, -400);
+
+			_DrawRectangle(dc, rackGuardMainFillBrush, levelShelfBorderPen, start, end, cs);
+		}
+
+
+        /// <summary>
+        /// Draws rack side view at (0.0, 0.0) point.
+        /// If rack has overhang pallets then rack's left column will be placed at (pallet_overhang_value, 0.0) point.
+        /// </summary>
+        public static void DrawRackSideView(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack, FormattedText viewNameText)
 		{
 			if (dc == null)
 				return;

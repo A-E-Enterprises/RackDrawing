@@ -173,6 +173,15 @@ namespace AppColorTheme
 		/// Rack column guard color
 		/// </summary>
 		eRackRowGuardDefault,
+		/// <summary>
+		/// Rack guard visualization main color to draw front and side view
+		/// </summary>
+		eRackGuardMainColorDefault,
+		/// <summary>
+		/// Rack guard visualization additional color to draw front and side view
+		/// </summary>
+		eRackGuardAltColorDefault,
+
 	}
 
 	/// <summary>

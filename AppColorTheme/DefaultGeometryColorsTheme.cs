@@ -78,6 +78,8 @@ namespace AppColorTheme
 			SetGeometryColor(eColorType.eRackAdvProp_DeckingPlateFillColor, Colors.DarkSlateGray);
 			SetGeometryColor(eColorType.eRackColumnGuardDefault, Colors.Red);
 			SetGeometryColor(eColorType.eRackRowGuardDefault, Colors.Orange);
+			SetGeometryColor(eColorType.eRackGuardMainColorDefault, Colors.Black);
+			SetGeometryColor(eColorType.eRackGuardAltColorDefault, Colors.Yellow);
 		}
 	}
 }

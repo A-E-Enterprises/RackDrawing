@@ -1,4 +1,5 @@
 ﻿using AppColorTheme;
+using System;
 using System.Windows.Media;
 
 namespace DrawingControl
@@ -208,5 +209,27 @@ namespace DrawingControl
 
 			return colorType;
 		}
-	}
+
+        internal static Brush GetRackAdvProps_RackGuardMainBrush()
+        {
+			Color defaultColor = Colors.Black;
+
+			Color colorValue;
+			if (m_CurrentTheme != null && m_CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out colorValue))
+				defaultColor = colorValue;
+
+			return new SolidColorBrush(defaultColor);
+		}
+
+        internal static Brush GetRackAdvProps_RackGuardAltBrush()
+        {
+			Color defaultColor = Colors.DarkSlateGray;
+
+			Color colorValue;
+			if (m_CurrentTheme != null && m_CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out colorValue))
+				defaultColor = colorValue;
+
+			return new SolidColorBrush(defaultColor);
+		}
+    }
 }
