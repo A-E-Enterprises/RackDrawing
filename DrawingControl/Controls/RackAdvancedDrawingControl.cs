@@ -1415,7 +1415,8 @@ namespace DrawingControl
 			bool bBreakLine = false,
 			Brush dimensionBrush = null,
 			double textRotateAngleDegrees = 0.0,
-			bool bMirrorTextRelativeToDimLine = false)
+			bool bMirrorTextRelativeToDimLine = false,
+			double dimensionTextOffset = 0.0)
 		{
 			if (dc == null)
 				return;
@@ -1487,6 +1488,7 @@ namespace DrawingControl
 				lines.Add(2, new List<Point> { supportLineStart_GlobaltPnt, supportLineEnd_GlobalPnt });
 				//
 				textDrawGlobalPnt = supportLineStart_GlobaltPnt;
+				textDrawGlobalPnt.X -= dimensionTextOffset;
 				textDrawGlobalPnt += (supportLineEnd_GlobalPnt - supportLineStart_GlobaltPnt) / 2;
 				textDrawGlobalPnt.X -= cs.GetGlobalWidth(textLength / 2, 1.0);
 				if(bMirrorTextRelativeToDimLine)
@@ -1528,6 +1530,7 @@ namespace DrawingControl
 				lines.Add(2, new List<Point> { supportLineStart_GlobaltPnt, supportLineEnd_GlobalPnt });
 				//
 				textDrawGlobalPnt = supportLineStart_GlobaltPnt;
+				textDrawGlobalPnt.X += dimensionTextOffset;
 				textDrawGlobalPnt += (supportLineEnd_GlobalPnt - supportLineStart_GlobaltPnt) / 2;
 				textDrawGlobalPnt.X -= cs.GetGlobalWidth(textLength / 2, 1.0);
 				if (bMirrorTextRelativeToDimLine)
@@ -1577,7 +1580,8 @@ namespace DrawingControl
 				lines.Add(2, new List<Point> { supportLineStart_GlobaltPnt, supportLineEnd_GlobalPnt });
 				//
 				textDrawGlobalPnt = supportLineStart_GlobaltPnt;
-				textDrawGlobalPnt += (supportLineEnd_GlobalPnt - supportLineStart_GlobaltPnt) / 2;
+                textDrawGlobalPnt.Y -= dimensionTextOffset;
+                textDrawGlobalPnt += (supportLineEnd_GlobalPnt - supportLineStart_GlobaltPnt) / 2;
 				if (bMirrorTextRelativeToDimLine)
 					textDrawGlobalPnt.X -= cs.GetGlobalWidth(textLength / 2, 1.0) - cs.GetGlobalHeight(textHeight / 2, 1.0);
 				else
@@ -1629,6 +1633,7 @@ namespace DrawingControl
 				lines.Add(2, new List<Point> { supportLineStart_GlobaltPnt, supportLineEnd_GlobalPnt });
 				//
 				textDrawGlobalPnt = supportLineStart_GlobaltPnt;
+				textDrawGlobalPnt.Y += dimensionTextOffset;
 				textDrawGlobalPnt += (supportLineEnd_GlobalPnt - supportLineStart_GlobaltPnt) / 2;
 				if (bMirrorTextRelativeToDimLine)
 					textDrawGlobalPnt.X -= cs.GetGlobalWidth(textLength / 2, 1.0) - cs.GetGlobalHeight(textHeight / 2, 1.0);

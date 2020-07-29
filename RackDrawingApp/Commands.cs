@@ -839,6 +839,10 @@ namespace RackDrawingApp
 			IGeomDisplaySettings geomDisplaySettings = DefaultGeomDisplaySettings.GetInstance();
 			geomDisplaySettings.TextFontSize = exportFontSize;
 
+			//=============================================================== TODO: collect dimensions ===============================================================
+			List<DimensionData> dimensions = new List<DimensionData>();
+			List<Rect> textColisionlist = new List<Rect>();
+
 			//
 			int totalImageLength = imageLength;
 			int totalImageHeight = imageHeight;
@@ -1045,17 +1049,10 @@ namespace RackDrawingApp
                             // add text size
                             if (bDisplayPTP)
                                 dimPixelsOffest += 1.5 * geomDisplaySettings.TextFontSize;
-                            RackAdvancedPropertiesControl._DrawDimension(
-                                dc,
-                                pnt_01,
-                                pnt_02,
-                                strDimText,
-                                dimPixelsOffest,
-                                geomDisplaySettings.TextFontSize,
-                                geomDisplaySettings.TextFontSize / 4,
-                                dimPlacement,
-                                ics
-                                );
+
+							dimensions.Add(new DimensionData(
+								pnt_01, pnt_02, strDimText, dimPixelsOffest, ics.GetGlobalWidth(dimPixelsOffest, 0.0) + ics.GetGlobalWidth(geomDisplaySettings.TextFontSize / 4, 0.0), 
+								geomDisplaySettings.TextFontSize, geomDisplaySettings.TextFontSize / 4, dimPlacement));
 
                             // display PTP
                             if (bDisplayPTP)
@@ -1093,18 +1090,9 @@ namespace RackDrawingApp
                                 }
                                 strDimText = "PTP = " + ptpDistValue.ToString();
 
-                                //
-                                RackAdvancedPropertiesControl._DrawDimension(
-                                    dc,
-                                    pnt_01,
-                                    pnt_02,
-                                    strDimText,
-                                    m_DimensionOffsetInPixels,
-                                    geomDisplaySettings.TextFontSize,
-                                    geomDisplaySettings.TextFontSize / 4,
-                                    dimPlacement,
-                                    ics
-                                    );
+								dimensions.Add(new DimensionData(
+									pnt_01, pnt_02, strDimText, m_DimensionOffsetInPixels, ics.GetGlobalWidth(m_DimensionOffsetInPixels, 0.0) + ics.GetGlobalWidth(geomDisplaySettings.TextFontSize / 4, 0.0),
+									geomDisplaySettings.TextFontSize, geomDisplaySettings.TextFontSize / 4, dimPlacement, isAisleSpace: true));
                             }
                         }
                     }
@@ -1121,7 +1109,17 @@ namespace RackDrawingApp
 
 						AisleSpace asGeom = geom as AisleSpace;
 						if (asGeom != null)
+						{
 							aisleSpaceList.Add(asGeom);
+
+							// text position is not accurate but it enough to detect collisions
+							Rect approximatedTextposition = new Rect(
+								ics.GetLocalPoint(new System.Windows.Point(asGeom.Center_GlobalPoint.X - 900, asGeom.Center_GlobalPoint.Y - 400), 1.0, new Vector(0.0, 0.0)),
+								ics.GetLocalPoint(new System.Windows.Point(asGeom.Center_GlobalPoint.X + 900, asGeom.Center_GlobalPoint.Y + 400), 1.0, new Vector(0.0, 0.0))
+								);
+
+							textColisionlist.Add(approximatedTextposition);
+						}
 					}
 
 					// export dimension for racks groups
@@ -1206,10 +1204,10 @@ namespace RackDrawingApp
 
 							if (exportedDimensionsList.Contains(rack.SizeIndex))
 								continue;
-							exportedDimensionsList.Add(rack.SizeIndex);
+                            exportedDimensionsList.Add(rack.SizeIndex);
 
-							// display length of the rack
-							System.Windows.Point pnt_01 = new System.Windows.Point();
+                            // display length of the rack
+                            System.Windows.Point pnt_01 = new System.Windows.Point();
 							System.Windows.Point pnt_02 = new System.Windows.Point();
 							string strDimText = rack.Length.ToString();
 							if(RackAdvancedPropertiesControl.eDimensionPlacement.eLeft == lengthDimPlacement)
@@ -1232,20 +1230,14 @@ namespace RackDrawingApp
 								pnt_01 = rack.BottomLeft_GlobalPoint;
 								pnt_02 = rack.BottomRight_GlobalPoint;
 							}
-                            // draw length dim
-                            RackAdvancedPropertiesControl._DrawDimension(
-                                    dc,
-                                    pnt_01,
-                                    pnt_02,
-                                    strDimText,
-                                    m_DimensionOffsetInPixels,
-                                    geomDisplaySettings.TextFontSize,
-                                    geomDisplaySettings.TextFontSize / 4,
-                                    lengthDimPlacement,
-                                    ics
-                                    );
-                            // for the first rack in the group need to display its depth
-                            int iRackIndex = rackGroup.IndexOf(rack);
+							// draw length dim
+
+							dimensions.Add(new DimensionData(
+								pnt_01, pnt_02, strDimText, m_DimensionOffsetInPixels, ics.GetGlobalWidth(m_DimensionOffsetInPixels, 0.0) + ics.GetGlobalWidth(geomDisplaySettings.TextFontSize / 4, 0.0), 
+								geomDisplaySettings.TextFontSize, geomDisplaySettings.TextFontSize / 4, lengthDimPlacement));
+
+							// for the first rack in the group need to display its depth
+							int iRackIndex = rackGroup.IndexOf(rack);
 							if(iRackIndex == 0)
 							{
 								pnt_01 = rack.BottomLeft_GlobalPoint;
@@ -1258,26 +1250,18 @@ namespace RackDrawingApp
 									pnt_02 = rack.TopRight_GlobalPoint;
 									depthDimPlacement = RackAdvancedPropertiesControl.eDimensionPlacement.eTop;
 								}
-
-								//
-								RackAdvancedPropertiesControl._DrawDimension(
-									dc,
-									pnt_01,
-									pnt_02,
-									strDimText,
-									m_DimensionOffsetInPixels,
-									geomDisplaySettings.TextFontSize,
-									geomDisplaySettings.TextFontSize / 4,
-									depthDimPlacement,
-									ics
-									);
+								
+								dimensions.Add(new DimensionData(
+									pnt_01, pnt_02, strDimText, m_DimensionOffsetInPixels, ics.GetGlobalWidth(m_DimensionOffsetInPixels, 0.0) + ics.GetGlobalWidth(geomDisplaySettings.TextFontSize / 4, 0.0),
+									geomDisplaySettings.TextFontSize, geomDisplaySettings.TextFontSize / 4, depthDimPlacement));
+								
 							}
 						}
 
 						// draw rack group length dimensions here
 						var first = rackGroup[0];
 						var last = rackGroup[rackGroup.Count - 1];
-
+						
 						double length = 0;
 						System.Windows.Point startPoint = new System.Windows.Point();
 						System.Windows.Point endPoint = new System.Windows.Point();
@@ -1313,49 +1297,120 @@ namespace RackDrawingApp
 						{
 							length = Math.Abs(endPoint.Y - startPoint.Y);
 						}
+
+						DimensionData rackGroupDim;
+
+						if (first.IsHorizontal)
+                        {
+							rackGroupDim = new DimensionData(
+								startPoint, endPoint, length.ToString(), dimPixelsOffest, ics.GetGlobalWidth(dimPixelsOffest, 0.0) + ics.GetGlobalWidth(geomDisplaySettings.TextFontSize / 4, 0.0),
+								geomDisplaySettings.TextFontSize, geomDisplaySettings.TextFontSize / 4, lengthDimPlacement, true);
+						}
+                        else
+                        {
+							rackGroupDim = new DimensionData(
+								endPoint, startPoint, length.ToString(), dimPixelsOffest, ics.GetGlobalWidth(dimPixelsOffest, 0.0) + ics.GetGlobalWidth(geomDisplaySettings.TextFontSize / 4, 0.0),
+								geomDisplaySettings.TextFontSize, geomDisplaySettings.TextFontSize / 4, lengthDimPlacement, true);
+						}
 						
-						RackAdvancedPropertiesControl._DrawDimension(dc,
-							startPoint,
-							endPoint,
-							length.ToString(),
-							dimPixelsOffest,
-							geomDisplaySettings.TextFontSize,
-							geomDisplaySettings.TextFontSize / 4,
-							lengthDimPlacement,
-							ics,
-							true
-							);
+
+						if (dimensions.All(x => x.Value != rackGroupDim.Value))
+							dimensions.Add(rackGroupDim);
+
 					}
 
 					// sheet can have rack placed at (0,0), so rack's dim will be displayed at the top and overlap sheet's length dim
 					double sheetDimOffset = m_DimensionOffsetInPixels;
 					sheetDimOffset += 1.5 * geomDisplaySettings.TextFontSize;
-					// sheet length dimension
-					RackAdvancedPropertiesControl._DrawDimension(
-						dc,
-						new System.Windows.Point(0, 0),
-						new System.Windows.Point(sheet.Length, 0),
-						sheet.Length.ToString(),
-						sheetDimOffset,
-						geomDisplaySettings.TextFontSize,
-						geomDisplaySettings.TextFontSize / 4,
-						RackAdvancedPropertiesControl.eDimensionPlacement.eTop,
-						ics
-						);
 
-					// sheet height dimension
-					RackAdvancedPropertiesControl._DrawDimension(
-						dc,
-						new System.Windows.Point(sheet.Length, sheet.Width),
-						new System.Windows.Point(sheet.Length, 0.0),
-						sheet.Width.ToString(),
-						sheetDimOffset,
-						geomDisplaySettings.TextFontSize,
-						geomDisplaySettings.TextFontSize / 4,
-						RackAdvancedPropertiesControl.eDimensionPlacement.eRight,
-						ics
-						);
-				}
+					dimensions.Add(new DimensionData(
+								new System.Windows.Point(0, 0), new System.Windows.Point(sheet.Length, 0), sheet.Length.ToString(),
+								sheetDimOffset, ics.GetGlobalWidth(sheetDimOffset, 0.0) + ics.GetGlobalWidth(geomDisplaySettings.TextFontSize / 4, 0.0),
+								geomDisplaySettings.TextFontSize, geomDisplaySettings.TextFontSize / 4, RackAdvancedPropertiesControl.eDimensionPlacement.eTop, true));
+
+					dimensions.Add(new DimensionData(
+								new System.Windows.Point(sheet.Length, sheet.Width), new System.Windows.Point(sheet.Length, 0.0), sheet.Width.ToString(),
+								sheetDimOffset, ics.GetGlobalWidth(sheetDimOffset, 0.0) + ics.GetGlobalWidth(geomDisplaySettings.TextFontSize / 4, 0.0),
+								geomDisplaySettings.TextFontSize, geomDisplaySettings.TextFontSize / 4, RackAdvancedPropertiesControl.eDimensionPlacement.eRight, true));
+
+					// sheet length dimension
+					//RackAdvancedPropertiesControl._DrawDimension(
+					//	dc,
+					//	new System.Windows.Point(0, 0),
+					//	new System.Windows.Point(sheet.Length, 0),
+					//	sheet.Length.ToString(),
+					//	sheetDimOffset,
+					//	geomDisplaySettings.TextFontSize,
+					//	geomDisplaySettings.TextFontSize / 4,
+					//	RackAdvancedPropertiesControl.eDimensionPlacement.eTop,
+					//	ics
+					//	);
+
+					//// sheet height dimension
+					//RackAdvancedPropertiesControl._DrawDimension(
+					//	dc,
+					//	new System.Windows.Point(sheet.Length, sheet.Width),
+					//	new System.Windows.Point(sheet.Length, 0.0),
+					//	sheet.Width.ToString(),
+					//	sheetDimOffset,
+					//	geomDisplaySettings.TextFontSize,
+					//	geomDisplaySettings.TextFontSize / 4,
+					//	RackAdvancedPropertiesControl.eDimensionPlacement.eRight,
+					//	ics
+					//	);
+
+					//TODO: check overlapping
+					double dimensionOffset = 2000.0;
+
+					foreach (var dimension in dimensions.Where(x => x.IsRackGroup))
+					{
+						Rect dimRect = new Rect(
+							ics.GetLocalPoint(dimension.TextColisionRect.TopLeft, 1.0, new Vector(0.0, 0.0)),
+							ics.GetLocalPoint(dimension.TextColisionRect.BottomRight, 1.0, new Vector(0.0, 0.0)));
+
+						//dc.DrawRectangle(new SolidColorBrush(Colors.Red), null, dimRect);
+
+                        foreach (Rect text in textColisionlist)
+                        {
+							if (dimension.IsRackGroup && text.IntersectsWith(dimRect))
+							{
+								dimension.DimensionTextColisionOffset = dimensionOffset;
+							}
+                            //TODO calc offset
+						}
+
+						foreach (var item in dimensions.Where(x => !x.IsRackGroup))
+						{
+							if (dimension.IsAisleSpace && item.IsAisleSpace)
+								continue;
+
+							Rect otherDimRect = new Rect(
+								ics.GetLocalPoint(item.TextColisionRect.TopLeft, 1.0, new Vector(0.0, 0.0)),
+								ics.GetLocalPoint(item.TextColisionRect.BottomRight, 1.0, new Vector(0.0, 0.0)));
+
+							if (otherDimRect.IntersectsWith(dimRect))
+							{
+								dimension.DimensionTextColisionOffset += dimensionOffset;
+							}
+						}
+                    }
+					
+					foreach (DimensionData dimension in dimensions)
+                    {
+                        RackAdvancedPropertiesControl._DrawDimension(
+                            dc,
+                            dimension.First,
+                            dimension.Secont,
+                            dimension.DimensionText,
+                            dimension.DimensionPixelsOffset,
+							dimension.TextSize,
+                            dimension.PerpDimLineOffsetInPixels,
+                            dimension.DimensionPlacement,
+                            ics,
+							dimensionTextOffset: dimension.DimensionTextColisionOffset
+							);
+                    }
+                }
 
 				// Draw horizontal and vertical sheet elevations
 				if(bIncludeSheetElevationsPictures)
@@ -1389,6 +1444,93 @@ namespace RackDrawingApp
 
 			return visual;
 		}
+
+		private class DimensionData
+		{
+            public bool IsRackGroup { get; private set; }
+            public bool IsAisleSpace { get; private set; }
+            public System.Windows.Point First { get; private set; }
+			public System.Windows.Point Secont { get; private set; }
+			public string DimensionText { get; private set; }
+			public double DimensionPixelsOffset { get; set; }
+			public double DimensionTextOffset { get; set; }
+			public double TextSize { get; set; }
+            public double PerpDimLineOffsetInPixels { get; set; }
+			public RackAdvancedPropertiesControl.eDimensionPlacement DimensionPlacement { get; private set; }
+			public double Value
+			{
+				get
+				{
+					double result;
+
+					if (DimensionPlacement == RackAdvancedPropertiesControl.eDimensionPlacement.eBot || DimensionPlacement == RackAdvancedPropertiesControl.eDimensionPlacement.eTop)
+						result = Secont.X - First.X;
+					else
+						result = Secont.Y - First.Y;
+
+					return Math.Abs(result);
+				}
+			}
+
+			public double DimensionTextColisionOffset { get; set; } = 0.0;
+
+            public Rect TextColisionRect { get; private set; }
+
+            public DimensionData(
+				System.Windows.Point first,
+				System.Windows.Point second,
+				string dimensionText,
+				double dimensionPixelsOffset,
+				double dimensionTextOffset,
+				double textSize,
+				double perpDimLineOffsetInPixels,
+				RackAdvancedPropertiesControl.eDimensionPlacement dimensionPlacement,
+				bool isRackGroup = false,
+				bool isAisleSpace = false)
+            {
+				First = first;
+				Secont = second;
+				DimensionText = dimensionText;
+				DimensionPixelsOffset = dimensionPixelsOffset;
+				DimensionTextOffset = dimensionTextOffset;
+				DimensionPlacement = dimensionPlacement;
+				IsRackGroup = isRackGroup;
+				IsAisleSpace = isAisleSpace;
+				TextSize = textSize;
+				PerpDimLineOffsetInPixels = perpDimLineOffsetInPixels;
+
+				System.Windows.Point left;
+				System.Windows.Point right;
+
+				switch (dimensionPlacement)
+                {
+                    case RackAdvancedPropertiesControl.eDimensionPlacement.eBot:
+                        left = new System.Windows.Point(first.X + (Value / 2) - 800, first.Y + DimensionTextOffset);
+                        right = new System.Windows.Point(first.X + (Value / 2) + 800, left.Y + 400);
+						TextColisionRect = new Rect(left, right);
+
+						break;
+                    case RackAdvancedPropertiesControl.eDimensionPlacement.eTop:
+						left = new System.Windows.Point(first.X + (Value / 2) - 800, first.Y - DimensionTextOffset);
+						right = new System.Windows.Point(first.X + (Value / 2) + 800, left.Y - 400);
+						TextColisionRect = new Rect(left, right);
+
+						break;
+                    case RackAdvancedPropertiesControl.eDimensionPlacement.eLeft:
+						left = new System.Windows.Point(first.X - DimensionTextOffset, first.Y - (Value / 2) - 800);
+						right = new System.Windows.Point(second.X - DimensionTextOffset - 400, second.Y + (Value / 2) + 800);
+						TextColisionRect = new Rect(left, right);
+
+						break;
+                    case RackAdvancedPropertiesControl.eDimensionPlacement.eRight:
+						left = new System.Windows.Point(first.X + DimensionTextOffset, first.Y - (Value / 2) - 800);
+						right = new System.Windows.Point(second.X + DimensionTextOffset - 400, second.Y + (Value / 2) + 800);
+						TextColisionRect = new Rect(left, right);
+
+						break;
+                }
+            }
+        }
 
 		public static DrawingVisual CreateSheetElevationVisual(
 			DrawingSheet sheet,
@@ -2297,7 +2439,7 @@ namespace RackDrawingApp
 					// or 3 different pictures
 					List<DrawingVisual> sheetVisualsList = new List<DrawingVisual>();
 					if (Utils.FLE(sheet.Length, Command_ExportImages.SHEET_ELEV_MAX_SHEET_LENGTH) && Utils.FLE(sheet.Width, Command_ExportImages.SHEET_ELEV_MAX_SHEET_HEIGHT))
-						sheetVisualsList.Add(Command_ExportImages.CreateSheetLayoutVisual(sheet, null, imageLength, imageHeight, true, true));
+						sheetVisualsList.Add(Command_ExportImages.CreateSheetLayoutVisual(sheet, null, imageLength, imageHeight, true, false));
 					else
 					{
 						double minUnitsPerPixel = 0.0;
