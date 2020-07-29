@@ -1001,12 +1001,18 @@ namespace DrawingControl
 			double leftOffsetX = 0;
 			double rightOffsetX = 0;
 
+			double rackLength = rack.Length_X;
+            if (!rack.IsHorizontal)
+            {
+				rackLength = rack.Length_Y;
+			}
+
 			if (rack.IsUnderpassAvailable)
             {
 				leftOffsetX = 50;
 				if (rack.IsFirstInRowColumn)
 					leftOffsetX += rack.Column.Length;
-				rightOffsetX = rack.Length_X - rack.Column.Length - 210;
+				rightOffsetX = rackLength - rack.Column.Length - 210;
 
 				_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
 
@@ -1014,29 +1020,21 @@ namespace DrawingControl
 			}
 			else
             {
-				leftOffsetX = -50;
-				rightOffsetX = rack.Length_X - rack.Column.Length - 210;
+				leftOffsetX = -210;
+				rightOffsetX = rackLength + 50;
+
+				if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)) || 
+					(!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP)))
+				{
+					_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
+				}
+
+				if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+					|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM)))
+				{
+					_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
+				}
 			}
-
-
-
-			// right foundary binding
-			//start = new Point(rightOffsetX, 0);
-			//end = new Point(rack.Length_X - rack.Column.Length - 50, -8);
-			//_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
-
-			//// suport triangles
-			//start.Y -= 8;
-			//_DrawBracingLine(dc, cs, start, new Point(start.X + 50, -68), borderPen);
-			//_DrawBracingLine(dc, cs, new Point(start.X + 50 + 60, -68), end, borderPen);
-
-			//// main right guard body
-			//start.X += 50;
-			//end.X = start.X + 60;
-			//end.Y = -400;
-			//_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
-
-			//ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)
 		}
 
 		private static void _DrawRowGuard(Point start, DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Pen borderPen, Brush rackGuardMainFillBrush, Brush rackGuardAltFillBrush)
@@ -1081,27 +1079,54 @@ namespace DrawingControl
 			}
 			Brush rackGuardAltFillBrush = new SolidColorBrush(rackGuardFillColor);
 
-			Pen levelShelfBorderPen = new Pen(rackGuardMainFillBrush, 1.0);
+			Pen borderPen = new Pen(rackGuardMainFillBrush, 1.0);
 			
 			//TODO: draw yellow stripes
 			
 			Point start;
 			Point end;
 
-			if (rack.IsFirstInRowColumn)
+			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
+				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))) 
 			{
-				start = new Point(-40, 0);
-				end = new Point(rack.Column.Length + 40, -400);
+				double rackLength = rack.Length_X;
+				if (rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
+					rackLength = rack.Length_Y;
 
-				_DrawRectangle(dc, rackGuardMainFillBrush, levelShelfBorderPen, start, end, cs);
+				if (rack.IsFirstInRowColumn)
+				{
+					start = new Point(-40, 0);
+					end = new Point(rack.Column.Length + 40, -400);
+
+					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+				}
+
+				start = new Point(rackLength - rack.Column.Length - 40, 0);
+				end = new Point(start.X + rack.Column.Length + 80, -400);
+
+				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+            }
+            else if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+				||(!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)))
+            {
+				double rackLength = rack.Length_X;
+				if (rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+					rackLength = rack.Length_Y;
+
+				if (rack.IsFirstInRowColumn)
+				{
+					start = new Point(-40, 0);
+					end = new Point(rack.Column.Length + 40, -400);
+
+					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+				}
+
+				start = new Point(rackLength - rack.Column.Length - 40, 0);
+				end = new Point(start.X + rack.Column.Length + 80, -400);
+
+				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
 			}
-
-			start = new Point(rack.Length_X - rack.Column.Length - 40, 0);
-			end = new Point(start.X + rack.Column.Length + 80, -400);
-
-			_DrawRectangle(dc, rackGuardMainFillBrush, levelShelfBorderPen, start, end, cs);
 		}
-
 
         /// <summary>
         /// Draws rack side view at (0.0, 0.0) point.
