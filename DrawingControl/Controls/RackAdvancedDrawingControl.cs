@@ -1523,7 +1523,126 @@ namespace DrawingControl
 					dc.DrawText(viewNameText, SideViewTextCenter_ScreenPoint);
 				}
 			}
+
+			if (rack.Accessories.UprightGuard)
+			{
+				_TryDrawSideColumnGuard(dc, cs, displaySettings, rack);
+			}
+
+			if (rack.Accessories.RowGuard)
+			{
+				//_TryDrawFrontRowGuard(dc, cs, displaySettings, rack);
+			}
 		}
+
+		private static void _TryDrawSideColumnGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
+		{
+			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE)
+				return;
+
+			Color rackGuardFillColor = Colors.Black;
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out color))
+					rackGuardFillColor = color;
+			}
+			Brush rackGuardMainFillBrush = new SolidColorBrush(rackGuardFillColor);
+
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
+					rackGuardFillColor = color;
+			}
+			Brush rackGuardAltFillBrush = new SolidColorBrush(rackGuardFillColor);
+
+			Point step;
+
+			List<Point> path = new List<Point>();
+			//TODO: fill yellow
+
+			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
+				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))) 
+			{
+				step = new Point(rack.PalletOverhangValue - 125, 0);
+				path.Add(step);
+
+				step.X += 108;
+				path.Add(step);
+
+				step.Y = -380;
+				path.Add(step);
+
+				step.X -= 20;
+				step.Y = -400;
+				path.Add(step);
+
+				step.X -= 88;
+				path.Add(step);
+
+				_DrawGeometry(dc, cs, rackGuardMainFillBrush, true, path.ToArray());
+
+			}
+
+			path.Clear();
+
+			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+				||(!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)))
+            {
+				double rackLength = rack.Depth;
+
+                step = new Point(rack.PalletOverhangValue + rackLength + 125, 0);
+				path.Add(step);
+
+				step.X -= 108;
+				path.Add(step);
+
+				step.Y = -380;
+				path.Add(step);
+
+				step.X += 20;
+				step.Y = -400;
+				path.Add(step);
+
+				step.X += 88;
+				path.Add(step);
+
+				_DrawGeometry(dc, cs, rackGuardMainFillBrush, true, path.ToArray());
+			}
+		}
+
+		private static void _DrawGeometry(DrawingContext dc, ICoordinateSystem cs, Brush fillBrush, bool isFill, params Point[] points)
+        {
+			double defaultCameraScale = 1.0;
+			Vector defaultCameraOffset = new Vector(0.0, 0.0);
+
+			Pen pen = new Pen(fillBrush, 1.0);
+
+			PathGeometry pathGeom = new PathGeometry();
+			PathFigure figure = new PathFigure();
+
+			if (points.Length > 0)
+			{
+				figure.StartPoint = cs.GetLocalPoint(points[0], defaultCameraScale, defaultCameraOffset);
+
+				for (int i = 1; i < points.Length; i++)
+				{
+					//Point nextPoint = cs.GetLocalPoint(points[i], defaultCameraScale, defaultCameraOffset);
+					//Point end = cs.GetLocalPoint(points[i + 1], defaultCameraScale, defaultCameraOffset);
+
+					LineSegment lineSegment = new LineSegment();
+					lineSegment.Point = cs.GetLocalPoint(points[i], defaultCameraScale, defaultCameraOffset);
+
+					figure.Segments.Add(lineSegment);
+				}
+			}
+
+			pathGeom.Figures.Add(figure);
+
+            dc.DrawGeometry(fillBrush, pen, pathGeom);
+		}
+
 		private static void _DrawBracingLine(DrawingContext dc, ICoordinateSystem cs, Point bracingStartPoint, Point bracingEndPoint, Pen bracingLinePen)
 		{
 			if (dc == null)
