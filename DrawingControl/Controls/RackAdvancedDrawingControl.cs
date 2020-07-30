@@ -1573,11 +1573,11 @@ namespace DrawingControl
 			Pen borderPen = new Pen(rackGuardMainFillBrush, 1.0);
 
 			Point start = new Point(rack.PalletOverhangValue + GuardRowParameters.GuardRowRackOffset, 0);
-			Point end;
 
 			if (rack.IsUnderpassAvailable)
             {
-				_DrawSideRowGuard(dc, cs, rack, start, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
+				double xOffset = rack.Column.Depth - GuardRowParameters.GuardRowRackOffset;
+				_DrawSideRowGuard(dc, cs, rack, start, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush, xOffset);
 			}
 			else
             {
@@ -1594,24 +1594,31 @@ namespace DrawingControl
 			}
 		}
 
-		private static void _DrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, Rack rack, Point start, Pen pen, Brush brush, Brush secndaryBrush)
+		private static void _DrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, Rack rack, Point start, Pen pen, Brush brush, Brush secndaryBrush, double xAxisRackDarwingLimitation = 0)
 		{
+			// left guard foundation
+			start.X += xAxisRackDarwingLimitation;
 			Point end = new Point(start.X + GuardRowParameters.GuardRowFoundationLength, start.Y - GuardRowParameters.GuardRowFoundationHeight);
+			end.X -= xAxisRackDarwingLimitation;
 			_DrawRectangle(dc, Brushes.White, pen, start, end, cs);
 
 			start.Y = end.Y;
 			end.Y -= (GuardRowParameters.GuardRowHeight - GuardRowParameters.GuardRowFoundationHeight - GuardRowParameters.GuardRowWidth);
 			_DrawRectangle(dc, brush, pen, start, end, cs);
 
+			// guard horizontal plank
 			start.Y = end.Y;
 			end.X = start.X + rack.Depth - (2 * GuardRowParameters.GuardRowRackOffset);
+			end.X -= (2 * xAxisRackDarwingLimitation);
 			end.Y -= GuardRowParameters.GuardRowWidth;
 			_DrawRectangle(dc, brush, pen, start, end, cs);
 
 			start.X = end.X - GuardRowParameters.GuardRowFoundationLength;
+			start.X += xAxisRackDarwingLimitation;
 			end.Y = -GuardRowParameters.GuardRowFoundationHeight;
 			_DrawRectangle(dc, brush, pen, start, end, cs);
 
+			// right guard foundation
 			start.Y = end.Y;
 			end.Y = 0;
 			_DrawRectangle(dc, Brushes.White, pen, start, end, cs);
