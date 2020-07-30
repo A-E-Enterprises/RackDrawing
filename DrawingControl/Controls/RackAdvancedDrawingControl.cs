@@ -21,7 +21,9 @@ namespace DrawingControl
 		public const double GuardRowWidth = 60;
 
 		public const double GuardRowRackOffset = 50;
-	}
+
+		public static double GuardColumnSuppotOffset => (GuardRowFoundationWidth - GuardRowWidth) / 2;
+    }
 
 	public class RackAdvancedDrawingSettings
 	{
@@ -1392,9 +1394,6 @@ namespace DrawingControl
 			}
 		}
 
-
-
-
 		private static void _TryDrawFrontRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
 		{
 			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE && !rack.IsUnderpassAvailable)
@@ -1610,18 +1609,30 @@ namespace DrawingControl
 			Point end;
 
 			// foundary binding
-			end = new Point(start.X + 160, -8);
+			end = new Point(start.X + GuardRowParameters.GuardRowFoundationWidth, -GuardRowParameters.GuardRowFoundationHeight);
 			_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
 
 			// suport triangles
-			start.Y -= 8;
-			_DrawBracingLine(dc, cs, start, new Point(start.X + 50, -68), borderPen);
-			_DrawBracingLine(dc, cs, new Point(start.X + 50 + 60, -68), end, borderPen);
+			start.Y -= GuardRowParameters.GuardRowFoundationHeight;
 
-			// main left guard body
-			start.X += 50;
-			end.X = start.X + 60;
-			end.Y = -400;
+			double foundationSupportHeight = GuardRowParameters.GuardRowFoundationSupportHeight + GuardRowParameters.GuardRowFoundationHeight;
+
+			_DrawGeometry(dc, cs, borderPen, Brushes.White, new Point[] {
+				start,
+				new Point(start.X + GuardRowParameters.GuardColumnSuppotOffset, -foundationSupportHeight),
+				new Point(start.X + GuardRowParameters.GuardColumnSuppotOffset, -GuardRowParameters.GuardRowFoundationHeight)
+			});
+
+            _DrawGeometry(dc, cs, borderPen, Brushes.White, new Point[] {
+                new Point(start.X + GuardRowParameters.GuardColumnSuppotOffset + GuardRowParameters.GuardRowWidth, -GuardRowParameters.GuardRowFoundationHeight),
+				new Point(start.X + GuardRowParameters.GuardColumnSuppotOffset + GuardRowParameters.GuardRowWidth, -foundationSupportHeight),
+				new Point(start.X + (2 * GuardRowParameters.GuardColumnSuppotOffset) + GuardRowParameters.GuardRowWidth, -GuardRowParameters.GuardRowFoundationHeight)
+            });
+
+            // main left guard body
+            start.X += GuardRowParameters.GuardColumnSuppotOffset;
+			end.X = start.X + GuardRowParameters.GuardRowWidth;
+			end.Y = -GuardRowParameters.GuardRowHeight;
 			_DrawRectangle(dc, GetStripesBrush(mainColor, secondaryColor), borderPen, start, end, cs);
 		}
 
@@ -1703,10 +1714,6 @@ namespace DrawingControl
 			}
 		}
 
-
-
-
-
 		private static void _DrawGeometry(DrawingContext dc, ICoordinateSystem cs, Pen borderPen, Brush fillBrush, params Point[] points)
         {
 			double defaultCameraScale = 1.0;
@@ -1736,6 +1743,7 @@ namespace DrawingControl
 			
 			dc.DrawGeometry(fillBrush, borderPen, pathGeom);
 		}
+
 		private static void _DrawBracingLine(DrawingContext dc, ICoordinateSystem cs, Point bracingStartPoint, Point bracingEndPoint, Pen bracingLinePen)
 		{
 			if (dc == null)
