@@ -985,162 +985,6 @@ namespace DrawingControl
             }
 		}
 
-        private static void _TryDrawFrontRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
-        {
-			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE && !rack.IsUnderpassAvailable)
-				return;
-
-			Color rackGuardFillColor = Colors.Black;
-			if (CurrentGeometryColorsTheme.CurrentTheme != null)
-			{
-				Color color;
-				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out color))
-					rackGuardFillColor = color;
-			}
-			Brush rackGuardMainFillBrush = new SolidColorBrush(rackGuardFillColor);
-
-			if (CurrentGeometryColorsTheme.CurrentTheme != null)
-			{
-				Color color;
-				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
-					rackGuardFillColor = color;
-			}
-			Brush rackGuardAltFillBrush = new SolidColorBrush(rackGuardFillColor);
-
-			Pen borderPen = new Pen(rackGuardMainFillBrush, 1.0);
-
-			Point start;
-			Point end;
-			double leftOffsetX = 0;
-			double rightOffsetX = 0;
-
-			double rackLength = rack.Length_X;
-            if (!rack.IsHorizontal)
-            {
-				rackLength = rack.Length_Y;
-			}
-
-			if (rack.IsUnderpassAvailable)
-            {
-				leftOffsetX = 50;
-				if (rack.IsFirstInRowColumn)
-					leftOffsetX += rack.Column.Length;
-				rightOffsetX = rackLength - rack.Column.Length - 210;
-
-				_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
-
-				_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
-			}
-			else
-            {
-				leftOffsetX = -210;
-				rightOffsetX = rackLength + 50;
-
-				if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)) || 
-					(!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP)))
-				{
-					_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
-				}
-
-				if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
-					|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM)))
-				{
-					_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
-				}
-			}
-		}
-
-		private static void _DrawRowGuard(Point start, DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Pen borderPen, Brush rackGuardMainFillBrush, Brush rackGuardAltFillBrush)
-        {
-			Point end;
-
-			// foundary binding
-			end = new Point(start.X + 160, -8);
-			_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
-
-			// suport triangles
-			start.Y -= 8;
-			_DrawBracingLine(dc, cs, start, new Point(start.X + 50, -68), borderPen);
-			_DrawBracingLine(dc, cs, new Point(start.X + 50 + 60, -68), end, borderPen);
-
-			// main left guard body
-			start.X += 50;
-			end.X = start.X + 60;
-			end.Y = -400;
-			_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
-		}
-
-        private static void _TryDrawFrontColumnGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
-        {
-			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE)
-				return;
-
-			Color rackGuardFillColor = Colors.Black;
-			if (CurrentGeometryColorsTheme.CurrentTheme != null)
-			{
-				Color color;
-				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out color))
-					rackGuardFillColor = color;
-			}
-			Brush rackGuardMainFillBrush = new SolidColorBrush(rackGuardFillColor);
-
-			if (CurrentGeometryColorsTheme.CurrentTheme != null)
-			{
-				Color color;
-				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
-					rackGuardFillColor = color;
-			}
-			Brush rackGuardAltFillBrush = new SolidColorBrush(rackGuardFillColor);
-
-			Pen borderPen = new Pen(rackGuardMainFillBrush, 1.0);
-			
-			//TODO: draw yellow stripes
-			
-			Point start;
-			Point end;
-
-			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
-				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))) 
-			{
-				double rackLength = rack.Length_X;
-				if (rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
-					rackLength = rack.Length_Y;
-
-				if (rack.IsFirstInRowColumn)
-				{
-					start = new Point(-40, 0);
-					end = new Point(rack.Column.Length + 40, -400);
-
-					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
-				}
-
-				start = new Point(rackLength - rack.Column.Length - 40, 0);
-				end = new Point(start.X + rack.Column.Length + 80, -400);
-
-				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
-            }
-            else if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
-				||(!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)))
-            {
-				double rackLength = rack.Length_X;
-				if (rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
-					rackLength = rack.Length_Y;
-
-				if (rack.IsFirstInRowColumn)
-				{
-					start = new Point(-40, 0);
-					end = new Point(rack.Column.Length + 40, -400);
-
-					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
-				}
-
-				start = new Point(rackLength - rack.Column.Length - 40, 0);
-				end = new Point(start.X + rack.Column.Length + 80, -400);
-
-				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
-			}
-		}
-
         /// <summary>
         /// Draws rack side view at (0.0, 0.0) point.
         /// If rack has overhang pallets then rack's left column will be placed at (pallet_overhang_value, 0.0) point.
@@ -1548,8 +1392,11 @@ namespace DrawingControl
 			}
 		}
 
-        private static void _TryDrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
-        {
+
+
+
+		private static void _TryDrawFrontRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
+		{
 			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE && !rack.IsUnderpassAvailable)
 				return;
 
@@ -1560,71 +1407,57 @@ namespace DrawingControl
 				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out color))
 					rackGuardFillColor = color;
 			}
-			Brush rackGuardMainFillBrush = new SolidColorBrush(rackGuardFillColor);
 
+			Color rackGuardAltFillColor = Colors.Yellow;
 			if (CurrentGeometryColorsTheme.CurrentTheme != null)
 			{
 				Color color;
 				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
-					rackGuardFillColor = color;
+					rackGuardAltFillColor = color;
 			}
-			Brush rackGuardAltFillBrush = new SolidColorBrush(rackGuardFillColor);
-			
-			Pen borderPen = new Pen(rackGuardMainFillBrush, 1.0);
 
-			Point start = new Point(rack.PalletOverhangValue + GuardRowParameters.GuardRowRackOffset, 0);
+			Pen borderPen = new Pen(new SolidColorBrush(rackGuardFillColor), 1.0);
+
+			double leftOffsetX = 0;
+			double rightOffsetX = 0;
+
+			double rackLength = rack.Length_X;
+			if (!rack.IsHorizontal)
+			{
+				rackLength = rack.Length_Y;
+			}
 
 			if (rack.IsUnderpassAvailable)
-            {
-				double xOffset = rack.Column.Depth - GuardRowParameters.GuardRowRackOffset;
-				_DrawSideRowGuard(dc, cs, rack, start, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush, xOffset);
+			{
+				leftOffsetX = 50;
+				if (rack.IsFirstInRowColumn)
+					leftOffsetX += rack.Column.Length;
+				rightOffsetX = rackLength - rack.Column.Length - 210;
+
+				_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor);
+
+				_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor);
 			}
 			else
-            {
-				if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)) 
-					|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP)))
+			{
+				leftOffsetX = -210;
+				rightOffsetX = rackLength + 50;
+
+				if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)) ||
+					(!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP)))
 				{
-					_DrawSideRowGuard(dc, cs, rack, start, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
-				} 
-				else if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+					_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor);
+				}
+
+				if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
 					|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM)))
 				{
-					_DrawSideRowGuard(dc, cs, rack, start, borderPen, rackGuardMainFillBrush, rackGuardAltFillBrush);
+					_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor);
 				}
 			}
 		}
 
-		private static void _DrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, Rack rack, Point start, Pen pen, Brush brush, Brush secndaryBrush, double xAxisRackDarwingLimitation = 0)
-		{
-			// left guard foundation
-			start.X += xAxisRackDarwingLimitation;
-			Point end = new Point(start.X + GuardRowParameters.GuardRowFoundationLength, start.Y - GuardRowParameters.GuardRowFoundationHeight);
-			end.X -= xAxisRackDarwingLimitation;
-			_DrawRectangle(dc, Brushes.White, pen, start, end, cs);
-
-			start.Y = end.Y;
-			end.Y -= (GuardRowParameters.GuardRowHeight - GuardRowParameters.GuardRowFoundationHeight - GuardRowParameters.GuardRowWidth);
-			_DrawRectangle(dc, brush, pen, start, end, cs);
-
-			// guard horizontal plank
-			start.Y = end.Y;
-			end.X = start.X + rack.Depth - (2 * GuardRowParameters.GuardRowRackOffset);
-			end.X -= (2 * xAxisRackDarwingLimitation);
-			end.Y -= GuardRowParameters.GuardRowWidth;
-			_DrawRectangle(dc, brush, pen, start, end, cs);
-
-			start.X = end.X - GuardRowParameters.GuardRowFoundationLength;
-			start.X += xAxisRackDarwingLimitation;
-			end.Y = -GuardRowParameters.GuardRowFoundationHeight;
-			_DrawRectangle(dc, brush, pen, start, end, cs);
-
-			// right guard foundation
-			start.Y = end.Y;
-			end.Y = 0;
-			_DrawRectangle(dc, Brushes.White, pen, start, end, cs);
-		}
-
-        private static void _TryDrawSideColumnGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
+		private static void _TryDrawFrontColumnGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
 		{
 			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE)
 				return;
@@ -1636,20 +1469,189 @@ namespace DrawingControl
 				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out color))
 					rackGuardFillColor = color;
 			}
-			Brush rackGuardMainFillBrush = new SolidColorBrush(rackGuardFillColor);
 
+			Color rackGuardAltFillColor = Colors.Yellow;
 			if (CurrentGeometryColorsTheme.CurrentTheme != null)
 			{
 				Color color;
 				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
-					rackGuardFillColor = color;
+					rackGuardAltFillColor = color;
 			}
 			Brush rackGuardAltFillBrush = new SolidColorBrush(rackGuardFillColor);
+
+			Brush rackGuardMainFillBrush = GetStripesBrush(rackGuardFillColor, rackGuardAltFillColor);
+			Pen borderPen = new Pen(new SolidColorBrush(rackGuardFillColor), 1.0);
+
+			//TODO: draw yellow stripes
+
+			Point start;
+			Point end;
+
+			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
+				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)))
+			{
+				double rackLength = rack.Length_X;
+				if (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
+					rackLength = rack.Length_Y;
+
+				if (rack.IsFirstInRowColumn)
+				{
+					start = new Point(-40, 0);
+					end = new Point(rack.Column.Length + 40, -400);
+
+					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+				}
+
+				start = new Point(rackLength - rack.Column.Length - 40, 0);
+				end = new Point(start.X + rack.Column.Length + 80, -400);
+
+				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+			}
+			else if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)))
+			{
+				double rackLength = rack.Length_X;
+				if (rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+					rackLength = rack.Length_Y;
+
+				if (rack.IsFirstInRowColumn)
+				{
+					start = new Point(-40, 0);
+					end = new Point(rack.Column.Length + 40, -400);
+
+					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+				}
+
+				start = new Point(rackLength - rack.Column.Length - 40, 0);
+				end = new Point(start.X + rack.Column.Length + 80, -400);
+
+				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+			}
+		}
+
+		private static void _TryDrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
+        {
+			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE && !rack.IsUnderpassAvailable)
+				return;
+
+			Color rackGuardFillColor = Colors.Black;
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out color))
+					rackGuardFillColor = color;
+			}
+
+			Color rackGuardAltFillColor = Colors.Black;
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
+					rackGuardAltFillColor = color;
+			}
+			
+			Brush rackGuardMainFillBrush = GetStripesBrush(rackGuardFillColor, rackGuardAltFillColor);
+			Pen borderPen = new Pen(new SolidColorBrush(rackGuardFillColor), 1.0);
+
+			Point start = new Point(rack.PalletOverhangValue + GuardRowParameters.GuardRowRackOffset, 0);
+
+			if (rack.IsUnderpassAvailable)
+            {
+				double xOffset = rack.Column.Depth - GuardRowParameters.GuardRowRackOffset;
+				_DrawSideRowGuard(dc, cs, rack, start, borderPen, rackGuardMainFillBrush, xOffset);
+			}
+			else
+            {
+				if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)) 
+					|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP)))
+				{
+					_DrawSideRowGuard(dc, cs, rack, start, borderPen, rackGuardMainFillBrush);
+				} 
+				else if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+					|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM)))
+				{
+					_DrawSideRowGuard(dc, cs, rack, start, borderPen, rackGuardMainFillBrush);
+				}
+			}
+		}
+
+		private static void _DrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, Rack rack, Point start, Pen borderPen, Brush brush, double xAxisRackDarwingLimitation = 0)
+		{
+			// left guard foundation
+			start.X += xAxisRackDarwingLimitation;
+			Point end = new Point(start.X + GuardRowParameters.GuardRowFoundationLength, start.Y - GuardRowParameters.GuardRowFoundationHeight);
+			end.X -= xAxisRackDarwingLimitation;
+			_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
+
+			start.Y = end.Y;
+			end.Y -= (GuardRowParameters.GuardRowHeight - GuardRowParameters.GuardRowFoundationHeight - GuardRowParameters.GuardRowWidth);
+			_DrawRectangle(dc, brush, borderPen, start, end, cs);
+
+			// guard horizontal plank
+			start.Y = end.Y;
+			end.X = start.X + rack.Depth - (2 * GuardRowParameters.GuardRowRackOffset);
+			end.X -= (2 * xAxisRackDarwingLimitation);
+			end.Y -= GuardRowParameters.GuardRowWidth;
+			_DrawRectangle(dc, brush, borderPen, start, end, cs);
+
+			start.X = end.X - GuardRowParameters.GuardRowFoundationLength;
+			start.X += xAxisRackDarwingLimitation;
+			end.Y = -GuardRowParameters.GuardRowFoundationHeight;
+			_DrawRectangle(dc, brush, borderPen, start, end, cs);
+
+			// right guard foundation
+			start.Y = end.Y;
+			end.Y = 0;
+			_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
+		}
+
+		private static void _DrawRowGuard(Point start, DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Pen borderPen, Color mainColor, Color secondaryColor)
+		{
+			Point end;
+
+			// foundary binding
+			end = new Point(start.X + 160, -8);
+			_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
+
+			// suport triangles
+			start.Y -= 8;
+			_DrawBracingLine(dc, cs, start, new Point(start.X + 50, -68), borderPen);
+			_DrawBracingLine(dc, cs, new Point(start.X + 50 + 60, -68), end, borderPen);
+
+			// main left guard body
+			start.X += 50;
+			end.X = start.X + 60;
+			end.Y = -400;
+			_DrawRectangle(dc, GetStripesBrush(mainColor, secondaryColor), borderPen, start, end, cs);
+		}
+
+		private static void _TryDrawSideColumnGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
+		{
+			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE)
+				return;
+
+			Color rackGuardFillColor = Colors.Black;
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out color))
+					rackGuardFillColor = color;
+			}
+
+			Color rackGuardAltFillColor = Colors.Black;
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
+					rackGuardAltFillColor = color;
+			}
+
+			Brush rackGuardMainFillBrush = GetStripesBrush(rackGuardFillColor, rackGuardAltFillColor);
+			Pen borderPen = new Pen(new SolidColorBrush(rackGuardFillColor), 1.0);
 
 			Point step;
 
 			List<Point> path = new List<Point>();
-			//TODO: fill yellow
 
 			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
 				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))) 
@@ -1670,7 +1672,7 @@ namespace DrawingControl
 				step.X -= 88;
 				path.Add(step);
 
-				_DrawGeometry(dc, cs, rackGuardMainFillBrush, true, path.ToArray());
+				_DrawGeometry(dc, cs, borderPen, rackGuardMainFillBrush, path.ToArray());
 
 			}
 
@@ -1697,16 +1699,18 @@ namespace DrawingControl
 				step.X += 88;
 				path.Add(step);
 
-				_DrawGeometry(dc, cs, rackGuardMainFillBrush, true, path.ToArray());
+				_DrawGeometry(dc, cs, borderPen, rackGuardMainFillBrush, path.ToArray());
 			}
 		}
 
-		private static void _DrawGeometry(DrawingContext dc, ICoordinateSystem cs, Brush fillBrush, bool isFill, params Point[] points)
+
+
+
+
+		private static void _DrawGeometry(DrawingContext dc, ICoordinateSystem cs, Pen borderPen, Brush fillBrush, params Point[] points)
         {
 			double defaultCameraScale = 1.0;
 			Vector defaultCameraOffset = new Vector(0.0, 0.0);
-
-			Pen pen = new Pen(fillBrush, 1.0);
 
 			PathGeometry pathGeom = new PathGeometry();
 			PathFigure figure = new PathFigure();
@@ -1722,11 +1726,15 @@ namespace DrawingControl
 
 					figure.Segments.Add(lineSegment);
 				}
+
+				LineSegment lastLineSegment = new LineSegment();
+				lastLineSegment.Point = figure.StartPoint;
+				figure.Segments.Add(lastLineSegment);
 			}
 
 			pathGeom.Figures.Add(figure);
-
-            dc.DrawGeometry(fillBrush, pen, pathGeom);
+			
+			dc.DrawGeometry(fillBrush, borderPen, pathGeom);
 		}
 		private static void _DrawBracingLine(DrawingContext dc, ICoordinateSystem cs, Point bracingStartPoint, Point bracingEndPoint, Pen bracingLinePen)
 		{
@@ -1759,6 +1767,79 @@ namespace DrawingControl
 			Point endPnt = cs.GetLocalPoint(rectEndGlobalPnt, defaultCameraScale, defaultCameraOffset);
 			dc.DrawRectangle(rectFillBrush, rectBorderPen, new Rect(startPnt, endPnt));
 		}
+
+		private static DrawingBrush GetStripesBrush(Color main, Color secondary)
+		{
+			//========================Pattern1 - layout=======================
+			#region path
+			PathFigure pf = new PathFigure();
+			pf.StartPoint = new Point(0, 0);
+			pf.Segments.Add(new LineSegment(new Point(100, 0), false));
+			pf.Segments.Add(new LineSegment(new Point(100, 100), false));
+			pf.Segments.Add(new LineSegment(new Point(0, 100), false));
+			#endregion
+
+			PathGeometry blackFonPath = new PathGeometry(new PathFigure[] { pf });
+
+			//========================Pattern2 - stripes===============
+
+			#region path2
+			PathFigure pf1 = new PathFigure();
+			pf1.StartPoint = new Point(0, 0);
+			pf1.Segments.Add(new LineSegment(new Point(25, 0), false));
+			pf1.Segments.Add(new LineSegment(new Point(100, 75), false));
+			pf1.Segments.Add(new LineSegment(new Point(100, 100), false));
+			pf1.Segments.Add(new LineSegment(new Point(75, 100), false));
+			pf1.Segments.Add(new LineSegment(new Point(0, 25), false));
+			pf1.Segments.Add(new LineSegment(new Point(0, 0), false));
+
+			PathFigure pf2 = new PathFigure();
+			pf2.StartPoint = new Point(75, 0);
+			pf2.Segments.Add(new LineSegment(new Point(100, 25), false));
+			pf2.Segments.Add(new LineSegment(new Point(100, 0), false));
+
+			PathFigure pf3 = new PathFigure();
+			pf3.StartPoint = new Point(0, 75);
+			pf3.Segments.Add(new LineSegment(new Point(25, 100), false));
+			pf3.Segments.Add(new LineSegment(new Point(0, 100), false));
+			#endregion
+
+			PathGeometry stripesPath = new PathGeometry(new PathFigure[] { pf1, pf2, pf3 });
+
+			//========================Geometry Groups=======================
+			GeometryGroup blackGroup = new GeometryGroup();
+			blackGroup.FillRule = FillRule.Nonzero;
+			blackGroup.Children.Add(blackFonPath);
+
+			GeometryGroup stripeGroup = new GeometryGroup();
+			stripeGroup.FillRule = FillRule.Nonzero;
+			stripeGroup.Children.Add(stripesPath);
+
+			//========================Geometry Drawing=======================
+			GeometryDrawing black = new GeometryDrawing();
+			black.Brush = new SolidColorBrush(main);
+			black.Geometry = blackGroup;
+
+			GeometryDrawing stripes = new GeometryDrawing();
+			stripes.Brush = new SolidColorBrush(secondary);
+			stripes.Geometry = stripeGroup;
+
+			//========================Group=======================
+			DrawingGroup dgr = new DrawingGroup();
+			dgr.Children.Add(black);
+			dgr.Children.Add(stripes);
+
+			//========================Brush=======================
+			DrawingBrush db = new DrawingBrush();
+			db.Stretch = Stretch.UniformToFill;
+			db.ViewportUnits = BrushMappingMode.Absolute;
+			db.Viewport = new Rect(0, 0, 10, 10);
+			db.TileMode = TileMode.Tile;
+			db.Drawing = dgr;
+
+			return db;
+		}
+
 		public enum eDimensionPlacement : int
 		{
 			eBot = 1,
