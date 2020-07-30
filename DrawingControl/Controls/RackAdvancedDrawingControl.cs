@@ -1481,8 +1481,6 @@ namespace DrawingControl
 			Brush rackGuardMainFillBrush = GetStripesBrush(rackGuardFillColor, rackGuardAltFillColor);
 			Pen borderPen = new Pen(new SolidColorBrush(rackGuardFillColor), 1.0);
 
-			//TODO: draw yellow stripes
-
 			Point start;
 			Point end;
 
