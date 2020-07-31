@@ -1526,7 +1526,7 @@ namespace DrawingControl
 		}
 
 		private static void _TryDrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
-        {
+		{
 			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE && !rack.IsUnderpassAvailable)
 				return;
 
@@ -1545,24 +1545,24 @@ namespace DrawingControl
 				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
 					rackGuardAltFillColor = color;
 			}
-			
+
 			Brush rackGuardMainFillBrush = GetStripesBrush(rackGuardFillColor, rackGuardAltFillColor);
 			Pen borderPen = new Pen(new SolidColorBrush(rackGuardFillColor), 1.0);
 
 			Point start = new Point(rack.PalletOverhangValue + GuardRowParameters.GuardRowRackOffset, 0);
 
 			if (rack.IsUnderpassAvailable)
-            {
+			{
 				double xOffset = rack.Column.Depth - GuardRowParameters.GuardRowRackOffset;
-				_DrawSideRowGuard(dc, cs, rack, start, borderPen, rackGuardMainFillBrush, xOffset);
+				_DrawSideRowGuard(dc, cs, rack, start, borderPen, rackGuardMainFillBrush, xOffset, true);
 			}
 			else
-            {
-				if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)) 
+			{
+				if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
 					|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP)))
 				{
 					_DrawSideRowGuard(dc, cs, rack, start, borderPen, rackGuardMainFillBrush);
-				} 
+				}
 				else if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
 					|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM)))
 				{
@@ -1571,17 +1571,20 @@ namespace DrawingControl
 			}
 		}
 
-		private static void _DrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, Rack rack, Point start, Pen borderPen, Brush brush, double xAxisRackDarwingLimitation = 0)
+		private static void _DrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, Rack rack, Point start, Pen borderPen, Brush brush, 
+			double xAxisRackDarwingLimitation = 0, bool showHorizontalGuardOnly = false)
 		{
 			// left guard foundation
 			start.X += xAxisRackDarwingLimitation;
 			Point end = new Point(start.X + GuardRowParameters.GuardRowFoundationLength, start.Y - GuardRowParameters.GuardRowFoundationHeight);
 			end.X -= xAxisRackDarwingLimitation;
-			_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
+            if (!showHorizontalGuardOnly)
+				_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
 
 			start.Y = end.Y;
 			end.Y -= (GuardRowParameters.GuardRowHeight - GuardRowParameters.GuardRowFoundationHeight - GuardRowParameters.GuardRowWidth);
-			_DrawRectangle(dc, brush, borderPen, start, end, cs);
+            if (!showHorizontalGuardOnly)
+				_DrawRectangle(dc, brush, borderPen, start, end, cs);
 
 			// guard horizontal plank
 			start.Y = end.Y;
@@ -1593,12 +1596,14 @@ namespace DrawingControl
 			start.X = end.X - GuardRowParameters.GuardRowFoundationLength;
 			start.X += xAxisRackDarwingLimitation;
 			end.Y = -GuardRowParameters.GuardRowFoundationHeight;
-			_DrawRectangle(dc, brush, borderPen, start, end, cs);
+            if (!showHorizontalGuardOnly)
+				_DrawRectangle(dc, brush, borderPen, start, end, cs);
 
 			// right guard foundation
 			start.Y = end.Y;
 			end.Y = 0;
-			_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
+            if (!showHorizontalGuardOnly)
+				_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
 		}
 
 		private static void _DrawRowGuard(Point start, DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Pen borderPen, Color mainColor, Color secondaryColor)
@@ -1777,39 +1782,61 @@ namespace DrawingControl
 		{
 			//========================Pattern1 - layout=======================
 			#region path
-			PathFigure pf = new PathFigure();
-			pf.StartPoint = new Point(0, 0);
-			pf.Segments.Add(new LineSegment(new Point(100, 0), false));
-			pf.Segments.Add(new LineSegment(new Point(100, 100), false));
-			pf.Segments.Add(new LineSegment(new Point(0, 100), false));
+			PathFigure layout = new PathFigure();
+			layout.StartPoint = new Point(0, 0);
+			layout.Segments.Add(new LineSegment(new Point(80, 0), false));
+			layout.Segments.Add(new LineSegment(new Point(80, 80), false));
+			layout.Segments.Add(new LineSegment(new Point(0, 80), false));
 			#endregion
 
-			PathGeometry blackFonPath = new PathGeometry(new PathFigure[] { pf });
+			PathGeometry blackFonPath = new PathGeometry(new PathFigure[] { layout });
 
 			//========================Pattern2 - stripes===============
 
 			#region path2
-			PathFigure pf1 = new PathFigure();
-			pf1.StartPoint = new Point(0, 0);
-			pf1.Segments.Add(new LineSegment(new Point(25, 0), false));
-			pf1.Segments.Add(new LineSegment(new Point(100, 75), false));
-			pf1.Segments.Add(new LineSegment(new Point(100, 100), false));
-			pf1.Segments.Add(new LineSegment(new Point(75, 100), false));
-			pf1.Segments.Add(new LineSegment(new Point(0, 25), false));
-			pf1.Segments.Add(new LineSegment(new Point(0, 0), false));
+			PathFigure centerLine = new PathFigure();
+			centerLine.StartPoint = new Point(0, 0);
+			centerLine.Segments.Add(new LineSegment(new Point(10, 0), false));
+			centerLine.Segments.Add(new LineSegment(new Point(80, 70), false));
+			centerLine.Segments.Add(new LineSegment(new Point(80, 80), false));
+			centerLine.Segments.Add(new LineSegment(new Point(70, 80), false));
+			centerLine.Segments.Add(new LineSegment(new Point(0, 10), false));
+			centerLine.Segments.Add(new LineSegment(new Point(0, 0), false));
 
-			PathFigure pf2 = new PathFigure();
-			pf2.StartPoint = new Point(75, 0);
-			pf2.Segments.Add(new LineSegment(new Point(100, 25), false));
-			pf2.Segments.Add(new LineSegment(new Point(100, 0), false));
+			PathFigure upperCenterLine = new PathFigure();
+			upperCenterLine.StartPoint = new Point(30, 0);
+			upperCenterLine.Segments.Add(new LineSegment(new Point(50, 0), false));
+			upperCenterLine.Segments.Add(new LineSegment(new Point(80, 30), false));
+			upperCenterLine.Segments.Add(new LineSegment(new Point(80, 50), false));
+			upperCenterLine.Segments.Add(new LineSegment(new Point(30, 0), false));
 
-			PathFigure pf3 = new PathFigure();
-			pf3.StartPoint = new Point(0, 75);
-			pf3.Segments.Add(new LineSegment(new Point(25, 100), false));
-			pf3.Segments.Add(new LineSegment(new Point(0, 100), false));
+			PathFigure lowerCenterLine = new PathFigure();
+			lowerCenterLine.StartPoint = new Point(0, 30);
+			lowerCenterLine.Segments.Add(new LineSegment(new Point(50, 80), false));
+			lowerCenterLine.Segments.Add(new LineSegment(new Point(30, 80), false));
+			lowerCenterLine.Segments.Add(new LineSegment(new Point(0, 50), false));
+			lowerCenterLine.Segments.Add(new LineSegment(new Point(0, 30), false));
+
+			PathFigure upperCorner = new PathFigure();
+			upperCorner.StartPoint = new Point(0, 70);
+			upperCorner.Segments.Add(new LineSegment(new Point(0, 80), false));
+			upperCorner.Segments.Add(new LineSegment(new Point(10, 80), false));
+			upperCorner.Segments.Add(new LineSegment(new Point(0, 70), false));
+
+			PathFigure lowerCorner = new PathFigure();
+			lowerCorner.StartPoint = new Point(70, 0);
+			lowerCorner.Segments.Add(new LineSegment(new Point(80, 10), false));
+			lowerCorner.Segments.Add(new LineSegment(new Point(80, 0), false));
+			lowerCorner.Segments.Add(new LineSegment(new Point(70, 0), false));
 			#endregion
 
-			PathGeometry stripesPath = new PathGeometry(new PathFigure[] { pf1, pf2, pf3 });
+			PathGeometry stripesPath = new PathGeometry(new PathFigure[] {
+				lowerCorner,
+				lowerCenterLine,
+				centerLine,
+				upperCenterLine,
+				upperCorner
+			});
 
 			//========================Geometry Groups=======================
 			GeometryGroup blackGroup = new GeometryGroup();
@@ -1822,11 +1849,11 @@ namespace DrawingControl
 
 			//========================Geometry Drawing=======================
 			GeometryDrawing black = new GeometryDrawing();
-			black.Brush = new SolidColorBrush(main);
+			black.Brush = Brushes.Black;
 			black.Geometry = blackGroup;
 
 			GeometryDrawing stripes = new GeometryDrawing();
-			stripes.Brush = new SolidColorBrush(secondary);
+			stripes.Brush = Brushes.Yellow;
 			stripes.Geometry = stripeGroup;
 
 			//========================Group=======================
@@ -1837,8 +1864,8 @@ namespace DrawingControl
 			//========================Brush=======================
 			DrawingBrush db = new DrawingBrush();
 			db.Stretch = Stretch.UniformToFill;
-			db.ViewportUnits = BrushMappingMode.Absolute;
-			db.Viewport = new Rect(0, 0, 10, 10);
+			db.ViewportUnits = BrushMappingMode.RelativeToBoundingBox;
+			db.Viewport = new Rect(0, 0, 1, 1);
 			db.TileMode = TileMode.Tile;
 			db.Drawing = dgr;
 
