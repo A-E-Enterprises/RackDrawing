@@ -657,11 +657,11 @@ namespace AppColorTheme
 			m_ColorTypeToLocalNameDict.Add(eColorType.eRackAdvProp_PalletRiserFillColor, "Rack Adv Props pallet riser fill");
 			m_ColorTypeToLocalNameDict.Add(eColorType.eRackAdvProp_DeckingPlateFillColor, "Rack Adv Props decking plate fill");
 
-			m_ColorTypeToLocalNameDict.Add(eColorType.eRackRowGuardDefault, "Rack Row Guard");
-			m_ColorTypeToLocalNameDict.Add(eColorType.eRackColumnGuardDefault, "Rack Column Guard");
+			m_ColorTypeToLocalNameDict.Add(eColorType.eRackRowGuardDefault, "Rack Row Guard (Layout)");
+			m_ColorTypeToLocalNameDict.Add(eColorType.eRackColumnGuardDefault, "Rack Column Guard (Layout)");
 
-			m_ColorTypeToLocalNameDict.Add(eColorType.eRackGuardMainColorDefault, "Rack Guard Main Color");
-			m_ColorTypeToLocalNameDict.Add(eColorType.eRackGuardAltColorDefault, "Rack Guard Secondary Color");
+			m_ColorTypeToLocalNameDict.Add(eColorType.eRackGuardMainColorDefault, "Rack Guard Elevetion Main Color");
+			m_ColorTypeToLocalNameDict.Add(eColorType.eRackGuardAltColorDefault, "Rack Guard Elevetion Secondary Color");
 			//
 			// DESCRIPTION
 			//
@@ -735,8 +735,8 @@ namespace AppColorTheme
 			m_ColorTypeToDescriptionDict.Add(eColorType.eRackRowGuardDefault, "Rack Row Guard Draw Color");
 			m_ColorTypeToDescriptionDict.Add(eColorType.eRackColumnGuardDefault, "Rack Column Draw Color");
 
-			m_ColorTypeToDescriptionDict.Add(eColorType.eRackGuardMainColorDefault, "Rack Guard Main Color To Visualize Guards");
-			m_ColorTypeToDescriptionDict.Add(eColorType.eRackGuardAltColorDefault, "Rack Guard Secondary Color To Visualize Guards");
+			m_ColorTypeToDescriptionDict.Add(eColorType.eRackGuardMainColorDefault, "Rack Guard Main Color To Visualize Guards Elevation");
+			m_ColorTypeToDescriptionDict.Add(eColorType.eRackGuardAltColorDefault, "Rack Guard Secondary Color To Visualize Guards Elevation");
 
 			m_AreDictInitialized = true;
 		}
