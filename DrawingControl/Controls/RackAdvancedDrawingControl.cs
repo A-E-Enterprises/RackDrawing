@@ -1476,7 +1476,6 @@ namespace DrawingControl
 				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
 					rackGuardAltFillColor = color;
 			}
-			Brush rackGuardAltFillBrush = new SolidColorBrush(rackGuardFillColor);
 
 			Brush rackGuardMainFillBrush = GetStripesBrush(rackGuardFillColor, rackGuardAltFillColor);
 			Pen borderPen = new Pen(new SolidColorBrush(rackGuardFillColor), 1.0);
@@ -1508,7 +1507,7 @@ namespace DrawingControl
 				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)))
 			{
 				double rackLength = rack.Length_X;
-				if (rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+				if (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
 					rackLength = rack.Length_Y;
 
 				if (rack.IsFirstInRowColumn)
