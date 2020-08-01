@@ -976,7 +976,7 @@ namespace DrawingControl
 				}
 			}
 
-            if (rack.Accessories.UprightGuard)
+			if (rack.Accessories.UprightGuard)
             {
 				_TryDrawFrontColumnGuard(dc, cs, displaySettings, rack);
 			}
@@ -1482,6 +1482,7 @@ namespace DrawingControl
 
 			Point start;
 			Point end;
+			bool isDrawnDimensions = false;
 
 			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
 				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)))
@@ -1496,12 +1497,59 @@ namespace DrawingControl
 					end = new Point(rack.Column.Length + 40, -400);
 
 					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+
+					isDrawnDimensions = true;
+					if (displaySettings.DisplayTextAndDimensions)
+					{
+						_DrawDimension(dc, start, end,
+							Math.Abs(start.Y - end.Y).ToString(),
+							displaySettings.MinDimensionsLinesOffset,
+							displaySettings.DimensionsTextSize,
+							displaySettings.PerpDimLinesOffsetInPixels,
+							eDimensionPlacement.eLeft,
+							cs,
+							dimensionBrush: displaySettings.DimensionsBrush);
+
+						_DrawDimension(dc, new Point(start.X, 0), new Point(end.X, 0), "Column Size + 2x40",
+							displaySettings.MinDimensionsLinesOffset,
+							displaySettings.DimensionsTextSize,
+							displaySettings.PerpDimLinesOffsetInPixels,
+							eDimensionPlacement.eBot,
+							cs,
+							dimensionBrush: displaySettings.DimensionsBrush,
+							dimensionTextOffset: 600,
+							bMirrorTextRelativeToDimLine: true,
+							drawAdditionalSupportDimLine: true);
+					}
 				}
 
 				start = new Point(rackLength - rack.Column.Length - 40, 0);
 				end = new Point(start.X + rack.Column.Length + 80, -400);
 
 				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+
+				if (displaySettings.DisplayTextAndDimensions && !isDrawnDimensions)
+				{
+					_DrawDimension(dc, new Point(end.X, start.Y), end,
+						Math.Abs(start.Y - end.Y).ToString(),
+						7,
+						displaySettings.DimensionsTextSize,
+						displaySettings.PerpDimLinesOffsetInPixels,
+						eDimensionPlacement.eRight,
+						cs,
+						dimensionBrush: displaySettings.DimensionsBrush);
+
+					_DrawDimension(dc, new Point(start.X, 0), new Point(end.X, 0), "Column Size + 2x40",
+						displaySettings.MinDimensionsLinesOffset,
+						displaySettings.DimensionsTextSize,
+						displaySettings.PerpDimLinesOffsetInPixels,
+						eDimensionPlacement.eBot,
+						cs,
+						dimensionBrush: displaySettings.DimensionsBrush,
+						dimensionTextOffset: -600,
+						bMirrorTextRelativeToDimLine: true,
+						drawAdditionalSupportDimLine: true);
+                }
 			}
 			else if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
 				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)))
@@ -1664,6 +1712,14 @@ namespace DrawingControl
 
 			Point step;
 
+			Point dimensionStart;
+			Point dimensionEnd;
+
+			//Point dimensionOffsetStart;
+			//Point dimensionOffsetEnd;
+
+			bool isDimensionsDrawn = false;
+
 			List<Point> path = new List<Point>();
 
 			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
@@ -1671,12 +1727,16 @@ namespace DrawingControl
 			{
 				step = new Point(rack.PalletOverhangValue - 125, 0);
 				path.Add(step);
+				dimensionStart = step;
 
 				step.X += 108;
 				path.Add(step);
+				dimensionEnd = step;
 
 				step.Y = -380;
 				path.Add(step);
+
+				//dimensionOffsetStart = new Point(step.X, step.Y + 20); 
 
 				step.X -= 20;
 				step.Y = -400;
@@ -1684,9 +1744,41 @@ namespace DrawingControl
 
 				step.X -= 88;
 				path.Add(step);
+				//dimensionOffsetEnd = step;
 
 				_DrawGeometry(dc, cs, borderPen, rackGuardMainFillBrush, path.ToArray());
 
+				isDimensionsDrawn = true;
+                if (displaySettings.DisplayTextAndDimensions)
+                {
+					_DrawDimension(dc, dimensionStart, dimensionEnd,
+						Math.Abs(dimensionStart.X - dimensionEnd.X).ToString(),
+						3,
+						displaySettings.DimensionsTextSize,
+						displaySettings.PerpDimLinesOffsetInPixels,
+						eDimensionPlacement.eBot,
+						cs,
+						dimensionBrush: displaySettings.DimensionsBrush,
+						dimensionTextOffset: 200,
+						bMirrorTextRelativeToDimLine: true,
+						drawAdditionalSupportDimLine: true);
+					
+					Point rackColumnPosition = new Point(dimensionStart.X + 125, dimensionEnd.Y);
+					_DrawDimension(
+						dc,
+						dimensionStart,
+						rackColumnPosition, 
+						"125",
+						27,
+						displaySettings.DimensionsTextSize,
+						displaySettings.PerpDimLinesOffsetInPixels,
+						eDimensionPlacement.eBot,
+						cs,
+						dimensionBrush: displaySettings.DimensionsBrush,
+						dimensionTextOffset: 200,
+						bMirrorTextRelativeToDimLine: true,
+						drawAdditionalSupportDimLine: true);
+                }
 			}
 
 			path.Clear();
@@ -1698,9 +1790,11 @@ namespace DrawingControl
 
                 step = new Point(rack.PalletOverhangValue + rackLength + 125, 0);
 				path.Add(step);
+				dimensionStart = step;
 
 				step.X -= 108;
 				path.Add(step);
+				dimensionEnd = step;
 
 				step.Y = -380;
 				path.Add(step);
@@ -1713,6 +1807,39 @@ namespace DrawingControl
 				path.Add(step);
 
 				_DrawGeometry(dc, cs, borderPen, rackGuardMainFillBrush, path.ToArray());
+
+				if (displaySettings.DisplayTextAndDimensions && !isDimensionsDrawn)
+				{
+					_DrawDimension(dc, 
+						dimensionEnd,
+						dimensionStart,
+						Math.Abs(dimensionStart.X - dimensionEnd.X).ToString(),
+						7,
+						displaySettings.DimensionsTextSize,
+						displaySettings.PerpDimLinesOffsetInPixels,
+						eDimensionPlacement.eBot,
+						cs,
+						dimensionBrush: displaySettings.DimensionsBrush,
+						dimensionTextOffset: -200,
+						bMirrorTextRelativeToDimLine: true,
+						drawAdditionalSupportDimLine: true);
+					
+					Point rackColumnPosition = new Point(dimensionStart.X - 125, dimensionEnd.Y);
+					_DrawDimension(
+						dc,
+						rackColumnPosition,
+						dimensionStart,
+						"125",
+						27,
+						displaySettings.DimensionsTextSize,
+						displaySettings.PerpDimLinesOffsetInPixels,
+						eDimensionPlacement.eBot,
+						cs,
+						dimensionBrush: displaySettings.DimensionsBrush,
+						dimensionTextOffset: -200,
+						bMirrorTextRelativeToDimLine: true,
+						drawAdditionalSupportDimLine: true);
+				}
 			}
 		}
 
@@ -1908,7 +2035,8 @@ namespace DrawingControl
 			Brush dimensionBrush = null,
 			double textRotateAngleDegrees = 0.0,
 			bool bMirrorTextRelativeToDimLine = false,
-			double dimensionTextOffset = 0.0)
+			double dimensionTextOffset = 0.0,
+			bool drawAdditionalSupportDimLine = false)
 		{
 			if (dc == null)
 				return;
@@ -1978,6 +2106,16 @@ namespace DrawingControl
 				supportLineEnd_GlobalPnt.X = globalPnt_01.X;
 				supportLineEnd_GlobalPnt.X -= perpDimLineOffsetGlobalUnits;
 				lines.Add(2, new List<Point> { supportLineStart_GlobaltPnt, supportLineEnd_GlobalPnt });
+
+                if (drawAdditionalSupportDimLine)
+                {
+					lines.Add(-1, new List<Point> 
+					{
+						new Point(supportLineStart_GlobaltPnt.X, supportLineStart_GlobaltPnt.Y),
+						new Point(supportLineEnd_GlobalPnt.X - dimensionTextOffset, supportLineEnd_GlobalPnt.Y)
+					});
+				}
+
 				//
 				textDrawGlobalPnt = supportLineStart_GlobaltPnt;
 				textDrawGlobalPnt.X -= dimensionTextOffset;
@@ -2020,6 +2158,16 @@ namespace DrawingControl
 				supportLineEnd_GlobalPnt.X = globalPnt_01.X;
 				supportLineEnd_GlobalPnt.X -= perpDimLineOffsetGlobalUnits;
 				lines.Add(2, new List<Point> { supportLineStart_GlobaltPnt, supportLineEnd_GlobalPnt });
+
+				if (drawAdditionalSupportDimLine)
+				{
+					lines.Add(-1, new List<Point>
+					{
+						new Point(supportLineStart_GlobaltPnt.X + dimensionTextOffset, supportLineStart_GlobaltPnt.Y),
+						new Point(supportLineEnd_GlobalPnt.X + dimensionTextOffset, supportLineEnd_GlobalPnt.Y)
+					});
+				}
+
 				//
 				textDrawGlobalPnt = supportLineStart_GlobaltPnt;
 				textDrawGlobalPnt.X += dimensionTextOffset;
