@@ -1715,9 +1715,6 @@ namespace DrawingControl
 			Point dimensionStart;
 			Point dimensionEnd;
 
-			//Point dimensionOffsetStart;
-			//Point dimensionOffsetEnd;
-
 			bool isDimensionsDrawn = false;
 
 			List<Point> path = new List<Point>();
@@ -1736,15 +1733,12 @@ namespace DrawingControl
 				step.Y = -380;
 				path.Add(step);
 
-				//dimensionOffsetStart = new Point(step.X, step.Y + 20); 
-
 				step.X -= 20;
 				step.Y = -400;
 				path.Add(step);
 
 				step.X -= 88;
 				path.Add(step);
-				//dimensionOffsetEnd = step;
 
 				_DrawGeometry(dc, cs, borderPen, rackGuardMainFillBrush, path.ToArray());
 
