@@ -1433,9 +1433,9 @@ namespace DrawingControl
 					leftOffsetX += rack.Column.Length;
 				rightOffsetX = rackLength - rack.Column.Length - 210;
 
-				_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, showHeightAndOffsetDimensions: true);
+				_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, showHeightDimensions: !rack.Accessories.UprightGuard);
 
-				_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, showWidth: true);
+				_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, showWidthAndOffset: true);
 
                 if (displaySettings.DisplayTextAndDimensions)
                 {
@@ -1450,13 +1450,13 @@ namespace DrawingControl
 					_DrawDimension(dc,
 						dimStart,
 						dimEnd,
-						Math.Abs(rackUnderpassClearLength).ToString(),
-						10,
+						$"Clear Aisle {rackUnderpassClearLength}",
+						displaySettings.MinDimensionsLinesOffset,
 						displaySettings.DimensionsTextSize,
-						2,
-						eDimensionPlacement.eBot,
+						displaySettings.PerpDimLinesOffsetInPixels,
+						eDimensionPlacement.eTop,
 						cs,
-						dimensionBrush: displaySettings.DimensionsBrush, bMirrorTextRelativeToDimLine:true
+						dimensionBrush: displaySettings.DimensionsBrush
 						);
                 }
 			}
@@ -1476,7 +1476,7 @@ namespace DrawingControl
 				if (isRightConnected)
 				{
 					_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, 
-						showHeightAndOffsetDimensions: true, showWidth: isShowAllDimensionsTogether);
+						showHeightDimensions: true, showWidthAndOffset: isShowAllDimensionsTogether);
 				}
 
 				if (isLeftConnected)
@@ -1540,19 +1540,18 @@ namespace DrawingControl
 							cs,
 							dimensionBrush: displaySettings.DimensionsBrush);
 
+						// clear aisle space
 						_DrawDimension(dc, 
 							new Point(start.X, 0),
 							new Point(end.X, 0),
-							"Column Size + 2x40",
+							$"{Math.Abs(end.X - start.X)}",
 							displaySettings.MinDimensionsLinesOffset,
 							displaySettings.DimensionsTextSize,
 							displaySettings.PerpDimLinesOffsetInPixels,
 							eDimensionPlacement.eBot,
 							cs,
 							dimensionBrush: displaySettings.DimensionsBrush,
-							dimensionTextOffset: 600,
-							bMirrorTextRelativeToDimLine: true,
-							drawAdditionalSupportDimLine: true);
+							bMirrorTextRelativeToDimLine: true);
 					}
 				}
 
@@ -1735,7 +1734,7 @@ namespace DrawingControl
 		}
 
 		private static void _DrawRowGuard(Point start, DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, 
-			Pen borderPen, Color mainColor, Color secondaryColor, bool showHeightAndOffsetDimensions = false, bool showWidth = false)
+			Pen borderPen, Color mainColor, Color secondaryColor, bool showHeightDimensions = false, bool showWidthAndOffset = false)
 		{
 			Point end;
 
@@ -1770,7 +1769,7 @@ namespace DrawingControl
 
 			if (displaySettings.DisplayTextAndDimensions)
 			{
-                if (showHeightAndOffsetDimensions)
+                if (showHeightDimensions)
                 {
 					// height
 					_DrawDimension(dc, 
@@ -1788,7 +1787,7 @@ namespace DrawingControl
 						dimensionTextOffset: 0);
                 }
 
-                if (showWidth)
+                if (showWidthAndOffset)
                 {
 					// guard body width
 					_DrawDimension(dc, new Point(start.X, end.Y), new Point(end.X, end.Y),
@@ -1805,16 +1804,6 @@ namespace DrawingControl
 						new Point(offsetDimension.X, 0), 
 						new Point(offsetDimension.Y, 0),
 						$"{GuardRowParameters.GuardColumnSuppotOffset + GuardRowParameters.GuardRowFoundationWidth}",
-						displaySettings.MinDimensionsLinesOffset + 3,
-						displaySettings.DimensionsTextSize,
-						displaySettings.PerpDimLinesOffsetInPixels,
-						eDimensionPlacement.eBot,
-						cs,
-						dimensionBrush: displaySettings.DimensionsBrush);
-
-					// guard bottom width
-					_DrawDimension(dc, new Point(foundaryDimension.X, 0), new Point(foundaryDimension.Y, 0),
-						GuardRowParameters.GuardRowFoundationWidth.ToString(),
 						displaySettings.MinDimensionsLinesOffset,
 						displaySettings.DimensionsTextSize,
 						displaySettings.PerpDimLinesOffsetInPixels,
@@ -1822,6 +1811,17 @@ namespace DrawingControl
 						cs,
 						dimensionBrush: displaySettings.DimensionsBrush,
 						bMirrorTextRelativeToDimLine: true);
+
+					// guard bottom width
+					//_DrawDimension(dc, new Point(foundaryDimension.X, 0), new Point(foundaryDimension.Y, 0),
+					//	GuardRowParameters.GuardRowFoundationWidth.ToString(),
+					//	displaySettings.MinDimensionsLinesOffset,
+					//	displaySettings.DimensionsTextSize,
+					//	displaySettings.PerpDimLinesOffsetInPixels,
+					//	eDimensionPlacement.eBot,
+					//	cs,
+					//	dimensionBrush: displaySettings.DimensionsBrush,
+					//	bMirrorTextRelativeToDimLine: true);
                 }
 			}
 		}
