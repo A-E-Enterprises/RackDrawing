@@ -976,14 +976,16 @@ namespace DrawingControl
 				}
 			}
 
-			if (rack.Accessories.RowGuard)
-			{
-				_TryDrawFrontRowGuard(dc, cs, displaySettings, rack);
-			}
+			bool isGuardHeighShown = false;
 
 			if (rack.Accessories.UprightGuard)
-            {
-				_TryDrawFrontColumnGuard(dc, cs, displaySettings, rack);
+			{
+				_TryDrawFrontColumnGuard(dc, cs, displaySettings, rack, out isGuardHeighShown);
+			}
+
+			if (rack.Accessories.RowGuard)
+			{
+				_TryDrawFrontRowGuard(dc, cs, displaySettings, rack, isGuardHeighShown);
 			}
 		}
 
@@ -1394,7 +1396,7 @@ namespace DrawingControl
 			}
 		}
 
-		private static void _TryDrawFrontRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
+		private static void _TryDrawFrontRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack, bool isHeightDisplayed)
 		{
 			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE && !rack.IsUnderpassAvailable)
 				return;
@@ -1433,11 +1435,13 @@ namespace DrawingControl
 					leftOffsetX += rack.Column.Length;
 				rightOffsetX = rackLength - rack.Column.Length - 210;
 
-				_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, showHeightDimensions: !rack.Accessories.UprightGuard);
+				_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, 
+					showHeightDimensions: !rack.Accessories.UprightGuard, showWidthAndOffset: !rack.IsFirstInRowColumn);
 
-				_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, showWidthAndOffset: true);
-
-                if (displaySettings.DisplayTextAndDimensions)
+				_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, 
+					showWidthAndOffset: rack.IsFirstInRowColumn);
+                
+				if (displaySettings.DisplayTextAndDimensions)
                 {
 					double rackUnderpassClearLength = rack.InnerLength - (2 * (GuardRowParameters.GuardRowRackOffset + GuardRowParameters.GuardRowFoundationWidth));
 					Point dimStart = new Point(rack.Column.Length + GuardRowParameters.GuardRowRackOffset + GuardRowParameters.GuardRowFoundationWidth, 0);
@@ -1475,19 +1479,27 @@ namespace DrawingControl
 
 				if (isRightConnected)
 				{
-					_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, 
-						showHeightDimensions: true, showWidthAndOffset: isShowAllDimensionsTogether);
+					_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor,
+						showHeightDimensions: !isHeightDisplayed, showWidthAndOffset: true, isRightSideRack: true);
+					isHeightDisplayed = true;
 				}
 
 				if (isLeftConnected)
 				{
-					_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor);
+					bool canShowWidth = !isRightConnected && (
+						(rack.IsHorizontal && !rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM) && !rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP)) 
+						|| (!rack.IsHorizontal && !rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT) && !rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
+					);
+					_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor,
+						showHeightDimensions: !isHeightDisplayed, showWidthAndOffset: isShowAllDimensionsTogether);
 				}
 			}
 		}
 
-		private static void _TryDrawFrontColumnGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
+		private static void _TryDrawFrontColumnGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack, out bool isHeightDisplayed)
 		{
+			isHeightDisplayed = false;
+
 			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE)
 				return;
 
@@ -1512,7 +1524,9 @@ namespace DrawingControl
 
 			Point start;
 			Point end;
-			bool isDrawnDimensions = false;
+			bool isDrawnWidth = false;
+			bool isHeightFitLeft = false;
+			bool isHeightFitRight = false;
 
 			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
 				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)))
@@ -1521,6 +1535,11 @@ namespace DrawingControl
 				if (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
 					rackLength = rack.Length_Y;
 
+				isHeightFitLeft = (rack.IsFirstInRowColumn && rack.IsHorizontal && !rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+					|| (rack.IsFirstInRowColumn && !rack.IsHorizontal && !rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM));
+				isHeightFitRight = rack.IsUnderpassAvailable || ((rack.IsHorizontal && !rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
+					|| (!rack.IsHorizontal && !rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP)));
+
 				if (rack.IsFirstInRowColumn)
 				{
 					start = new Point(-40, 0);
@@ -1528,11 +1547,97 @@ namespace DrawingControl
 
 					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
 
-					isDrawnDimensions = true;
+					//isDrawnDimensions = true;
+					if (displaySettings.DisplayTextAndDimensions)
+					{
+						if (isHeightFitLeft)
+							// height
+							_DrawDimension(dc, start, end,
+								Math.Abs(start.Y - end.Y).ToString(),
+								displaySettings.MinDimensionsLinesOffset,
+								displaySettings.DimensionsTextSize,
+								displaySettings.PerpDimLinesOffsetInPixels,
+								eDimensionPlacement.eLeft,
+								cs,
+								dimensionBrush: displaySettings.DimensionsBrush);
+
+						if (!isDrawnWidth && isHeightFitLeft)
+						{
+							isDrawnWidth = true;
+
+							// width
+							_DrawDimension(dc,
+								new Point(start.X, 0),
+								new Point(end.X, 0),
+								$"{Math.Abs(end.X - start.X)}",
+								displaySettings.MinDimensionsLinesOffset,
+								displaySettings.DimensionsTextSize,
+								displaySettings.PerpDimLinesOffsetInPixels,
+								eDimensionPlacement.eBot,
+								cs,
+								dimensionBrush: displaySettings.DimensionsBrush,
+								bMirrorTextRelativeToDimLine: true);
+						}
+					}
+				}
+
+				start = new Point(rackLength - rack.Column.Length - 40, 0);
+				end = new Point(start.X + rack.Column.Length + 80, -400);
+
+				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+
+				if (displaySettings.DisplayTextAndDimensions)
+				{
+                    if (isHeightFitRight)
+						// height
+						_DrawDimension(dc, start, end,
+							Math.Abs(start.Y - end.Y).ToString(),
+							10,
+							displaySettings.DimensionsTextSize,
+							displaySettings.PerpDimLinesOffsetInPixels,
+							eDimensionPlacement.eRight,
+							cs,
+							dimensionBrush: displaySettings.DimensionsBrush);
+
+					if (!isDrawnWidth)
+					{
+						// width
+						_DrawDimension(dc,
+							new Point(start.X, 0),
+							new Point(end.X, 0),
+							$"{Math.Abs(end.X - start.X)}",
+							displaySettings.MinDimensionsLinesOffset,
+							displaySettings.DimensionsTextSize,
+							displaySettings.PerpDimLinesOffsetInPixels,
+							eDimensionPlacement.eBot,
+							cs,
+							dimensionBrush: displaySettings.DimensionsBrush,
+							bMirrorTextRelativeToDimLine: true);
+					}
+                }
+			}
+			else if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)))
+			{
+				double rackLength = rack.Length_X;
+				if (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+					rackLength = rack.Length_Y;
+
+				isHeightFitLeft = (rack.IsHorizontal && !rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+					|| (!rack.IsHorizontal && !rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM));
+
+				if (rack.IsFirstInRowColumn)
+				{
+					start = new Point(-40, 0);
+					end = new Point(rack.Column.Length + 40, -400);
+
+					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
+
+					isDrawnWidth = true;
 					if (displaySettings.DisplayTextAndDimensions)
 					{
 						_DrawDimension(dc, start, end,
-							Math.Abs(start.Y - end.Y).ToString(),
+						 	Math.Abs(start.Y - end.Y).ToString(),
 							displaySettings.MinDimensionsLinesOffset,
 							displaySettings.DimensionsTextSize,
 							displaySettings.PerpDimLinesOffsetInPixels,
@@ -1540,9 +1645,8 @@ namespace DrawingControl
 							cs,
 							dimensionBrush: displaySettings.DimensionsBrush);
 
-						// clear aisle space
 						_DrawDimension(dc, 
-							new Point(start.X, 0),
+							new Point(start.X, 0), 
 							new Point(end.X, 0),
 							$"{Math.Abs(end.X - start.X)}",
 							displaySettings.MinDimensionsLinesOffset,
@@ -1560,74 +1664,7 @@ namespace DrawingControl
 
 				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
 
-				if (displaySettings.DisplayTextAndDimensions && !isDrawnDimensions)
-				{
-					_DrawDimension(dc, start, end,
-						Math.Abs(start.Y - end.Y).ToString(),
-						10,
-						displaySettings.DimensionsTextSize,
-						displaySettings.PerpDimLinesOffsetInPixels,
-						eDimensionPlacement.eRight,
-						cs,
-						dimensionBrush: displaySettings.DimensionsBrush);
-
-					_DrawDimension(dc, new Point(start.X, 0), new Point(end.X, 0), "Column Size + 2x40",
-						displaySettings.MinDimensionsLinesOffset,
-						displaySettings.DimensionsTextSize,
-						displaySettings.PerpDimLinesOffsetInPixels,
-						eDimensionPlacement.eBot,
-						cs,
-						dimensionBrush: displaySettings.DimensionsBrush,
-						dimensionTextOffset: -600,
-						bMirrorTextRelativeToDimLine: true,
-						drawAdditionalSupportDimLine: true);
-                }
-			}
-			else if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
-				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)))
-			{
-				double rackLength = rack.Length_X;
-				if (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
-					rackLength = rack.Length_Y;
-
-				if (rack.IsFirstInRowColumn)
-				{
-					start = new Point(-40, 0);
-					end = new Point(rack.Column.Length + 40, -400);
-
-					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
-
-					isDrawnDimensions = true;
-					if (displaySettings.DisplayTextAndDimensions)
-					{
-						_DrawDimension(dc, start, end,
-							Math.Abs(start.Y - end.Y).ToString(),
-							displaySettings.MinDimensionsLinesOffset,
-							displaySettings.DimensionsTextSize,
-							displaySettings.PerpDimLinesOffsetInPixels,
-							eDimensionPlacement.eLeft,
-							cs,
-							dimensionBrush: displaySettings.DimensionsBrush);
-
-						_DrawDimension(dc, new Point(start.X, 0), new Point(end.X, 0), "Column Size + 2x40",
-							displaySettings.MinDimensionsLinesOffset,
-							displaySettings.DimensionsTextSize,
-							displaySettings.PerpDimLinesOffsetInPixels,
-							eDimensionPlacement.eBot,
-							cs,
-							dimensionBrush: displaySettings.DimensionsBrush,
-							dimensionTextOffset: 600,
-							bMirrorTextRelativeToDimLine: true,
-							drawAdditionalSupportDimLine: true);
-					}
-				}
-
-				start = new Point(rackLength - rack.Column.Length - 40, 0);
-				end = new Point(start.X + rack.Column.Length + 80, -400);
-
-				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
-
-				if (displaySettings.DisplayTextAndDimensions && !isDrawnDimensions)
+				if (displaySettings.DisplayTextAndDimensions && !isDrawnWidth)
 				{
 					_DrawDimension(dc, new Point(end.X, start.Y), end,
 						Math.Abs(start.Y - end.Y).ToString(),
@@ -1638,18 +1675,21 @@ namespace DrawingControl
 						cs,
 						dimensionBrush: displaySettings.DimensionsBrush);
 
-					_DrawDimension(dc, new Point(start.X, 0), new Point(end.X, 0), "Column Size + 2x40",
+					_DrawDimension(dc,
+						new Point(start.X, 0),
+						new Point(end.X, 0),
+						$"{Math.Abs(end.X - start.X)}",
 						displaySettings.MinDimensionsLinesOffset,
 						displaySettings.DimensionsTextSize,
 						displaySettings.PerpDimLinesOffsetInPixels,
 						eDimensionPlacement.eBot,
 						cs,
 						dimensionBrush: displaySettings.DimensionsBrush,
-						dimensionTextOffset: -600,
-						bMirrorTextRelativeToDimLine: true,
-						drawAdditionalSupportDimLine: true);
+						bMirrorTextRelativeToDimLine: true);
 				}
 			}
+
+			isHeightDisplayed = isHeightFitLeft || isHeightFitRight;
 		}
 
 		private static void _TryDrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
@@ -1698,6 +1738,165 @@ namespace DrawingControl
 			}
 		}
 
+		private static void _TryDrawSideColumnGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
+		{
+			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE)
+				return;
+
+			Color rackGuardFillColor = Colors.Black;
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out color))
+					rackGuardFillColor = color;
+			}
+
+			Color rackGuardAltFillColor = Colors.Black;
+			if (CurrentGeometryColorsTheme.CurrentTheme != null)
+			{
+				Color color;
+				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
+					rackGuardAltFillColor = color;
+			}
+
+			Brush rackGuardMainFillBrush = GetStripesBrush(rackGuardFillColor, rackGuardAltFillColor);
+			Pen borderPen = new Pen(new SolidColorBrush(rackGuardFillColor), 1.0);
+
+			Point step;
+
+			Point dimensionStart;
+			Point dimensionEnd;
+			Point dimensionHieght;
+
+			bool isDimensionsDrawn = false;
+
+			List<Point> path = new List<Point>();
+
+			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
+				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)))
+			{
+
+				step = new Point(rack.PalletOverhangValue - 125, 0);
+				path.Add(step);
+				dimensionStart = step;
+				dimensionHieght = new Point(dimensionStart.X, dimensionStart.Y);
+
+				step.X += 108;
+				path.Add(step);
+				dimensionEnd = step;
+
+				step.Y = -380;
+				path.Add(step);
+
+				step.X -= 20;
+				step.Y = -400;
+				path.Add(step);
+				dimensionHieght.Y = step.Y;
+
+				step.X -= 88;
+				path.Add(step);
+
+				_DrawGeometry(dc, cs, borderPen, rackGuardMainFillBrush, path.ToArray());
+
+				isDimensionsDrawn = true;
+				if (displaySettings.DisplayTextAndDimensions)
+				{
+					_DrawDimension(dc, dimensionStart, dimensionEnd,
+						Math.Abs(dimensionStart.X - dimensionEnd.X).ToString(),
+						10,
+						displaySettings.DimensionsTextSize,
+						displaySettings.PerpDimLinesOffsetInPixels,
+						eDimensionPlacement.eBot,
+						cs,
+						dimensionBrush: displaySettings.DimensionsBrush,
+						dimensionTextOffset: 200,
+						bMirrorTextRelativeToDimLine: true,
+						drawAdditionalSupportDimLine: true);
+
+					Point rackColumnPosition = new Point(dimensionStart.X + 125, dimensionEnd.Y);
+					_DrawDimension(
+						dc,
+						dimensionStart,
+						rackColumnPosition,
+						"125",
+						15,
+						displaySettings.DimensionsTextSize,
+						displaySettings.PerpDimLinesOffsetInPixels,
+						eDimensionPlacement.eBot,
+						cs,
+						dimensionBrush: displaySettings.DimensionsBrush,
+						dimensionTextOffset: 200,
+						bMirrorTextRelativeToDimLine: false,
+						drawAdditionalSupportDimLine: true);
+				}
+			}
+
+			path.Clear();
+
+			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)))
+			{
+				double rackLength = rack.Depth;
+
+				step = new Point(rack.PalletOverhangValue + rackLength + 125, 0);
+				path.Add(step);
+				dimensionStart = step;
+				dimensionHieght = new Point(dimensionStart.X, dimensionStart.Y);
+
+				step.X -= 108;
+				path.Add(step);
+				dimensionEnd = step;
+
+				step.Y = -380;
+				path.Add(step);
+
+				step.X += 20;
+				step.Y = -400;
+				path.Add(step);
+				dimensionHieght.Y = step.Y;
+
+				step.X += 88;
+				path.Add(step);
+
+				_DrawGeometry(dc, cs, borderPen, rackGuardMainFillBrush, path.ToArray());
+
+				if (displaySettings.DisplayTextAndDimensions && !isDimensionsDrawn)
+				{
+					// depth
+					_DrawDimension(dc,
+						dimensionEnd,
+						dimensionStart,
+						Math.Abs(dimensionStart.X - dimensionEnd.X).ToString(),
+						10,
+						displaySettings.DimensionsTextSize,
+						displaySettings.PerpDimLinesOffsetInPixels,
+						eDimensionPlacement.eBot,
+						cs,
+						dimensionBrush: displaySettings.DimensionsBrush,
+						dimensionTextOffset: -200,
+						bMirrorTextRelativeToDimLine: true,
+						drawAdditionalSupportDimLine: true);
+
+					// offset
+					Point rackColumnPosition = new Point(dimensionStart.X - 125, dimensionEnd.Y);
+					_DrawDimension(
+						dc,
+						rackColumnPosition,
+						dimensionStart,
+						"125",
+						15,
+						displaySettings.DimensionsTextSize,
+						displaySettings.PerpDimLinesOffsetInPixels,
+						eDimensionPlacement.eBot,
+						cs,
+						dimensionBrush: displaySettings.DimensionsBrush,
+						dimensionTextOffset: -200,
+						bMirrorTextRelativeToDimLine: false,
+						drawAdditionalSupportDimLine: true);
+				}
+			}
+		}
+
 		private static void _DrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, Rack rack, Point start, Pen borderPen, Brush brush, 
 			double xAxisRackDarwingLimitation = 0, bool showHorizontalGuardOnly = false)
 		{
@@ -1734,7 +1933,7 @@ namespace DrawingControl
 		}
 
 		private static void _DrawRowGuard(Point start, DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, 
-			Pen borderPen, Color mainColor, Color secondaryColor, bool showHeightDimensions = false, bool showWidthAndOffset = false)
+			Pen borderPen, Color mainColor, Color secondaryColor, bool showHeightDimensions = false, bool showWidthAndOffset = false, bool isRightSideRack = false)
 		{
 			Point end;
 
@@ -1742,7 +1941,6 @@ namespace DrawingControl
 			end = new Point(start.X + GuardRowParameters.GuardRowFoundationWidth, -GuardRowParameters.GuardRowFoundationHeight);
 			_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
 
-			Point foundaryDimension = new Point(start.X, end.X);
 			Point offsetDimension = new Point(start.X, start.X + GuardRowParameters.GuardColumnSuppotOffset + GuardRowParameters.GuardRowFoundationWidth);
 			// suport triangles
 			start.Y -= GuardRowParameters.GuardRowFoundationHeight;
@@ -1771,6 +1969,8 @@ namespace DrawingControl
 			{
                 if (showHeightDimensions)
                 {
+					eDimensionPlacement heightDim = start.X < 0 ? eDimensionPlacement.eLeft : eDimensionPlacement.eRight;
+
 					// height
 					_DrawDimension(dc, 
 						new Point(start.X + GuardRowParameters.GuardRowWidth, end.Y), 
@@ -1779,11 +1979,11 @@ namespace DrawingControl
 						7,
 						displaySettings.DimensionsTextSize,
 						displaySettings.PerpDimLinesOffsetInPixels,
-						eDimensionPlacement.eRight,
+						heightDim,
 						cs,
 						dimensionBrush: displaySettings.DimensionsBrush,
 						drawAdditionalSupportDimLine: true,
-						bMirrorTextRelativeToDimLine: true,
+						bMirrorTextRelativeToDimLine: false	,
 						dimensionTextOffset: 0);
                 }
 
@@ -1801,8 +2001,8 @@ namespace DrawingControl
 
 					// offset
 					_DrawDimension(dc, 
-						new Point(offsetDimension.X, 0), 
-						new Point(offsetDimension.Y, 0),
+						new Point(isRightSideRack ? offsetDimension.X - GuardRowParameters.GuardColumnSuppotOffset : offsetDimension.X, 0), 
+						new Point(isRightSideRack ? offsetDimension.Y - GuardRowParameters.GuardColumnSuppotOffset : offsetDimension.Y, 0),
 						$"{GuardRowParameters.GuardColumnSuppotOffset + GuardRowParameters.GuardRowFoundationWidth}",
 						displaySettings.MinDimensionsLinesOffset,
 						displaySettings.DimensionsTextSize,
@@ -1811,175 +2011,7 @@ namespace DrawingControl
 						cs,
 						dimensionBrush: displaySettings.DimensionsBrush,
 						bMirrorTextRelativeToDimLine: true);
-
-					// guard bottom width
-					//_DrawDimension(dc, new Point(foundaryDimension.X, 0), new Point(foundaryDimension.Y, 0),
-					//	GuardRowParameters.GuardRowFoundationWidth.ToString(),
-					//	displaySettings.MinDimensionsLinesOffset,
-					//	displaySettings.DimensionsTextSize,
-					//	displaySettings.PerpDimLinesOffsetInPixels,
-					//	eDimensionPlacement.eBot,
-					//	cs,
-					//	dimensionBrush: displaySettings.DimensionsBrush,
-					//	bMirrorTextRelativeToDimLine: true);
                 }
-			}
-		}
-
-		private static void _TryDrawSideColumnGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack)
-		{
-			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE)
-				return;
-
-			Color rackGuardFillColor = Colors.Black;
-			if (CurrentGeometryColorsTheme.CurrentTheme != null)
-			{
-				Color color;
-				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardMainColorDefault, out color))
-					rackGuardFillColor = color;
-			}
-
-			Color rackGuardAltFillColor = Colors.Black;
-			if (CurrentGeometryColorsTheme.CurrentTheme != null)
-			{
-				Color color;
-				if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackGuardAltColorDefault, out color))
-					rackGuardAltFillColor = color;
-			}
-
-			Brush rackGuardMainFillBrush = GetStripesBrush(rackGuardFillColor, rackGuardAltFillColor);
-			Pen borderPen = new Pen(new SolidColorBrush(rackGuardFillColor), 1.0);
-
-			Point step;
-
-			Point dimensionStart;
-			Point dimensionEnd;
-			Point dimensionHieght;
-
-			bool isDimensionsDrawn = false;
-
-			List<Point> path = new List<Point>();
-
-			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
-				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))) 
-			{
-				
-				step = new Point(rack.PalletOverhangValue - 125, 0);
-				path.Add(step);
-				dimensionStart = step;
-				dimensionHieght = new Point(dimensionStart.X, dimensionStart.Y);
-
-				step.X += 108;
-				path.Add(step);
-				dimensionEnd = step;
-
-				step.Y = -380;
-				path.Add(step);
-
-				step.X -= 20;
-				step.Y = -400;
-				path.Add(step);
-				dimensionHieght.Y = step.Y;
-
-				step.X -= 88;
-				path.Add(step);
-
-				_DrawGeometry(dc, cs, borderPen, rackGuardMainFillBrush, path.ToArray());
-
-				isDimensionsDrawn = true;
-                if (displaySettings.DisplayTextAndDimensions)
-                {
-					_DrawDimension(dc, dimensionStart, dimensionEnd,
-						Math.Abs(dimensionStart.X - dimensionEnd.X).ToString(),
-						10,
-						displaySettings.DimensionsTextSize,
-						displaySettings.PerpDimLinesOffsetInPixels,
-						eDimensionPlacement.eBot,
-						cs,
-						dimensionBrush: displaySettings.DimensionsBrush,
-						dimensionTextOffset: 200,
-						bMirrorTextRelativeToDimLine: true,
-						drawAdditionalSupportDimLine: true);
-					
-					Point rackColumnPosition = new Point(dimensionStart.X + 125, dimensionEnd.Y);
-					_DrawDimension(
-						dc,
-						dimensionStart,
-						rackColumnPosition, 
-						"125",
-						15,
-						displaySettings.DimensionsTextSize,
-						displaySettings.PerpDimLinesOffsetInPixels,
-						eDimensionPlacement.eBot,
-						cs,
-						dimensionBrush: displaySettings.DimensionsBrush,
-						dimensionTextOffset: 200,
-						bMirrorTextRelativeToDimLine: false,
-						drawAdditionalSupportDimLine: true);
-                }
-			}
-
-			path.Clear();
-
-			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
-				||(!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)))
-            {
-				double rackLength = rack.Depth;
-
-                step = new Point(rack.PalletOverhangValue + rackLength + 125, 0);
-				path.Add(step);
-				dimensionStart = step;
-				dimensionHieght = new Point(dimensionStart.X, dimensionStart.Y);
-
-				step.X -= 108;
-				path.Add(step);
-				dimensionEnd = step;
-
-				step.Y = -380;
-				path.Add(step);
-
-				step.X += 20;
-				step.Y = -400;
-				path.Add(step);
-				dimensionHieght.Y = step.Y;
-
-				step.X += 88;
-				path.Add(step);
-
-				_DrawGeometry(dc, cs, borderPen, rackGuardMainFillBrush, path.ToArray());
-
-				if (displaySettings.DisplayTextAndDimensions && !isDimensionsDrawn)
-				{
-					_DrawDimension(dc, 
-						dimensionEnd,
-						dimensionStart,
-						Math.Abs(dimensionStart.X - dimensionEnd.X).ToString(),
-						10,
-						displaySettings.DimensionsTextSize,
-						1,
-						eDimensionPlacement.eBot,
-						cs,
-						dimensionBrush: displaySettings.DimensionsBrush,
-						dimensionTextOffset: -200,
-						bMirrorTextRelativeToDimLine: true,
-						drawAdditionalSupportDimLine: true);
-					
-					Point rackColumnPosition = new Point(dimensionStart.X - 125, dimensionEnd.Y);
-					_DrawDimension(
-						dc,
-						rackColumnPosition,
-						dimensionStart,
-						"125",
-						15,
-						displaySettings.DimensionsTextSize,
-						1,
-						eDimensionPlacement.eBot,
-						cs,
-						dimensionBrush: displaySettings.DimensionsBrush,
-						dimensionTextOffset: -200,
-						bMirrorTextRelativeToDimLine: true,
-						drawAdditionalSupportDimLine: true);
-				}
 			}
 		}
 
@@ -2249,11 +2281,16 @@ namespace DrawingControl
 
                 if (drawAdditionalSupportDimLine)
                 {
-					lines.Add(-1, new List<Point> 
-					{
-						new Point(supportLineStart_GlobaltPnt.X, supportLineStart_GlobaltPnt.Y),
-						new Point(supportLineEnd_GlobalPnt.X - dimensionTextOffset, supportLineEnd_GlobalPnt.Y)
-					});
+					Point startSupportLine = new Point(supportLineStart_GlobaltPnt.X, supportLineStart_GlobaltPnt.Y);
+					Point endSupportLine = new Point(supportLineEnd_GlobalPnt.X - dimensionTextOffset, supportLineEnd_GlobalPnt.Y);
+
+                    if (dimensionTextOffset < 0)
+                    {
+						startSupportLine = new Point(supportLineStart_GlobaltPnt.X - dimensionTextOffset, supportLineStart_GlobaltPnt.Y);
+						endSupportLine = new Point(supportLineStart_GlobaltPnt.X , supportLineEnd_GlobalPnt.Y);
+					}
+
+					lines.Add(-1, new List<Point>{ startSupportLine, endSupportLine });
 				}
 
 				//
