@@ -10,6 +10,20 @@ using System.Windows.Media;
 
 namespace DrawingControl
 {
+	public class GuardColumnParameters
+	{
+		public const double GuardColumnFrontOffset = 45;
+		public const double GuardColumnSideOffset = 40;
+		public const double GuardColumnDepth = 108;
+		public const double GuardColumnInnerSideDepth = 10;
+
+		public const double GuardColumnHeight = 400;
+		public const double GuardColumnForwardOffset = 125;
+		public const double GuardColumnInnerAngleOffset = 20;
+		public static double GuardColumnInnerHeight => (GuardColumnHeight - GuardColumnInnerAngleOffset);
+		public static double GuardColumnTopDepth => (GuardColumnDepth - GuardColumnInnerAngleOffset);
+	}
+
 	public class GuardRowParameters
 	{
 		public const double GuardRowFoundationLength = 70;
@@ -1531,6 +1545,7 @@ namespace DrawingControl
 			Point start;
 			Point end;
 			bool isDrawnWidth = false;
+			bool isDrawnHeight = false;
 			bool isHeightFitLeft = false;
 			bool isHeightFitRight = false;
 
@@ -1548,28 +1563,30 @@ namespace DrawingControl
 
 				if (rack.IsFirstInRowColumn)
 				{
-					start = new Point(-40, 0);
-					end = new Point(rack.Column.Length + 40, -400);
+					start = new Point(-GuardColumnParameters.GuardColumnSideOffset, 0);
+					end = new Point(rack.Column.Length + GuardColumnParameters.GuardColumnSideOffset, -GuardColumnParameters.GuardColumnHeight);
 
 					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
 
 					if (displaySettings.DisplayTextAndDimensions)
 					{
 						if (isHeightFitLeft)
+						{
 							// height
 							_DrawDimension(dc, start, end,
-								Math.Abs(start.Y - end.Y).ToString(),
+								GuardColumnParameters.GuardColumnHeight.ToString(),
 								displaySettings.MinDimensionsLinesOffset,
 								displaySettings.DimensionsTextSize,
 								displaySettings.PerpDimLinesOffsetInPixels,
 								eDimensionPlacement.eLeft,
 								cs,
 								dimensionBrush: displaySettings.DimensionsBrush);
+							isDrawnHeight = true;
+						}
 
 						if (!isDrawnWidth && isHeightFitLeft)
 						{
 							isDrawnWidth = true;
-
 							// width
 							_DrawDimension(dc,
 								new Point(start.X, 0),
@@ -1586,17 +1603,17 @@ namespace DrawingControl
 					}
 				}
 
-				start = new Point(rackLength - rack.Column.Length - 40, 0);
-				end = new Point(start.X + rack.Column.Length + 80, -400);
+				start = new Point(rackLength - rack.Column.Length - GuardColumnParameters.GuardColumnSideOffset, 0);
+				end = new Point(start.X + rack.Column.Length + (2 * GuardColumnParameters.GuardColumnSideOffset), -GuardColumnParameters.GuardColumnHeight);
 
 				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
 
 				if (displaySettings.DisplayTextAndDimensions)
 				{
-                    if (isHeightFitRight)
+                    if (isHeightFitRight && !isDrawnHeight)
 						// height
 						_DrawDimension(dc, start, end,
-							Math.Abs(start.Y - end.Y).ToString(),
+							GuardColumnParameters.GuardColumnHeight.ToString(),
 							10,
 							displaySettings.DimensionsTextSize,
 							displaySettings.PerpDimLinesOffsetInPixels,
@@ -1635,8 +1652,8 @@ namespace DrawingControl
 
 				if (rack.IsFirstInRowColumn)
 				{
-					start = new Point(-40, 0);
-					end = new Point(rack.Column.Length + 40, -400);
+					start = new Point(-GuardColumnParameters.GuardColumnSideOffset, 0);
+					end = new Point(rack.Column.Length + GuardColumnParameters.GuardColumnSideOffset, -GuardColumnParameters.GuardColumnHeight);
 
 					_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
 
@@ -1645,7 +1662,7 @@ namespace DrawingControl
 						// height
 						if (isHeightFitLeft)
 							_DrawDimension(dc, start, end,
-						 		Math.Abs(start.Y - end.Y).ToString(),
+						 		GuardColumnParameters.GuardColumnHeight.ToString(),
 								displaySettings.MinDimensionsLinesOffset,
 								displaySettings.DimensionsTextSize,
 								displaySettings.PerpDimLinesOffsetInPixels,
@@ -1672,8 +1689,8 @@ namespace DrawingControl
 					}
 				}
 
-				start = new Point(rackLength - rack.Column.Length - 40, 0);
-				end = new Point(start.X + rack.Column.Length + 80, -400);
+				start = new Point(rackLength - rack.Column.Length - GuardColumnParameters.GuardColumnSideOffset, 0);
+				end = new Point(start.X + rack.Column.Length + (2 * GuardColumnParameters.GuardColumnSideOffset), -GuardColumnParameters.GuardColumnHeight);
 
 				_DrawRectangle(dc, rackGuardMainFillBrush, borderPen, start, end, cs);
 
@@ -1817,24 +1834,24 @@ namespace DrawingControl
 				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)))
 			{
 
-				step = new Point(rack.PalletOverhangValue - 125, 0);
+				step = new Point(rack.PalletOverhangValue - GuardColumnParameters.GuardColumnForwardOffset, 0);
 				path.Add(step);
 				dimensionStart = step;
 				dimensionHieght = new Point(dimensionStart.X, dimensionStart.Y);
 
-				step.X += 108;
+				step.X += GuardColumnParameters.GuardColumnDepth;
 				path.Add(step);
 				dimensionEnd = step;
-
-				step.Y = -380;
+				
+				step.Y = -GuardColumnParameters.GuardColumnInnerHeight;
 				path.Add(step);
 
-				step.X -= 20;
-				step.Y = -400;
+				step.X -= GuardColumnParameters.GuardColumnInnerAngleOffset;
+				step.Y = -GuardColumnParameters.GuardColumnHeight;
 				path.Add(step);
 				dimensionHieght.Y = step.Y;
 
-				step.X -= 88;
+				step.X -= GuardColumnParameters.GuardColumnTopDepth;
 				path.Add(step);
 
 				_DrawGeometry(dc, cs, borderPen, rackGuardMainFillBrush, path.ToArray());
@@ -1844,7 +1861,7 @@ namespace DrawingControl
 				{
 					// depth
 					_DrawDimension(dc, dimensionStart, dimensionEnd,
-						Math.Abs(dimensionStart.X - dimensionEnd.X).ToString(),
+						GuardColumnParameters.GuardColumnDepth.ToString(),
 						3,
 						displaySettings.DimensionsTextSize,
 						displaySettings.PerpDimLinesOffsetInPixels,
@@ -1861,7 +1878,7 @@ namespace DrawingControl
 						dc,
 						dimensionStart,
 						rackColumnPosition,
-						"125",
+						GuardColumnParameters.GuardColumnForwardOffset.ToString(),
 						15,
 						displaySettings.DimensionsTextSize,
 						displaySettings.PerpDimLinesOffsetInPixels,
@@ -1875,7 +1892,7 @@ namespace DrawingControl
                         dc,
                         new Point(dimensionHieght.X, dimensionHieght.Y),
 						new Point(dimensionHieght.X, 0),
-                        "400",
+						GuardColumnParameters.GuardColumnHeight.ToString(),
                         displaySettings.DimensionsTextSize,
                         displaySettings.DimensionsTextSize,
                         displaySettings.PerpDimLinesOffsetInPixels,
@@ -1895,24 +1912,24 @@ namespace DrawingControl
 			{
 				double rackLength = rack.Depth;
 
-				step = new Point(rack.PalletOverhangValue + rackLength + 125, 0);
+				step = new Point(rack.PalletOverhangValue + rackLength + GuardColumnParameters.GuardColumnForwardOffset, 0);
 				path.Add(step);
 				dimensionStart = step;
 				dimensionHieght = new Point(dimensionStart.X, dimensionStart.Y);
 
-				step.X -= 108;
+				step.X -= GuardColumnParameters.GuardColumnDepth;
 				path.Add(step);
 				dimensionEnd = step;
 
-				step.Y = -380;
+				step.Y = -GuardColumnParameters.GuardColumnInnerHeight;
 				path.Add(step);
 
-				step.X += 20;
-				step.Y = -400;
+				step.X += GuardColumnParameters.GuardColumnInnerAngleOffset;
+				step.Y = -GuardColumnParameters.GuardColumnHeight;
 				path.Add(step);
 				dimensionHieght.Y = step.Y;
 
-				step.X += 88;
+				step.X += GuardColumnParameters.GuardColumnTopDepth;
 				path.Add(step);
 
 				_DrawGeometry(dc, cs, borderPen, rackGuardMainFillBrush, path.ToArray());
@@ -1940,7 +1957,7 @@ namespace DrawingControl
 						dc,
 						rackColumnPosition,
 						dimensionStart,
-						"125",
+						GuardColumnParameters.GuardColumnForwardOffset.ToString(),
 						15,
 						displaySettings.DimensionsTextSize,
 						displaySettings.PerpDimLinesOffsetInPixels,
@@ -2203,11 +2220,11 @@ namespace DrawingControl
 
 			//========================Geometry Drawing=======================
 			GeometryDrawing black = new GeometryDrawing();
-			black.Brush = Brushes.Black;
+			black.Brush = new SolidColorBrush(main);
 			black.Geometry = blackGroup;
 
 			GeometryDrawing stripes = new GeometryDrawing();
-			stripes.Brush = Brushes.Yellow;
+			stripes.Brush = new SolidColorBrush(secondary);
 			stripes.Geometry = stripeGroup;
 
 			//========================Group=======================
