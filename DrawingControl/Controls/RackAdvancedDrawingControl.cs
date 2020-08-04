@@ -1454,16 +1454,17 @@ namespace DrawingControl
 
 			if (rack.IsUnderpassAvailable)
 			{
-				leftOffsetX = 50;
+				leftOffsetX = GuardRowParameters.GuardColumnSuppotOffset;
 				if (rack.IsFirstInRowColumn)
 					leftOffsetX += rack.Column.Length;
-				rightOffsetX = rackLength - rack.Column.Length - 210;
+
+				rightOffsetX = rackLength - rack.Column.Length - (GuardRowParameters.GuardColumnSuppotOffset + GuardRowParameters.GuardRowFoundationWidth);
 
 				_DrawRowGuard(new Point(leftOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, 
-					showHeightDimensions: !rack.Accessories.UprightGuard, showWidthAndOffset: !rack.IsFirstInRowColumn);
+					showHeightDimensions: !rack.Accessories.UprightGuard, showWidthAndOffset: !rack.IsFirstInRowColumn, isUnderpass: true);
 
 				_DrawRowGuard(new Point(rightOffsetX, 0), dc, cs, displaySettings, borderPen, rackGuardFillColor, rackGuardAltFillColor, 
-					showWidthAndOffset: rack.IsFirstInRowColumn);
+					showWidthAndOffset: rack.IsFirstInRowColumn, isUnderpass: true);
                 
 				if (displaySettings.DisplayTextAndDimensions)
                 {
@@ -2005,7 +2006,7 @@ namespace DrawingControl
 		}
 
 		private static void _DrawRowGuard(Point start, DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, 
-			Pen borderPen, Color mainColor, Color secondaryColor, bool showHeightDimensions = false, bool showWidthAndOffset = false, bool isRightSideRack = false)
+			Pen borderPen, Color mainColor, Color secondaryColor, bool showHeightDimensions = false, bool showWidthAndOffset = false, bool isRightSideRack = false, bool isUnderpass = false)
 		{
 			Point end;
 
@@ -2014,6 +2015,11 @@ namespace DrawingControl
 			_DrawRectangle(dc, Brushes.White, borderPen, start, end, cs);
 
 			Point offsetDimension = new Point(start.X, start.X + GuardRowParameters.GuardColumnSuppotOffset + GuardRowParameters.GuardRowFoundationWidth);
+			if (isUnderpass)
+			{
+                offsetDimension.X -= GuardRowParameters.GuardColumnSuppotOffset;
+                offsetDimension.Y -= GuardRowParameters.GuardColumnSuppotOffset;
+            }
 			// suport triangles
 			start.Y -= GuardRowParameters.GuardRowFoundationHeight;
 
