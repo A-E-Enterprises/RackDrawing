@@ -1,4 +1,15 @@
-﻿RackDrawingApp 1.407.041
+﻿RackDrawingApp 1.407.042
+[fixed] Fixed guards dimensions overlapping
+[fixed] Fixed underpass row guard drawing
+[fixed] Fixed row guard side drawing
+[new] Racks Guards On Elevation Views. Added dimensions to guards on elevation views
+[new] Racks Guards On Elevation Views. Added stripes brush to draw elevation guards
+[new] Racks Guards On Elevation Views. Added drawing of guards on elevation views
+[new] Racks Guards On Elevation Views. Added drawing of guards on elevation views
+[new] Added rack column and tie beam offset lines for every rack
+[internal] Added bottom column guard line to drawing
+
+RackDrawingApp 1.407.041
 [internal] Increase version of Rack serialization model
 [internal] Rack row width. Commit 2. Show full rack row size for entire selected group
 [internal] Rack row width. Commit 1. Show rack rows width for export
