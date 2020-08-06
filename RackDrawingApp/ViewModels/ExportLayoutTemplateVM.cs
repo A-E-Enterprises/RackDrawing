@@ -1,9 +1,12 @@
 ﻿using DrawingControl;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace RackDrawingApp
 {
@@ -438,9 +441,154 @@ namespace RackDrawingApp
 		}
 
 		//=============================================================================
-		private ObservableCollection<object> m_AccessoriesVisualization = new ObservableCollection<object>();
-		public ObservableCollection<object> AccessoriesVisualization { get { return m_AccessoriesVisualization; } }
+		private ObservableCollection<AccessoryVisualPresentation> m_AccessoriesVisualization = new ObservableCollection<AccessoryVisualPresentation>();
+		public ObservableCollection<AccessoryVisualPresentation> AccessoriesVisualization
+		{
+			get => m_AccessoriesVisualization;
+			set
+			{
+				m_AccessoriesVisualization = value;
+				NotifyPropertyChanged(() => AccessoriesVisualization);
+			}
+		}
 
 		#endregion
+
+		public void ParseVisualAccessories()
+		{
+			//TODO: add images for every accessory
+
+			// Rack Accessories
+			if (m_Document != null && m_Document.Rack_Accessories != null)
+			{
+				if (m_Document.Rack_Accessories.UprightGuard)
+					AccessoriesVisualization.Add(new AccessoryVisualPresentation("Upright Guard", "Resources//Accessories//UprightGuard.png"));
+				if (m_Document.Rack_Accessories.RowGuard)
+				{
+					if (m_Document.Rack_Accessories.IsHeavyDutyEnabled)
+						AccessoriesVisualization.Add(new AccessoryVisualPresentation("Heavy Duty Row Guard", "Resources//Accessories//UprightGuard.png"));
+					else
+						AccessoriesVisualization.Add(new AccessoryVisualPresentation("Row Guard", "Resources//Accessories//UprightGuard.png"));
+				}
+				if (m_Document.Rack_Accessories.Signages)
+					AccessoriesVisualization.Add(new AccessoryVisualPresentation("Signages", "Resources//Accessories//UprightGuard.png"));
+				if (m_Document.Rack_Accessories.IsMeshCladdingEnabled)
+					AccessoriesVisualization.Add(new AccessoryVisualPresentation("Mesh Cladding", "Resources//Accessories//UprightGuard.png"));
+			}
+
+			if (m_Sheet != null && m_Sheet.TieBeamsList != null && m_Sheet.TieBeamsList.Count > 0)
+				AccessoriesVisualization.Add(new AccessoryVisualPresentation("Tie Beams", "Resources//Accessories//UprightGuard.png"));
+
+			List<Tuple<string, string>> usedAccessories = new List<Tuple<string, string>>();
+
+			// Levels Accessories
+			foreach (Rack rack in m_Sheet.GetAllRacks())
+			{
+				if (rack == null)
+					continue;
+				if (rack.Levels == null)
+					continue;
+
+				foreach (RackLevel level in rack.Levels)
+				{
+					if (level == null)
+						continue;
+					if (level.Accessories == null)
+						continue;
+
+					if (level.Accessories.IsDeckPlateAvailable)
+					{
+						if (eDeckPlateType.eAlongDepth_UDL == level.Accessories.DeckPlateType)
+                        {
+                            if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.DECKING_PANEL_6BP_SHELVING))
+                            {
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.DECKING_PANEL_6BP_SHELVING, "Resources//Accessories//UprightGuard.png"));
+							}
+						}
+						else if (eDeckPlateType.eAlongDepth_PalletSupport == level.Accessories.DeckPlateType)
+                        {
+							if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.DECKING_PANEL_6BP_PALLET))
+							{
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.DECKING_PANEL_6BP_PALLET, "Resources//Accessories//UprightGuard.png"));
+							}
+						}
+						else if (eDeckPlateType.eAlongLength == level.Accessories.DeckPlateType)
+						{
+							if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.DECKING_PANEL_4BP))
+							{
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.DECKING_PANEL_4BP, "Resources//Accessories//UprightGuard.png"));
+							}
+						}
+					}
+
+					if (level.Accessories.PalletStopper)
+					{
+						if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.PALLET_STOPPER))
+						{
+							usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.PALLET_STOPPER, "Resources//Accessories//UprightGuard.png"));
+						}
+					}
+					if (level.Accessories.ForkEntryBar)
+					{
+						if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.FORK_ENTRY_BAR))
+						{
+							usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.FORK_ENTRY_BAR, "Resources//Accessories//UprightGuard.png"));
+						}
+					}
+					if (level.Accessories.PalletSupportBar)
+					{
+						if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.PALLET_SUPPORT_BAR))
+						{
+							usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.PALLET_SUPPORT_BAR, "Resources//Accessories//UprightGuard.png"));
+						}
+					}
+					if (level.Accessories.GuidedTypePalletSupport)
+					{
+						if (level.Accessories.GuidedTypePalletSupport_WithPSB && level.Accessories.GuidedTypePalletSupport_WithStopper)
+						{
+							if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER))
+							{
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER, "Resources//Accessories//UprightGuard.png"));
+							}
+						}
+						else if (level.Accessories.GuidedTypePalletSupport_WithPSB)
+						{
+							if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB))
+							{
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB, "Resources//Accessories//UprightGuard.png"));
+							}
+						}
+						else if (level.Accessories.GuidedTypePalletSupport_WithStopper)
+						{
+							if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB))
+							{
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB, "Resources//Accessories//UprightGuard.png"));
+							}
+						}
+					}
+
+					if (rack.AreLevelsTheSame)
+						break;
+				}
+			}
+
+            foreach (var accessory in usedAccessories)
+            {
+				AccessoriesVisualization.Add(new AccessoryVisualPresentation(accessory.Item1, accessory.Item2));
+			}
+		}
 	}
+
+	public class AccessoryVisualPresentation : BaseViewModel
+	{
+        public BitmapImage ImageSource { get; private set; }
+        public string Name { get; private set; }
+
+        public AccessoryVisualPresentation(string name, string path)
+        {
+			Name = name;
+			ImageSource = new BitmapImage(new Uri($"{path}", UriKind.Relative));
+		}
+
+    }
 }

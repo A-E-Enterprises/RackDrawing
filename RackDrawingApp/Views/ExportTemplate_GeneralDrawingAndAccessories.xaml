@@ -19,12 +19,22 @@
 
         <ItemsControl
             Grid.Row="1"
+            MaxHeight="200"
             HorizontalAlignment="Left"
 		    VerticalAlignment="Center"
             ItemsSource="{Binding AccessoriesVisualization, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Image Source="{Binding ImageSource}" Width="Auto" />
+                    <Border BorderThickness="1" BorderBrush="DarkGray">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Image Grid.Row="0" Source="/Resources/Accessories/UprightGuard.png" />
+                            <TextBlock Grid.Row="1" Text="{Binding Name}"/>
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>

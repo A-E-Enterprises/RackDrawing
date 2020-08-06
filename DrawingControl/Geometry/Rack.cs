@@ -233,6 +233,16 @@ namespace DrawingControl
 	[Serializable]
 	public class RackLevelAccessories : ISerializable, IDeserializationCallback, IClonable
 	{
+		public static string DECKING_PANEL_6BP_SHELVING = "Decking Panel 6BP (Shelving application)";
+		public static string DECKING_PANEL_6BP_PALLET = "Decking Panel 6BP (Pallet application)";
+		public static string DECKING_PANEL_4BP = "Decking Panel 4BP";
+		public static string PALLET_STOPPER = "Pallet Stopper";
+		public static string FORK_ENTRY_BAR = "Fork Entry Bar";
+		public static string PALLET_SUPPORT_BAR = "Pallet Support Bar(PSB)";
+		public static string GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER = "Guided Type Pallet Support With Stopper";
+		public static string GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB = "Guided Type Pallet Support With PSB";
+		public static string GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB = "Guided Type Pallet Support With Stopper and With PSB";
+
 		public RackLevelAccessories(RackLevel owner)
 		{
 			m_Owner = owner;

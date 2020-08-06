@@ -2553,9 +2553,9 @@ namespace RackDrawingApp
 						ExportLayoutTemplateVM templateVM = new ExportLayoutTemplateVM(curDoc, sheet);
 						templateVM.Date = DateTime.Now.Date.ToString("dd MMMM yyyy");
 						templateVM.DisplayRackAccessories = true;
-						templateVM.RackAccessories = strRackAccessories;
 						templateVM.DisplayRackLevelAccessories = true;
 						templateVM.RackLevelAccessories = strLevelAccessories;
+						templateVM.RackAccessories = strRackAccessories;
 						templateVM.PageNumber = iSheetNumber;
 						templateVM.ImageHeaderText = sheet.Name + ": General Arrangement";
 
@@ -2569,20 +2569,22 @@ namespace RackDrawingApp
 							templateVM.ImageSources.Add(Command_ExportImages._GetBmpFromVisual(sheetVisual, elevationImageLength, elevationImageHeight));
 
 							while (iVisualIndex < sheetVisualsList.Count)
-                            {
+							{
 								sheetVisual = sheetVisualsList[iVisualIndex];
 
 								elevationImageLength = (int)sheetVisual.ContentBounds.Width;
 								elevationImageHeight = (int)sheetVisual.ContentBounds.Height;
 
 								templateVM.ImageSources.Add(Command_ExportImages._GetBmpFromVisual(sheetVisual, elevationImageLength, elevationImageHeight));
-							
+
 								++iVisualIndex;
 							}
 						}
 						else
+						{
 							templateVM.ImageSrc = Command_ExportImages._GetBmpFromVisual(sheetVisual, imageLength, imageHeight);
-
+							templateVM.ParseVisualAccessories();
+						}
 						// Calculate which blocks can be exported
 						double availableHeight = dynamicFillBlockHeight;
 						bool isAnyBlockExported = false;
@@ -2616,14 +2618,16 @@ namespace RackDrawingApp
 								break;
 						}
 
-                        ExportLayoutTemplate02_Sheet01 pdfExportTemplateControl = new ExportLayoutTemplate02_Sheet01(templateVM, null);
+						ExportLayoutTemplate02_Sheet01 pdfExportTemplateControl = new ExportLayoutTemplate02_Sheet01(templateVM, null);
 
 						// set template to show multiple elevations if IsPrintAllRackElevationsInSinglePage is on
 						System.Windows.Controls.UserControl contentContainer;
 						if (sheetVisualsList.IndexOf(sheetVisual) != 0 && isAllElevationsTogether)
 							contentContainer = new ExportTemplate_MultipleElevationsLayout();
 						else
-							contentContainer = new ExportTemplate_GeneralLayout();
+						{
+							contentContainer = new ExportTemplate_GeneralDrawingAndAccessories();
+						}
 
 						pdfExportTemplateControl.DrawingPart.Content = contentContainer;
 
@@ -2711,7 +2715,7 @@ namespace RackDrawingApp
 							secondRack = racksList[i];
 
 							if (secondRack != null)
-								secondRackVisual = _CreateRackAdvancedPropsVisual(rack, null, scaledImageSize, scaledImageSize, drawingSettings);
+								secondRackVisual = _CreateRackAdvancedPropsVisual(secondRack, null, scaledImageSize, scaledImageSize, drawingSettings);
 						}
 
 						string firstRackAccessories = GetRackLevelAccessories(rack);
@@ -2970,15 +2974,6 @@ namespace RackDrawingApp
 		/// <summary>
 		/// String with rack level accessory.
 		/// </summary>
-		private static string DECKING_PANEL_6BP_SHELVING = "Decking Panel 6BP (Shelving application)";
-		private static string DECKING_PANEL_6BP_PALLET = "Decking Panel 6BP (Pallet application)";
-		private static string DECKING_PANEL_4BP = "Decking Panel 4BP";
-		private static string PALLET_STOPPER = "Pallet Stopper";
-		private static string FORK_ENTRY_BAR = "Fork Entry Bar";
-		private static string PALLET_SUPPORT_BAR = "Pallet Support Bar(PSB)";
-		private static string GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER = "Guided Type Pallet Support With Stopper";
-		private static string GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB = "Guided Type Pallet Support With PSB";
-		private static string GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB = "Guided Type Pallet Support With Stopper and With PSB";
 		private static string GetRackLevelAccessories(Rack rack)
 		{
 			if (rack == null || rack.Levels == null)
@@ -2987,15 +2982,15 @@ namespace RackDrawingApp
 			// key - accessory name
 			// value - count
 			Dictionary<string, int> accessoryToCountDict = new Dictionary<string, int>();
-			accessoryToCountDict.Add(DECKING_PANEL_6BP_SHELVING, 0);
-			accessoryToCountDict.Add(DECKING_PANEL_6BP_PALLET, 0);
-			accessoryToCountDict.Add(DECKING_PANEL_4BP, 0);
-			accessoryToCountDict.Add(PALLET_STOPPER, 0);
-			accessoryToCountDict.Add(FORK_ENTRY_BAR, 0);
-			accessoryToCountDict.Add(PALLET_SUPPORT_BAR, 0);
-			accessoryToCountDict.Add(GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER, 0);
-			accessoryToCountDict.Add(GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB, 0);
-			accessoryToCountDict.Add(GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.DECKING_PANEL_6BP_SHELVING, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.DECKING_PANEL_6BP_PALLET, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.DECKING_PANEL_4BP, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.PALLET_STOPPER, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.FORK_ENTRY_BAR, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.PALLET_SUPPORT_BAR, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB, 0);
 
 			foreach(RackLevel level in rack.Levels)
 			{
@@ -3008,28 +3003,28 @@ namespace RackDrawingApp
 				if(level.Accessories.IsDeckPlateAvailable)
 				{
 					if (eDeckPlateType.eAlongDepth_UDL == level.Accessories.DeckPlateType)
-						++accessoryToCountDict[DECKING_PANEL_6BP_SHELVING];
+						++accessoryToCountDict[RackLevelAccessories.DECKING_PANEL_6BP_SHELVING];
 					else if(eDeckPlateType.eAlongDepth_PalletSupport == level.Accessories.DeckPlateType)
-						++accessoryToCountDict[DECKING_PANEL_6BP_PALLET];
+						++accessoryToCountDict[RackLevelAccessories.DECKING_PANEL_6BP_PALLET];
 					else if(eDeckPlateType.eAlongLength == level.Accessories.DeckPlateType)
-						++accessoryToCountDict[DECKING_PANEL_4BP];
+						++accessoryToCountDict[RackLevelAccessories.DECKING_PANEL_4BP];
 				}
 				if(level.Accessories.PalletStopper)
-					++accessoryToCountDict[PALLET_STOPPER];
+					++accessoryToCountDict[RackLevelAccessories.PALLET_STOPPER];
 				if(level.Accessories.ForkEntryBar)
-					++accessoryToCountDict[FORK_ENTRY_BAR];
+					++accessoryToCountDict[RackLevelAccessories.FORK_ENTRY_BAR];
 				if(level.Accessories.PalletSupportBar)
-					++accessoryToCountDict[PALLET_SUPPORT_BAR];
+					++accessoryToCountDict[RackLevelAccessories.PALLET_SUPPORT_BAR];
 				if(level.Accessories.GuidedTypePalletSupport)
 				{
 					if(level.Accessories.GuidedTypePalletSupport_WithPSB && level.Accessories.GuidedTypePalletSupport_WithStopper)
-						++accessoryToCountDict[GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB];
+						++accessoryToCountDict[RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB];
 					else if(level.Accessories.GuidedTypePalletSupport_WithPSB)
-						++accessoryToCountDict[GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB];
+						++accessoryToCountDict[RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB];
 					else if(level.Accessories.GuidedTypePalletSupport_WithStopper)
-						++accessoryToCountDict[GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER];
+						++accessoryToCountDict[RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER];
 					else
-						++accessoryToCountDict[GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB];
+						++accessoryToCountDict[RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB];
 				}
 
 				if (rack.AreLevelsTheSame)
@@ -3068,15 +3063,15 @@ namespace RackDrawingApp
 			// key - accessory name
 			// value - count
 			Dictionary<string, int> accessoryToCountDict = new Dictionary<string, int>();
-			accessoryToCountDict.Add(DECKING_PANEL_6BP_SHELVING, 0);
-			accessoryToCountDict.Add(DECKING_PANEL_6BP_PALLET, 0);
-			accessoryToCountDict.Add(DECKING_PANEL_4BP, 0);
-			accessoryToCountDict.Add(PALLET_STOPPER, 0);
-			accessoryToCountDict.Add(FORK_ENTRY_BAR, 0);
-			accessoryToCountDict.Add(PALLET_SUPPORT_BAR, 0);
-			accessoryToCountDict.Add(GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER, 0);
-			accessoryToCountDict.Add(GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB, 0);
-			accessoryToCountDict.Add(GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.DECKING_PANEL_6BP_SHELVING, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.DECKING_PANEL_6BP_PALLET, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.DECKING_PANEL_4BP, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.PALLET_STOPPER, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.FORK_ENTRY_BAR, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.PALLET_SUPPORT_BAR, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB, 0);
+			accessoryToCountDict.Add(RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB, 0);
 
 			foreach (Rack rack in racksList)
 			{
@@ -3096,28 +3091,28 @@ namespace RackDrawingApp
 					if (level.Accessories.IsDeckPlateAvailable)
 					{
 						if (eDeckPlateType.eAlongDepth_UDL == level.Accessories.DeckPlateType)
-							++accessoryToCountDict[DECKING_PANEL_6BP_SHELVING];
+							++accessoryToCountDict[RackLevelAccessories.DECKING_PANEL_6BP_SHELVING];
 						else if (eDeckPlateType.eAlongDepth_PalletSupport == level.Accessories.DeckPlateType)
-							++accessoryToCountDict[DECKING_PANEL_6BP_PALLET];
+							++accessoryToCountDict[RackLevelAccessories.DECKING_PANEL_6BP_PALLET];
 						else if (eDeckPlateType.eAlongLength == level.Accessories.DeckPlateType)
-							++accessoryToCountDict[DECKING_PANEL_4BP];
+							++accessoryToCountDict[RackLevelAccessories.DECKING_PANEL_4BP];
 					}
 					if (level.Accessories.PalletStopper)
-						++accessoryToCountDict[PALLET_STOPPER];
+						++accessoryToCountDict[RackLevelAccessories.PALLET_STOPPER];
 					if (level.Accessories.ForkEntryBar)
-						++accessoryToCountDict[FORK_ENTRY_BAR];
+						++accessoryToCountDict[RackLevelAccessories.FORK_ENTRY_BAR];
 					if (level.Accessories.PalletSupportBar)
-						++accessoryToCountDict[PALLET_SUPPORT_BAR];
+						++accessoryToCountDict[RackLevelAccessories.PALLET_SUPPORT_BAR];
 					if (level.Accessories.GuidedTypePalletSupport)
 					{
 						if (level.Accessories.GuidedTypePalletSupport_WithPSB && level.Accessories.GuidedTypePalletSupport_WithStopper)
-							++accessoryToCountDict[GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB];
+							++accessoryToCountDict[RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB];
 						else if (level.Accessories.GuidedTypePalletSupport_WithPSB)
-							++accessoryToCountDict[GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB];
+							++accessoryToCountDict[RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB];
 						else if (level.Accessories.GuidedTypePalletSupport_WithStopper)
-							++accessoryToCountDict[GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER];
+							++accessoryToCountDict[RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER];
 						else
-							++accessoryToCountDict[GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB];
+							++accessoryToCountDict[RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB];
 					}
 
 					if (rack.AreLevelsTheSame)

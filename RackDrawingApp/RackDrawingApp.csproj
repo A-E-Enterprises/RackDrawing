@@ -331,7 +331,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controls\" />
-    <Folder Include="Resources\Accessories\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Properties\logo_1.ico" />
@@ -399,6 +398,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Properties\PDF_RightColumnBottomPicture.TIF" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Accessories\UprightGuard.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
