@@ -1,4 +1,5 @@
 ﻿using DrawingControl;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using System.Windows.Media;
@@ -145,9 +146,25 @@ namespace RackDrawingApp
 			}
 		}
 
-		//=============================================================================
-		// If true then need to display rack statistics
-		private bool m_bDisplayRackStatistics = false;
+        //=============================================================================
+        // Fill this if need to draw multiple images per page or use ImageSrc for single image
+        private List<ImageSource> m_ImageSources = null;
+		public List<ImageSource> ImageSources
+		{
+			get { return m_ImageSources; }
+			set
+			{
+				if (value != m_ImageSources)
+				{
+					m_ImageSources = value;
+					NotifyPropertyChanged(() => ImageSources);
+				}
+			}
+		}
+
+        //=============================================================================
+        // If true then need to display rack statistics
+        private bool m_bDisplayRackStatistics = false;
 		public bool DisplayRackStatistics
 		{
 			get { return m_bDisplayRackStatistics; }

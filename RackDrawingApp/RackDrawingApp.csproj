@@ -148,6 +148,12 @@
     <Compile Include="Views\ExportLayoutTemplate02_Sheet01.xaml.cs">
       <DependentUpon>ExportLayoutTemplate02_Sheet01.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ExportTemplate_GeneralLayout.xaml.cs">
+      <DependentUpon>ExportTemplate_GeneralLayout.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ExportTemplate_MultipleElevationsLayout.xaml.cs">
+      <DependentUpon>ExportTemplate_MultipleElevationsLayout.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
@@ -209,6 +215,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ExportLayoutTemplate02_Sheet01.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ExportTemplate_GeneralLayout.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ExportTemplate_MultipleElevationsLayout.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

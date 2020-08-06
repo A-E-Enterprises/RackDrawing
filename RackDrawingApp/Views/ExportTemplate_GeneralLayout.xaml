@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="RackDrawingApp.Views.ExportTemplate_GeneralLayout"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        
+    <Viewbox
+		HorizontalAlignment="Left"
+		VerticalAlignment="Top"
+					
+		StretchDirection="DownOnly"
+		Stretch="Uniform"
+		>
+        <Image Source="{Binding ImageSrc, Mode=OneWay}" />
+    </Viewbox>
+
+</UserControl>

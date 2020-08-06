@@ -22,6 +22,8 @@ namespace RackDrawingApp
 
 			m_VM = vm;
 			this.DataContext = m_VM;
+
+			this.DrawingPart.Content = new Views.ExportTemplate_GeneralLayout();
 		}
 
 		#region Properties
