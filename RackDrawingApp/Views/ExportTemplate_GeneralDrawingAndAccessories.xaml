@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="RackDrawingApp.Views.ExportTemplate_GeneralDrawingAndAccessories"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <Viewbox
+            Grid.Row="0"
+		    HorizontalAlignment="Left"
+		    VerticalAlignment="Top"
+					
+		    StretchDirection="DownOnly"
+		    Stretch="Uniform">
+            <Image Source="{Binding ImageSrc, Mode=OneWay}" />
+        </Viewbox>
+
+        <ItemsControl
+            Grid.Row="1"
+            HorizontalAlignment="Left"
+		    VerticalAlignment="Center"
+            ItemsSource="{Binding AccessoriesVisualization, Mode=OneWay}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Image Source="{Binding ImageSource}" Width="Auto" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </Grid>
+</UserControl>

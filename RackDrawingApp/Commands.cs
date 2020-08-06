@@ -2673,47 +2673,151 @@ namespace RackDrawingApp
 					false
 					);
 
-				foreach (Rack rack in racksList)
+				if (curDoc.IsFitRackGroupToSamePage)
 				{
-					if (rack == null)
-						continue;
+					double scaledImageSizeDetailed = Command_ExportImages.maxImageSize / 2.5;
+					int scaledImageSize = (int)Math.Ceiling(scaledImageSizeDetailed);
 
-					// create 2000x2000 image
-					DrawingVisual rackVisual = _CreateRackAdvancedPropsVisual(rack, null, Command_ExportImages.maxImageSize, Command_ExportImages.maxImageSize, drawingSettings);
-					if (rackVisual == null)
-						continue;
+					drawingSettings = new RackAdvancedDrawingSettings(
+						(1.5 * 40.0) / 2.5,
+						(1.5 * 48.0) / 2.5,
+						(1.5 * 60.0) / 2.5,
+						(1.5 * 40.0) / 2.5,
+						(1.5 * 60.0) / 2.5,
+						(1.5 * 10.0) / 2.5,
+						(1.5 * 5.0) / 2.5,
+						true,
+						false
+						);
 
-					// create page for image
-					PdfPage newPage = pdfDoc.AddPage();
+					for (int i = 0; i < racksList.Count; i++)
+                    {
+						Rack secondRack = null;
+						DrawingVisual secondRackVisual = null;
 
-					// set view model properties
-					ExportLayoutTemplateVM templateVM = new ExportLayoutTemplateVM(curDoc, null);
-					templateVM.Date = DateTime.Now.Date.ToString("dd MMMM yyyy");
-					templateVM.PageNumber = iSheetNumber;
-					templateVM.ImageHeaderText = rack.Text;
-					templateVM.DisplayRackStatistics = false;
-					templateVM.DisplayPalleteStatistics = false;
-					templateVM.DisplayMHEDetails = false;
-					templateVM.DisplayImportantNotesOnFlooring = false;
-					templateVM.DisplayNotes = false;
-					templateVM.DisplayRackAccessories = false;
-					templateVM.DisplayRackLevelAccessories = true;
-					templateVM.RackLevelAccessories = GetRackLevelAccessories(rack);
-					templateVM.ImageSrc = Command_ExportImages._GetBmpFromVisual(rackVisual, Command_ExportImages.maxImageSize, Command_ExportImages.maxImageSize);
-					//
-					System.Windows.Controls.UserControl pdfExportTemplateControl = new ExportLayoutTemplate02_Sheet01(templateVM, vm.DrawingControl.WatermarkImage);
+						Rack rack = racksList[i];
 
-					_PrepareTemplateForExport(pdfExportTemplateControl);
-					//
-					// rack.Text contains text that displayed over rack in the sheet layout
-					_ExportDrawingVisual(newPage, pdfExportTemplateControl, (int)Math.Floor(pdfExportTemplateControl.DesiredSize.Width), (int)Math.Floor(pdfExportTemplateControl.DesiredSize.Height));
+						if (rack == null)
+							continue;
 
-					// Remove image from memory. Otherwise RenderTargetBitmap.Render() can throw OutOfMemory exception.
-					templateVM.ImageSrc = null;
-					GC.Collect();
-					GC.WaitForPendingFinalizers();
+						// create 2000x2000 image
+						DrawingVisual rackVisual = _CreateRackAdvancedPropsVisual(rack, null, scaledImageSize, scaledImageSize, drawingSettings);
+						if (rackVisual == null)
+							continue;
 
-					++iSheetNumber;
+						i++;
+                        if (i < racksList.Count)
+                        {
+							secondRack = racksList[i];
+
+							if (secondRack != null)
+								secondRackVisual = _CreateRackAdvancedPropsVisual(rack, null, scaledImageSize, scaledImageSize, drawingSettings);
+						}
+
+						string firstRackAccessories = GetRackLevelAccessories(rack);
+
+						string secondRackAccessories = secondRackVisual != null 
+							? GetRackLevelAccessories(secondRack) 
+							: string.Empty;
+
+						PdfPage newPage = pdfDoc.AddPage();
+
+						ExportLayoutTemplateVM templateVM = new ExportLayoutTemplateVM(curDoc, null);
+						templateVM.Date = DateTime.Now.Date.ToString("dd MMMM yyyy");
+						templateVM.PageNumber = iSheetNumber;
+						templateVM.DisplayRackStatistics = false;
+						templateVM.DisplayPalleteStatistics = false;
+						templateVM.DisplayMHEDetails = false;
+						templateVM.DisplayImportantNotesOnFlooring = false;
+						templateVM.DisplayNotes = false;
+						templateVM.DisplayRackAccessories = false;
+						templateVM.DisplayRackLevelAccessories = true;
+						
+						templateVM.ImageHeaderText = secondRackVisual != null 
+							? $"{rack.Text} - {secondRack.Text}" 
+							: rack.Text;
+
+						templateVM.RackLevelAccessories = $"{secondRackAccessories}\n\n{secondRackAccessories}";
+
+						if (secondRackVisual != null)
+						{
+							templateVM.ImageSources = new List<ImageSource>();
+
+							templateVM.ImageSources.Add(
+								Command_ExportImages._GetBmpFromVisual(rackVisual, scaledImageSize, scaledImageSize));
+
+							templateVM.ImageSources.Add(
+								Command_ExportImages._GetBmpFromVisual(secondRackVisual, scaledImageSize, scaledImageSize));
+                        }
+                        else
+                        {
+							templateVM.ImageSrc = Command_ExportImages._GetBmpFromVisual(rackVisual, Command_ExportImages.maxImageSize, Command_ExportImages.maxImageSize);
+						}
+
+						ExportLayoutTemplate02_Sheet01 pdfExportTemplateControl = new ExportLayoutTemplate02_Sheet01(templateVM, vm.DrawingControl.WatermarkImage);
+
+						if (secondRackVisual != null)
+						{
+							pdfExportTemplateControl.DrawingPart.Content = new ExportTemplate_MultipleRacksLayout();
+						}
+
+						_PrepareTemplateForExport(pdfExportTemplateControl);
+						//
+						// rack.Text contains text that displayed over rack in the sheet layout
+						_ExportDrawingVisual(newPage, pdfExportTemplateControl, (int)Math.Floor(pdfExportTemplateControl.DesiredSize.Width), (int)Math.Floor(pdfExportTemplateControl.DesiredSize.Height));
+
+						// Remove image from memory. Otherwise RenderTargetBitmap.Render() can throw OutOfMemory exception.
+						templateVM.ImageSrc = null;
+						GC.Collect();
+						GC.WaitForPendingFinalizers();
+
+						++iSheetNumber;
+					}
+				}
+				else
+				{
+					foreach (Rack rack in racksList)
+					{
+						if (rack == null)
+							continue;
+
+						// create 2000x2000 image
+						DrawingVisual rackVisual = _CreateRackAdvancedPropsVisual(rack, null, Command_ExportImages.maxImageSize, Command_ExportImages.maxImageSize, drawingSettings);
+						if (rackVisual == null)
+							continue;
+
+						// create page for image
+						PdfPage newPage = pdfDoc.AddPage();
+
+						// set view model properties
+						ExportLayoutTemplateVM templateVM = new ExportLayoutTemplateVM(curDoc, null);
+						templateVM.Date = DateTime.Now.Date.ToString("dd MMMM yyyy");
+						templateVM.PageNumber = iSheetNumber;
+						templateVM.ImageHeaderText = rack.Text;
+						templateVM.DisplayRackStatistics = false;
+						templateVM.DisplayPalleteStatistics = false;
+						templateVM.DisplayMHEDetails = false;
+						templateVM.DisplayImportantNotesOnFlooring = false;
+						templateVM.DisplayNotes = false;
+						templateVM.DisplayRackAccessories = false;
+						templateVM.DisplayRackLevelAccessories = true;
+						templateVM.RackLevelAccessories = GetRackLevelAccessories(rack);
+						templateVM.ImageSrc = Command_ExportImages._GetBmpFromVisual(rackVisual, Command_ExportImages.maxImageSize, Command_ExportImages.maxImageSize);
+						//
+						System.Windows.Controls.UserControl pdfExportTemplateControl = new ExportLayoutTemplate02_Sheet01(templateVM, vm.DrawingControl.WatermarkImage);
+
+						_PrepareTemplateForExport(pdfExportTemplateControl);
+						//
+						// rack.Text contains text that displayed over rack in the sheet layout
+						_ExportDrawingVisual(newPage, pdfExportTemplateControl, (int)Math.Floor(pdfExportTemplateControl.DesiredSize.Width), (int)Math.Floor(pdfExportTemplateControl.DesiredSize.Height));
+
+						// Remove image from memory. Otherwise RenderTargetBitmap.Render() can throw OutOfMemory exception.
+						templateVM.ImageSrc = null;
+						GC.Collect();
+						GC.WaitForPendingFinalizers();
+
+						++iSheetNumber;
+					}
 				}
 
 				// pdfDoc.Save() trows an exception if PDF doesnt have sheets

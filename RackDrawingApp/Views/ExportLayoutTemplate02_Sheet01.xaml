@@ -74,23 +74,6 @@
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     />
-
-                <!--<Viewbox
-					Grid.Row="2"
-                    Visibility="{Binding HasSingleImage, Converter={StaticResource BooleanToVisibilityConverter}}"
-					
-					HorizontalAlignment="Center"
-					VerticalAlignment="Center"
-					
-					StretchDirection="DownOnly"
-					Stretch="Uniform"
-					>
-					<Image
-						Source="{Binding ImageSrc, Mode=OneWay}"
-						/>
-				</Viewbox>-->
-
-
             </Grid>
 			
 			<!--

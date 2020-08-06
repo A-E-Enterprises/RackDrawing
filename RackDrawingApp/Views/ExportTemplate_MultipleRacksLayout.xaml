@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="RackDrawingApp.Views.ExportTemplate_MultipleRacksLayout"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <ItemsControl
+        HorizontalAlignment="Center"
+		VerticalAlignment="Center"
+        ItemsSource="{Binding ImageSources, Mode=OneWay}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Viewbox StretchDirection="DownOnly" Stretch="Uniform">
+                    <Image Source="{Binding}" Width="Auto" />
+                </Viewbox>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+    </ItemsControl>
+</UserControl>

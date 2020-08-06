@@ -1,5 +1,6 @@
 ﻿using DrawingControl;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
 using System.Windows.Media;
@@ -435,6 +436,10 @@ namespace RackDrawingApp
 				return sb.ToString();
 			}
 		}
+
+		//=============================================================================
+		private ObservableCollection<object> m_AccessoriesVisualization = new ObservableCollection<object>();
+		public ObservableCollection<object> AccessoriesVisualization { get { return m_AccessoriesVisualization; } }
 
 		#endregion
 	}
