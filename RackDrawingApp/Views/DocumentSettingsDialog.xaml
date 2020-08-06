@@ -45,9 +45,9 @@
 		Margin="{StaticResource DialogMargin}">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="{StaticResource HorizontalGutter}"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="{StaticResource HorizontalGutter_x3}"/>
+            <RowDefinition Height="{StaticResource HorizontalGutter}"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="{StaticResource HorizontalGutter_x3}"/>
 			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="{StaticResource HorizontalGutter}"/>
 			<RowDefinition Height="*"/>
@@ -55,9 +55,14 @@
 			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="{StaticResource HorizontalGutter_x3}"/>
-			<RowDefinition Height="Auto"/>
-		</Grid.RowDefinitions>
-		<Grid.ColumnDefinitions>
+            
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="{StaticResource HorizontalGutter_x3}"/>
+            
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto"/>
 			<ColumnDefinition Width="{StaticResource VerticalGutter}"/>
 			<ColumnDefinition Width="Auto"/>
@@ -661,12 +666,74 @@
 		HORIZONTAL GUTTER
 		-->
 
-		<!--
+        <!--
 		ROW 11
+		PDF PRINTING SETTINGS HEADER
+		-->
+        <TextBlock
+			Grid.Row="11"
+			Grid.Column="0"
+			Grid.ColumnSpan="3"
+			Text="Pdf printing settings"
+			/>
+
+        <!--
+		ROW 12
+		PDF PRINTING SETTINGS
+		-->
+        <Grid 
+            Grid.Row="12"
+            Grid.Column="0"
+			Grid.ColumnSpan="3"
+            >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="{StaticResource VerticalGutter}"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <CheckBox 
+                Grid.Column="0"
+                Margin="0 0 5 0"
+                VerticalAlignment="Center"
+                IsChecked="{Binding IsPrintRackElevations}"
+                >
+                Print rack elevations
+            </CheckBox>
+
+            <CheckBox
+                Grid.Column="2"
+                IsEnabled="{Binding IsPrintRackElevations}"
+                Margin="0 0 5 0"
+                VerticalAlignment="Center"
+                IsChecked="{Binding IsPrintAllRackElevationsInSinglePage}"
+                >
+                Combine rack elevations to single page
+            </CheckBox>
+
+            <CheckBox
+                Grid.Column="4"
+                Margin="0 0 5 0"
+                VerticalAlignment="Center"
+                IsChecked="{Binding IsFitRackGroupToSamePage}"
+                >
+                Fit racks with same index together
+            </CheckBox>
+        </Grid>
+
+        <!--
+		ROW 13
+		HORIZONTAL GUTTER
+		-->
+
+        <!--
+		ROW 14
 		OK BUTTON
 		-->
 		<Button
-			Grid.Row="11"
+			Grid.Row="14"
 			Grid.Column="0"
 			Grid.ColumnSpan="3"
 			

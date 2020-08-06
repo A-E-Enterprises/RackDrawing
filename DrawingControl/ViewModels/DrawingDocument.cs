@@ -1122,6 +1122,49 @@ namespace DrawingControl
 			}
 		}
 
+		//============================================================================ Pdf printing settings
+		private bool m_IsPrintRackElevations;
+		/// <summary>
+		/// Configuration to print in pdf rack elevations
+		/// </summary>
+		public bool IsPrintRackElevations
+		{
+			get => m_IsPrintRackElevations;
+			set
+			{
+				m_IsPrintRackElevations = value;
+				NotifyPropertyChanged(() => IsPrintRackElevations);
+			}
+		}
+
+		private bool m_IsPrintAllRackElevationsInSinglePage;
+		/// <summary>
+		/// Configuration to pull all racks elevations to single page
+		/// </summary>
+		public bool IsPrintAllRackElevationsInSinglePage
+		{
+			get => m_IsPrintAllRackElevationsInSinglePage;
+			set
+			{
+				m_IsPrintAllRackElevationsInSinglePage = value;
+				NotifyPropertyChanged(() => IsPrintAllRackElevationsInSinglePage);
+			}
+		}
+
+		private bool m_IsFitRackGroupToSamePage;
+		/// <summary>
+		///	Configuration to combine racks with same index in single page
+		/// </summary>
+		public bool IsFitRackGroupToSamePage
+		{
+			get => m_IsFitRackGroupToSamePage;
+			set
+			{
+				m_IsFitRackGroupToSamePage = value;
+				NotifyPropertyChanged(() => IsFitRackGroupToSamePage);
+			}
+		}
+
 		#endregion
 
 		#region Functions
