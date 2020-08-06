@@ -2563,9 +2563,6 @@ namespace RackDrawingApp
 						{
 							templateVM.ImageSources = new List<ImageSource>();
 
-							templateVM.MaxImageLength = imageLength;
-							templateVM.MaxImageHeight = imageHeight;
-
 							elevationImageLength = (int)sheetVisual.ContentBounds.Width;
 							elevationImageHeight = (int)sheetVisual.ContentBounds.Height;
 
