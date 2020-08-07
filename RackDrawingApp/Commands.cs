@@ -787,12 +787,6 @@ namespace RackDrawingApp
 
 		//=============================================================================
 		/// <summary>
-		/// If sheet size is less than this values, then sheet elevation pictures should be exported with sheet layout picture.
-		/// Otherwise sheet elevations should be exported as separate pictures. Sheet layout and sheet elevation should have the same scale in this case.
-		/// </summary>
-		//public static int SHEET_ELEV_MAX_SHEET_LENGTH = 30000;
-		//public static int SHEET_ELEV_MAX_SHEET_HEIGHT = 20000;
-		/// <summary>
 		/// Pixels reserved for sheet length and height dimensions.
 		/// </summary>
 		public static int m_ExtraSpaceForDimension = 150;
@@ -2511,11 +2505,11 @@ namespace RackDrawingApp
                         {
                             if (Utils.FGT(unitPerPixel_HorizSheetElevation, 0.0))
                                 sheetVisualsList.Add(Command_ExportImages.CreateSheetElevationVisual(sheet, null, imageLength, imageHeight, true,
-                                    horizontalSheetElevationRacksList, horizontalSheetElevation_BiggestRackHeight, minUnitsPerPixel, true));
+                                    horizontalSheetElevationRacksList, horizontalSheetElevation_BiggestRackHeight, minUnitsPerPixel, false));
 
                             if (Utils.FGT(unitPerPixel_VertSheetElevation, 0.0))
                                 sheetVisualsList.Add(Command_ExportImages.CreateSheetElevationVisual(sheet, null, imageLength, imageHeight, false,
-                                    verticalSheetElevationRacksList, verticalSheetElevation_BiggestRackHeight, minUnitsPerPixel, true));
+                                    verticalSheetElevationRacksList, verticalSheetElevation_BiggestRackHeight, minUnitsPerPixel, false));
                         }
                     }
 
@@ -2588,7 +2582,7 @@ namespace RackDrawingApp
 						}
 
 						ExportLayoutTemplate02_Sheet01 pdfExportTemplateControl = new ExportLayoutTemplate02_Sheet01(templateVM, vm.DrawingControl.WatermarkImage);
-                        if (iVisualIndex == 0 && templateVM.AccessoriesVisualization.Count > 0)
+                        if (sheetVisualsList.IndexOf(sheetVisual) == 0 && templateVM.AccessoriesVisualization.Count > 0)
                         {
 							pdfExportTemplateControl.DrawingPart.Content = new ExportTemplate_GeneralDrawingAndAccessories();
 						}

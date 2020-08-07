@@ -154,9 +154,6 @@
     <Compile Include="Views\ExportTemplate_GeneralLayout.xaml.cs">
       <DependentUpon>ExportTemplate_GeneralLayout.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ExportTemplate_MultipleElevationsLayout.xaml.cs">
-      <DependentUpon>ExportTemplate_MultipleElevationsLayout.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\ExportTemplate_MultipleRacksLayout.xaml.cs">
       <DependentUpon>ExportTemplate_MultipleRacksLayout.xaml</DependentUpon>
     </Compile>
@@ -229,10 +226,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ExportTemplate_GeneralLayout.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ExportTemplate_MultipleElevationsLayout.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
