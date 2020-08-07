@@ -444,7 +444,7 @@ namespace RackDrawingApp
 		private ObservableCollection<AccessoryVisualPresentation> m_AccessoriesVisualization = new ObservableCollection<AccessoryVisualPresentation>();
 		public ObservableCollection<AccessoryVisualPresentation> AccessoriesVisualization
 		{
-			get => m_AccessoriesVisualization;
+			get { return m_AccessoriesVisualization; }
 			set
 			{
 				m_AccessoriesVisualization = value;

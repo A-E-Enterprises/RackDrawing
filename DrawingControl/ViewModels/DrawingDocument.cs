@@ -1129,7 +1129,7 @@ namespace DrawingControl
 		/// </summary>
 		public bool IsPrintRackElevations
 		{
-			get => m_IsPrintRackElevations;
+			get { return m_IsPrintRackElevations; }
 			set
 			{
 				m_IsPrintRackElevations = value;
@@ -1143,7 +1143,7 @@ namespace DrawingControl
 		/// </summary>
 		public bool IsPrintAllRackElevationsInSinglePage
 		{
-			get => m_IsPrintAllRackElevationsInSinglePage;
+			get { return m_IsPrintAllRackElevationsInSinglePage; }
 			set
 			{
 				m_IsPrintAllRackElevationsInSinglePage = value;
@@ -1157,7 +1157,7 @@ namespace DrawingControl
 		/// </summary>
 		public bool IsFitRackGroupToSamePage
 		{
-			get => m_IsFitRackGroupToSamePage;
+			get { return m_IsFitRackGroupToSamePage; }
 			set
 			{
 				m_IsFitRackGroupToSamePage = value;
