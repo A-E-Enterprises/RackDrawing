@@ -53,7 +53,9 @@ namespace RackDrawingApp
 
 				IsPrintRackElevations = doc.IsPrintRackElevations;
 				IsPrintAllRackElevationsInSinglePage = doc.IsPrintAllRackElevationsInSinglePage;
-				IsFitRackGroupToSamePage = doc.IsFitRackGroupToSamePage;
+
+				PrintingSheetElevationMaxLength = doc.PrintingSheetElevationMaxLength;
+				PrintingSheetElevationMaxHeight = doc.PrintingSheetElevationMaxHeight;
 			}
 		}
 
@@ -172,17 +174,31 @@ namespace RackDrawingApp
 			}
 		}
 
-		private bool m_IsFitRackGroupToSamePage;
+		private int m_printing_sheet_elevation_max_length;
 		/// <summary>
 		///	Configuration to combine racks with same index in single page
 		/// </summary>
-		public bool IsFitRackGroupToSamePage
+		public int PrintingSheetElevationMaxLength
 		{
-			get { return m_IsFitRackGroupToSamePage; }
+			get { return m_printing_sheet_elevation_max_length; }
 			set
 			{
-				m_IsFitRackGroupToSamePage = value;
-				NotifyPropertyChanged(() => IsFitRackGroupToSamePage);
+				m_printing_sheet_elevation_max_length = value;
+				NotifyPropertyChanged(() => PrintingSheetElevationMaxLength);
+			}
+		}
+
+		private int m_printing_sheet_elevation_max_height;
+		/// <summary>
+		///	Configuration to combine racks with same index in single page
+		/// </summary>
+		public int PrintingSheetElevationMaxHeight
+		{
+			get { return m_printing_sheet_elevation_max_height; }
+			set
+			{
+				m_printing_sheet_elevation_max_height = value;
+				NotifyPropertyChanged(() => PrintingSheetElevationMaxHeight);
 			}
 		}
 

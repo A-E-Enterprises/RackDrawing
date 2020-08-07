@@ -9,8 +9,8 @@
         
         <Viewbox
             Grid.Row="0"
-		    HorizontalAlignment="Left"
-		    VerticalAlignment="Top"
+		    HorizontalAlignment="Center"
+		    VerticalAlignment="Center"
 					
 		    StretchDirection="DownOnly"
 		    Stretch="Uniform">

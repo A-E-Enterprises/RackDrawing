@@ -1151,19 +1151,45 @@ namespace DrawingControl
 			}
 		}
 
-		private bool m_IsFitRackGroupToSamePage;
+        private int m_printing_sheet_elevation_max_length = 30000;
 		/// <summary>
-		///	Configuration to combine racks with same index in single page
+		/// Set max room length(width) for printing boundary
 		/// </summary>
-		public bool IsFitRackGroupToSamePage
+        public int PrintingSheetElevationMaxLength
 		{
-			get { return m_IsFitRackGroupToSamePage; }
-			set
-			{
-				m_IsFitRackGroupToSamePage = value;
-				NotifyPropertyChanged(() => IsFitRackGroupToSamePage);
+            get { return m_printing_sheet_elevation_max_length; }
+            set { 
+				m_printing_sheet_elevation_max_length = value;
+				NotifyPropertyChanged(() => PrintingSheetElevationMaxLength);
 			}
 		}
+
+        private int m_printingSheetElevationMaxHeight = 20000;
+		/// <summary>
+		/// Set max room height for printing boundary
+		/// </summary>
+		public int PrintingSheetElevationMaxHeight
+		{
+            get { return m_printingSheetElevationMaxHeight; }
+            set {
+				m_printingSheetElevationMaxHeight = value;
+				NotifyPropertyChanged(() => PrintingSheetElevationMaxHeight);
+			}
+		}
+
+		//private bool m_IsFitRackGroupToSamePage;
+		///// <summary>
+		/////	Configuration to combine racks with same index in single page
+		///// </summary>
+		//public bool IsFitRackGroupToSamePage
+		//{
+		//	get { return m_IsFitRackGroupToSamePage; }
+		//	set
+		//	{
+		//		m_IsFitRackGroupToSamePage = value;
+		//		NotifyPropertyChanged(() => IsFitRackGroupToSamePage);
+		//	}
+		//}
 
 		#endregion
 

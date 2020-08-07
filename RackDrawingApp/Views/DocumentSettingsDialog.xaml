@@ -688,8 +688,14 @@
             >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="{StaticResource VerticalGutter_x3}"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="{StaticResource VerticalGutter_x3}"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="{StaticResource VerticalGutter}"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="{StaticResource VerticalGutter_x3}"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="{StaticResource VerticalGutter}"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -703,24 +709,59 @@
                 Print rack elevations
             </CheckBox>
 
-            <CheckBox
-                Grid.Column="2"
-                IsEnabled="{Binding IsPrintRackElevations}"
-                Margin="0 0 5 0"
-                VerticalAlignment="Center"
-                IsChecked="{Binding IsPrintAllRackElevationsInSinglePage}"
-                >
-                Combine rack elevations to single page
-            </CheckBox>
+            <!--
+            ROW 1
+            VERTICAL GUTTER 3
+            -->
 
             <CheckBox
-                Grid.Column="4"
+                Grid.Column="2"
                 Margin="0 0 5 0"
                 VerticalAlignment="Center"
                 IsChecked="{Binding IsFitRackGroupToSamePage}"
                 >
                 Fit racks with same index together
             </CheckBox>
+            
+            <!--
+            ROW 3
+            VERTICAL GUTTER 3
+            -->
+            
+            <TextBlock 
+                Grid.Column="4"
+                Text="Printing Max Sheet Length"/>
+
+            <!--
+            ROW 5
+            VERTICAL GUTTER
+            -->
+
+            <TextBox
+				Grid.Column="6"
+				HorizontalContentAlignment="Left"
+				Text="{Binding PrintingSheetElevationMaxLength, Mode=TwoWay}"
+				/>
+
+            <!--
+            ROW 7
+            VERTICAL GUTTER 3
+            -->
+            
+            <TextBlock 
+                Grid.Column="8"
+                Text="Pdf printing settings"/>
+
+            <!--
+            ROW 9
+            VERTICAL GUTTER
+            -->
+
+            <TextBox
+				Grid.Column="10"
+				HorizontalContentAlignment="Left"
+				Text="{Binding PrintingSheetElevationMaxHeight, Mode=TwoWay}"
+				/>
         </Grid>
 
         <!--

@@ -620,7 +620,7 @@ namespace RackDrawingApp
 					}
 
 					// export layout picture
-					if (Utils.FLE(sheet.Length, SHEET_ELEV_MAX_SHEET_LENGTH) && Utils.FLE(sheet.Width, SHEET_ELEV_MAX_SHEET_HEIGHT))
+					if (Utils.FLE(sheet.Length, curDoc.PrintingSheetElevationMaxLength) && Utils.FLE(sheet.Width, curDoc.PrintingSheetElevationMaxHeight))
 					{
 						DrawingVisual sheetVisual = CreateSheetLayoutVisual(sheet, vm.DrawingControl.WatermarkImage, imageLength, imageHeight, false, true);
 						if (sheetVisual != null)
@@ -790,8 +790,8 @@ namespace RackDrawingApp
 		/// If sheet size is less than this values, then sheet elevation pictures should be exported with sheet layout picture.
 		/// Otherwise sheet elevations should be exported as separate pictures. Sheet layout and sheet elevation should have the same scale in this case.
 		/// </summary>
-		public static int SHEET_ELEV_MAX_SHEET_LENGTH = 30000;
-		public static int SHEET_ELEV_MAX_SHEET_HEIGHT = 20000;
+		//public static int SHEET_ELEV_MAX_SHEET_LENGTH = 30000;
+		//public static int SHEET_ELEV_MAX_SHEET_HEIGHT = 20000;
 		/// <summary>
 		/// Pixels reserved for sheet length and height dimensions.
 		/// </summary>
@@ -2356,7 +2356,7 @@ namespace RackDrawingApp
 			double oldWatermarkOpacity = WatermarkInfo.Opacity;
 			WatermarkInfo.Opacity = 0.07;
 
-			bool isAllElevationsTogether = curDoc.IsPrintRackElevations && curDoc.IsPrintAllRackElevationsInSinglePage;
+			//bool isAllElevationsTogether = curDoc.IsPrintRackElevations;
 
 			try
 			{
@@ -2470,66 +2470,58 @@ namespace RackDrawingApp
 					string strRackAccessories = GetRackAccessories(curDoc, sheet);
 					string strLevelAccessories = GetRackLevelAccessories(sheet);
 
-					int elevationImageLength = imageLength;
-					int elevationImageHeight = imageHeight;
-
 					// export 1 big picture(sheet layout with vert and horiz sheet elevations
 					// or 3 different pictures
 					// vert and horiz sheet elevations should be a single page
 					List<DrawingVisual> sheetVisualsList = new List<DrawingVisual>();
-					if (Utils.FLE(sheet.Length, Command_ExportImages.SHEET_ELEV_MAX_SHEET_LENGTH) && Utils.FLE(sheet.Width, Command_ExportImages.SHEET_ELEV_MAX_SHEET_HEIGHT))
-						sheetVisualsList.Add(Command_ExportImages.CreateSheetLayoutVisual(sheet, null, imageLength, imageHeight, true, curDoc.IsPrintRackElevations));
-					else
-					{
-						double minUnitsPerPixel = 0.0;
 
-						int totalImageLength = imageLength - 2 * Command_ExportImages.m_ExtraSpaceForDimension;
-						int totalImageHeight = imageHeight - 2 * Command_ExportImages.m_ExtraSpaceForDimension;
+					if (Utils.FLE(sheet.Length, curDoc.PrintingSheetElevationMaxLength) && Utils.FLE(sheet.Width, curDoc.PrintingSheetElevationMaxHeight))
+                        sheetVisualsList.Add(Command_ExportImages.CreateSheetLayoutVisual(sheet, null, imageLength, imageHeight, true, curDoc.IsPrintRackElevations));
+                    else
+                    {
+                        double minUnitsPerPixel = 0.0;
 
-						double unitPerPixel_SheetLayout = ImageCoordinateSystem.GetMaxUnitsPerPixel(totalImageLength, totalImageHeight, sheet.Length, sheet.Width);
+                        int totalImageLength = imageLength - 2 * Command_ExportImages.m_ExtraSpaceForDimension;
+                        int totalImageHeight = imageHeight - 2 * Command_ExportImages.m_ExtraSpaceForDimension;
 
-						double unitPerPixel_HorizSheetElevation = 0.0;
-						double unitPerPixel_VertSheetElevation = 0.0;
-						//
-						List<Rack> horizontalSheetElevationRacksList = null;
-						List<Rack> verticalSheetElevationRacksList = null;
-						double horizontalSheetElevation_BiggestRackHeight = 0.0;
-						double verticalSheetElevation_BiggestRackHeight = 0.0;
-						// Sheet layout and sheet elevations pictures should have the same scale.
-						if (sheet.GetSheetElevations(out horizontalSheetElevationRacksList, out verticalSheetElevationRacksList, out horizontalSheetElevation_BiggestRackHeight, out verticalSheetElevation_BiggestRackHeight))
-						{
-							if (horizontalSheetElevationRacksList != null && horizontalSheetElevationRacksList.Count > 0 && Utils.FGT(horizontalSheetElevation_BiggestRackHeight, 0.0))
-								unitPerPixel_HorizSheetElevation = ImageCoordinateSystem.GetMaxUnitsPerPixel(totalImageLength, totalImageHeight, sheet.Length, horizontalSheetElevation_BiggestRackHeight);
+                        double unitPerPixel_SheetLayout = ImageCoordinateSystem.GetMaxUnitsPerPixel(totalImageLength, totalImageHeight, sheet.Length, sheet.Width);
 
-							if (verticalSheetElevationRacksList != null && verticalSheetElevationRacksList.Count > 0 && Utils.FGT(verticalSheetElevation_BiggestRackHeight, 0.0))
-								unitPerPixel_VertSheetElevation = ImageCoordinateSystem.GetMaxUnitsPerPixel(totalImageLength, totalImageHeight, verticalSheetElevation_BiggestRackHeight, sheet.Width);
-						}
+                        double unitPerPixel_HorizSheetElevation = 0.0;
+                        double unitPerPixel_VertSheetElevation = 0.0;
+                        //
+                        List<Rack> horizontalSheetElevationRacksList = null;
+                        List<Rack> verticalSheetElevationRacksList = null;
+                        double horizontalSheetElevation_BiggestRackHeight = 0.0;
+                        double verticalSheetElevation_BiggestRackHeight = 0.0;
+                        // Sheet layout and sheet elevations pictures should have the same scale.
+                        if (sheet.GetSheetElevations(out horizontalSheetElevationRacksList, out verticalSheetElevationRacksList, out horizontalSheetElevation_BiggestRackHeight, out verticalSheetElevation_BiggestRackHeight))
+                        {
+                            if (horizontalSheetElevationRacksList != null && horizontalSheetElevationRacksList.Count > 0 && Utils.FGT(horizontalSheetElevation_BiggestRackHeight, 0.0))
+                                unitPerPixel_HorizSheetElevation = ImageCoordinateSystem.GetMaxUnitsPerPixel(totalImageLength, totalImageHeight, sheet.Length, horizontalSheetElevation_BiggestRackHeight);
 
-						minUnitsPerPixel = Math.Max(unitPerPixel_SheetLayout, Math.Max(unitPerPixel_HorizSheetElevation, unitPerPixel_VertSheetElevation));
+                            if (verticalSheetElevationRacksList != null && verticalSheetElevationRacksList.Count > 0 && Utils.FGT(verticalSheetElevation_BiggestRackHeight, 0.0))
+                                unitPerPixel_VertSheetElevation = ImageCoordinateSystem.GetMaxUnitsPerPixel(totalImageLength, totalImageHeight, verticalSheetElevation_BiggestRackHeight, sheet.Width);
+                        }
 
-						sheetVisualsList.Add(Command_ExportImages.CreateSheetLayoutVisual(sheet, null, imageLength, imageHeight, true, false, minUnitsPerPixel));
+                        minUnitsPerPixel = Math.Max(unitPerPixel_SheetLayout, Math.Max(unitPerPixel_HorizSheetElevation, unitPerPixel_VertSheetElevation));
 
-						if (curDoc.IsPrintRackElevations)
-						{
-							if (isAllElevationsTogether)
-							{
-								elevationImageLength = imageLength / 2;
-								elevationImageHeight = imageHeight / 2;
-							}
+                        sheetVisualsList.Add(Command_ExportImages.CreateSheetLayoutVisual(sheet, null, imageLength, imageHeight, true, false, minUnitsPerPixel));
 
-							if (Utils.FGT(unitPerPixel_HorizSheetElevation, 0.0))
-								sheetVisualsList.Add(Command_ExportImages.CreateSheetElevationVisual(sheet, null, elevationImageLength, elevationImageHeight, true,
-									horizontalSheetElevationRacksList, horizontalSheetElevation_BiggestRackHeight, minUnitsPerPixel, true));//isAllElevationsTogether
+                        if (curDoc.IsPrintRackElevations)
+                        {
+                            if (Utils.FGT(unitPerPixel_HorizSheetElevation, 0.0))
+                                sheetVisualsList.Add(Command_ExportImages.CreateSheetElevationVisual(sheet, null, imageLength, imageHeight, true,
+                                    horizontalSheetElevationRacksList, horizontalSheetElevation_BiggestRackHeight, minUnitsPerPixel, true));
 
-							if (Utils.FGT(unitPerPixel_VertSheetElevation, 0.0))
-								sheetVisualsList.Add(Command_ExportImages.CreateSheetElevationVisual(sheet, null, elevationImageLength, elevationImageHeight, false,
-									verticalSheetElevationRacksList, verticalSheetElevation_BiggestRackHeight, minUnitsPerPixel, true));//isAllElevationsTogether
-						}
-					}
+                            if (Utils.FGT(unitPerPixel_VertSheetElevation, 0.0))
+                                sheetVisualsList.Add(Command_ExportImages.CreateSheetElevationVisual(sheet, null, imageLength, imageHeight, false,
+                                    verticalSheetElevationRacksList, verticalSheetElevation_BiggestRackHeight, minUnitsPerPixel, true));
+                        }
+                    }
 
-					// Create PDF sheets until there are not exported blocks or not exported visuals.
-					// Index of visual for export in sheetVisualsList.
-					int iVisualIndex = 0;
+                    // Create PDF sheets until there are not exported blocks or not exported visuals.
+                    // Index of visual for export in sheetVisualsList.
+                    int iVisualIndex = 0;
 					while (blocksForExport.Count > 0 || iVisualIndex < sheetVisualsList.Count)
 					{
 						DrawingVisual sheetVisual = null;
@@ -2559,32 +2551,9 @@ namespace RackDrawingApp
 						templateVM.PageNumber = iSheetNumber;
 						templateVM.ImageHeaderText = sheet.Name + ": General Arrangement";
 
-						if (iVisualIndex > 1 && isAllElevationsTogether)
-						{
-							templateVM.ImageSources = new List<ImageSource>();
-
-							elevationImageLength = (int)sheetVisual.ContentBounds.Width;
-							elevationImageHeight = (int)sheetVisual.ContentBounds.Height;
-
-							templateVM.ImageSources.Add(Command_ExportImages._GetBmpFromVisual(sheetVisual, elevationImageLength, elevationImageHeight));
-
-							while (iVisualIndex < sheetVisualsList.Count)
-							{
-								sheetVisual = sheetVisualsList[iVisualIndex];
-
-								elevationImageLength = (int)sheetVisual.ContentBounds.Width;
-								elevationImageHeight = (int)sheetVisual.ContentBounds.Height;
-
-								templateVM.ImageSources.Add(Command_ExportImages._GetBmpFromVisual(sheetVisual, elevationImageLength, elevationImageHeight));
-
-								++iVisualIndex;
-							}
-						}
-						else
-						{
-							templateVM.ImageSrc = Command_ExportImages._GetBmpFromVisual(sheetVisual, imageLength, imageHeight);
-							templateVM.ParseVisualAccessories();
-						}
+						templateVM.ImageSrc = Command_ExportImages._GetBmpFromVisual(sheetVisual, imageLength, imageHeight);
+						templateVM.ParseVisualAccessories();
+						
 						// Calculate which blocks can be exported
 						double availableHeight = dynamicFillBlockHeight;
 						bool isAnyBlockExported = false;
@@ -2618,26 +2587,18 @@ namespace RackDrawingApp
 								break;
 						}
 
-						ExportLayoutTemplate02_Sheet01 pdfExportTemplateControl = new ExportLayoutTemplate02_Sheet01(templateVM, null);
-
-						// set template to show multiple elevations if IsPrintAllRackElevationsInSinglePage is on
-						System.Windows.Controls.UserControl contentContainer;
-						if (sheetVisualsList.IndexOf(sheetVisual) != 0 && isAllElevationsTogether)
-							contentContainer = new ExportTemplate_MultipleElevationsLayout();
-						else
-						{
-							contentContainer = new ExportTemplate_GeneralDrawingAndAccessories();
+						ExportLayoutTemplate02_Sheet01 pdfExportTemplateControl = new ExportLayoutTemplate02_Sheet01(templateVM, vm.DrawingControl.WatermarkImage);
+                        if (iVisualIndex == 0 && templateVM.AccessoriesVisualization.Count > 0)
+                        {
+							pdfExportTemplateControl.DrawingPart.Content = new ExportTemplate_GeneralDrawingAndAccessories();
 						}
-
-						pdfExportTemplateControl.DrawingPart.Content = contentContainer;
 
 						_PrepareTemplateForExport(pdfExportTemplateControl);
 						_ExportDrawingVisual(newPage, pdfExportTemplateControl, (int)Math.Floor(pdfExportTemplateControl.DesiredSize.Width), (int)Math.Floor(pdfExportTemplateControl.DesiredSize.Height));
 
 						// Remove image from memory. Otherwise RenderTargetBitmap.Render() can throw OutOfMemory exception.
 						templateVM.ImageSrc = null;
-						templateVM.ImageSources?.Clear();
-						templateVM.ImageSources = null;
+
 						GC.Collect();
 						GC.WaitForPendingFinalizers();
 
@@ -2677,7 +2638,7 @@ namespace RackDrawingApp
 					false
 					);
 
-				if (curDoc.IsFitRackGroupToSamePage)
+				if (curDoc.IsPrintAllRackElevationsInSinglePage)
 				{
 					double scaledImageSizeDetailed = Command_ExportImages.maxImageSize / 2.5;
 					int scaledImageSize = (int)Math.Ceiling(scaledImageSizeDetailed);
@@ -3567,7 +3528,8 @@ namespace RackDrawingApp
 				// update pdf printing settings
 				curDoc.IsPrintRackElevations = docSettingsVM.IsPrintRackElevations;
 				curDoc.IsPrintAllRackElevationsInSinglePage = docSettingsVM.IsPrintAllRackElevationsInSinglePage;
-				curDoc.IsFitRackGroupToSamePage = docSettingsVM.IsFitRackGroupToSamePage;
+				curDoc.PrintingSheetElevationMaxLength = docSettingsVM.PrintingSheetElevationMaxLength;
+				curDoc.PrintingSheetElevationMaxHeight = docSettingsVM.PrintingSheetElevationMaxHeight;
 
 				//
 				foreach (PalletConfiguration palletConfig in docSettingsVM.PalletConfigurationCollection)
