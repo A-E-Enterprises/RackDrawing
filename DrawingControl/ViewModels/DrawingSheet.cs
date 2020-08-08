@@ -1563,6 +1563,231 @@ namespace DrawingControl
 			return result;
 		}
 
+		public Rack GetBackToBackRack(Rack currentRack)
+        {
+			Rack backToBackRack = null;
+
+			if (currentRack != null)
+            {
+				//TODO: search where right value for this offset
+				double backToBackRacksStandartOffset = 50;
+
+				// we can ignore current rack group (row)
+				List<Rack> currentRackGroup = currentRack.Sheet.GetRackGroup(currentRack);
+
+				foreach (var rackGroup in currentRack.Sheet.RacksGroups)
+				{
+					// not search in current group (row)
+					if (rackGroup == currentRackGroup)
+						continue;
+
+					if (backToBackRack != null)
+						break;
+
+					foreach (Rack candidateRack in rackGroup)
+					{
+						// rack with different orientation can't be back to back and can't have united tie beams
+						if (candidateRack.IsHorizontal != currentRack.IsHorizontal)
+							break;
+
+						if (currentRack.IsHorizontal)
+						{
+							if (Utils.FEQ(currentRack.TopLeft_GlobalPoint.X, candidateRack.TopLeft_GlobalPoint.X))
+							{
+								if (backToBackRack == null)
+								{
+									double racksConnectionYPoint = default(double);
+
+									if (currentRack.TopLeft_GlobalPoint.Y > candidateRack.TopLeft_GlobalPoint.Y)
+									{
+										racksConnectionYPoint = currentRack.TopLeft_GlobalPoint.Y - currentRack.PalletOverhangValue - candidateRack.PalletOverhangValue - backToBackRacksStandartOffset;
+
+										if (Utils.FEQ(racksConnectionYPoint, candidateRack.BottomLeft_GlobalPoint.Y))
+										{
+											backToBackRack = candidateRack;
+											break;
+										}
+									}
+									else
+									{
+										racksConnectionYPoint = currentRack.BottomLeft_GlobalPoint.Y + currentRack.PalletOverhangValue + candidateRack.PalletOverhangValue + backToBackRacksStandartOffset;
+
+										if (Utils.FEQ(racksConnectionYPoint, candidateRack.TopLeft_GlobalPoint.Y))
+										{
+											backToBackRack = candidateRack;
+											break;
+										}
+									}
+								}
+							}
+						}
+						else
+						{
+							if (Utils.FEQ(candidateRack.TopLeft_GlobalPoint.X, currentRack.TopLeft_GlobalPoint.X))
+							{
+								if (backToBackRack == null)
+								{
+									double racksConnectionXPoint = default(double);
+
+									if (currentRack.Center_GlobalPoint.X > candidateRack.Center_GlobalPoint.X)
+									{
+										racksConnectionXPoint = currentRack.TopLeft_GlobalPoint.X - currentRack.PalletOverhangValue - candidateRack.PalletOverhangValue - backToBackRacksStandartOffset;
+
+										if (Utils.FEQ(racksConnectionXPoint, candidateRack.TopRight_GlobalPoint.Y))
+										{
+											backToBackRack = candidateRack;
+											break;
+										}
+									}
+									else
+									{
+										racksConnectionXPoint = currentRack.TopRight_GlobalPoint.Y + currentRack.PalletOverhangValue + candidateRack.PalletOverhangValue + backToBackRacksStandartOffset;
+
+										if (Utils.FEQ(racksConnectionXPoint, candidateRack.TopLeft_GlobalPoint.Y))
+										{
+											backToBackRack = candidateRack;
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			return backToBackRack;
+		}
+
+		public Rack GetTieBeamConnectedRack(Rack currentRack)
+		{
+			Rack tieBeamContainsRack = null;
+
+			if (currentRack != null && (currentRack.TieBeamFrame.HasFlag(eTieBeamFrame.eEndFrame) || currentRack.TieBeamFrame.HasFlag(eTieBeamFrame.eStartFrame)))
+			{
+				TieBeam connectedTieBeam = null;
+
+				// search tie beam
+				foreach (TieBeam tieBeam in TieBeamsList)
+                {
+					if (tieBeam.IsHorizontal == currentRack.IsHorizontal)
+						continue;
+
+					//currentRack.TopRight_GlobalPoint
+					//currentRack.BottomRight_GlobalPoint
+					//tieBeam.IsHorizontal
+
+					if (currentRack.IsHorizontal)
+                    {
+                        if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
+                        {
+                            if (currentRack.BottomRight_GlobalPoint == tieBeam.TopRight_GlobalPoint)
+                            {
+								connectedTieBeam = tieBeam;
+								break;
+							}
+						}
+                        if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+                        {
+							if (currentRack.TopRight_GlobalPoint == tieBeam.BottomRight_GlobalPoint)
+							{
+								connectedTieBeam = tieBeam;
+								break;
+							}
+						}
+					}
+                    else
+                    {
+						if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
+						{
+							if (currentRack.BottomRight_GlobalPoint == tieBeam.BottomLeft_GlobalPoint)
+							{
+								connectedTieBeam = tieBeam;
+								break;
+							}
+						}
+						if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+						{
+							if (currentRack.BottomLeft_GlobalPoint == tieBeam.BottomRight_GlobalPoint)
+							{
+								connectedTieBeam = tieBeam;
+								break;
+							}
+						}
+					}
+				}
+
+				if (connectedTieBeam == null)
+					return tieBeamContainsRack;
+
+				// we can ignore current rack group (row)
+				List<Rack> currentRackGroup = currentRack.Sheet.GetRackGroup(currentRack);
+
+                // search another rack for found tie beam
+				foreach (List<Rack> rackGroup in RacksGroups)
+				{
+					// is found already
+					if (tieBeamContainsRack != null)
+						break;
+
+					// not search in current group (row)
+					if (rackGroup == currentRackGroup)
+						continue;
+
+					foreach (Rack candidateRack in rackGroup)
+					{
+						// rack with same orientation can't connect found tie beam
+						if (candidateRack.IsHorizontal == connectedTieBeam.IsHorizontal)
+							break;
+
+						// ignore self reference
+						if (candidateRack == currentRack)
+							continue;
+
+						if (candidateRack.IsHorizontal)
+						{
+							if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+							{
+                                if (candidateRack.BottomRight_GlobalPoint == connectedTieBeam.TopRight_GlobalPoint)
+                                {
+									tieBeamContainsRack = candidateRack;
+									break;
+								}
+                            }
+                            else if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
+                            {
+								if (candidateRack.TopRight_GlobalPoint == connectedTieBeam.BottomRight_GlobalPoint)
+								{
+									tieBeamContainsRack = candidateRack;
+									break;
+								}
+							}
+						}
+						else
+						{
+							if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+							{
+								if (candidateRack.BottomRight_GlobalPoint == tieBeamContainsRack.BottomLeft_GlobalPoint)
+								{
+									tieBeamContainsRack = candidateRack;
+									break;
+								}
+							}
+							else if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
+							{
+								if (candidateRack.BottomLeft_GlobalPoint == tieBeamContainsRack.BottomRight_GlobalPoint)
+								{
+									tieBeamContainsRack = candidateRack;
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			return tieBeamContainsRack;
+		}
 
 		//=============================================================================
 		public void CreateColumnPattern(Column original, Point globalPoint, double DrawingWidth, double DrawingHeight)
