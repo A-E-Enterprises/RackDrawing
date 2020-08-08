@@ -221,6 +221,71 @@ namespace DrawingControl
 		}
 	}
 
+	public class RackDrawingBrushes
+    {
+        public RackDrawingBrushes(RackAdvancedDrawingSettings displaySettings, Color rackFillColor)
+        {
+			// Need to clone brushes and pens, otherwise displaySetting's brushes and pens will be modified.
+			// It is a problem for sheet elevation picture, because all racks will have border of the last exported rack.
+
+			if (displaySettings.ColumnFillBrush != null)
+				ColumnFillBrush = displaySettings.ColumnFillBrush.Clone();
+
+			if (displaySettings.ColumnBorderPen != null)
+				ColumnBorderPen = displaySettings.ColumnBorderPen.Clone();
+
+			if (displaySettings.LevelShelfBrush != null)
+				LevelShelfFillBrush = displaySettings.LevelShelfBrush.Clone();
+
+			if (displaySettings.LevelShelfPen != null)
+				LevelShelfBorderPen = displaySettings.LevelShelfPen.Clone();
+
+			if (displaySettings.PalletFillBrush != null)
+				PalletFillBrush = displaySettings.PalletFillBrush.Clone();
+
+			if (displaySettings.PalletBorderPen != null)
+				PalletBorderPen = displaySettings.PalletBorderPen.Clone();
+
+			if (displaySettings.PalletRiserFillBrush != null)
+				PalletRiserFillBrush = displaySettings.PalletRiserFillBrush.Clone();
+
+			if (displaySettings.PalletRiserBorderPen != null)
+				PalletRiserBorderPen = displaySettings.PalletRiserBorderPen.Clone();
+
+			if (displaySettings.BracingLineBrush != null)
+				BracingLineFillBrush = displaySettings.BracingLineBrush.Clone();
+
+			if (displaySettings.BracingLinePen != null)
+				BracingLineBorderPen = displaySettings.BracingLinePen.Clone();
+
+			if (displaySettings.IsItSheetElevationPicture)
+			{
+				Brush rackFillBrush = new SolidColorBrush(rackFillColor);
+				ColumnFillBrush = rackFillBrush;
+				ColumnBorderPen.Brush = rackFillBrush;
+				LevelShelfFillBrush = rackFillBrush;
+				LevelShelfBorderPen.Brush = rackFillBrush;
+				PalletFillBrush = null;
+				PalletBorderPen.Brush = rackFillBrush;
+				PalletRiserFillBrush = null;
+				PalletRiserBorderPen.Brush = rackFillBrush;
+				BracingLineFillBrush = null;
+				BracingLineBorderPen.Brush = rackFillBrush;
+			}
+		}
+
+		public Brush ColumnFillBrush { get; private set; }
+		public Pen ColumnBorderPen { get; private set; }
+		public Brush LevelShelfFillBrush { get; private set; }
+		public Pen LevelShelfBorderPen { get; private set; }
+		public Brush PalletFillBrush { get; private set; }
+		public Pen PalletBorderPen { get; private set; }
+		public Brush PalletRiserFillBrush { get; private set; }
+		public Pen PalletRiserBorderPen { get; private set; }
+		public Brush BracingLineFillBrush { get; private set; }
+		public Pen BracingLineBorderPen { get; private set; }
+	}
+
 	// Displays rack advanced properties view.
 	// Front and side view of the rack with pallets\levels\beams\etc.
 	// Displayed only when ShowAdvancedProperties = true.
@@ -462,7 +527,6 @@ namespace DrawingControl
 
 			// Text height in pixels
 			string exampleText = "TEST";
-			double levelTextHeight_Pixels = new FormattedText(exampleText, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, m_TextTypeFace, displaySettings.LevelTextSize, displaySettings.TextBrush).Height;
 			double dimTextHeight_Pixels = new FormattedText(exampleText, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, m_TextTypeFace, displaySettings.DimensionsTextSize, displaySettings.TextBrush).Height;
 			double viewNameTextHeight_Pixels = Math.Max(FrontViewText.Height, SideViewText.Height);
 			// Height(in pixels) reserved for inner length and length dimensions, which are displayed at the top of the rack.
@@ -527,17 +591,24 @@ namespace DrawingControl
 			frontViewOffsetInPixels.X += rBeamTextMaxSizeInPixels;// + spaceForDimInPixels;
 			//
 			dc.PushTransform(new TranslateTransform(frontViewOffsetInPixels.X, frontViewOffsetInPixels.Y));
-			DrawRackFrontView(dc, cs, displaySettings, selectedRack, FrontViewText);
-			dc.Pop();
+            DrawRackFrontView(dc, cs, displaySettings, selectedRack, FrontViewText);
+            dc.Pop();
 
 			// SIDE VIEW
 			Vector sideViewOffsetInPixels = frontViewOffsetInPixels;
+
+			Rack backToBackRack = rackForDraw.Sheet.GetBackToBackRack(rackForDraw);
+			Rack tieBeamConnectedRack = rackForDraw.Sheet.GetTieBeamConnectedRack(rackForDraw); ;
+
+			
 			// Add space for front view, height dimensions and space between views
 			sideViewOffsetInPixels.X += cs.GetWidthInPixels(rackLength, 1.0) + 4.9 * displaySettings.MinDimensionsLinesOffset + distanceBetweenViewsInPixels;
-			//
-			dc.PushTransform(new TranslateTransform(sideViewOffsetInPixels.X, sideViewOffsetInPixels.Y));
+            //
+            dc.PushTransform(new TranslateTransform(sideViewOffsetInPixels.X, sideViewOffsetInPixels.Y));
             DrawRackSideView(dc, cs, displaySettings, selectedRack, SideViewText);
-            dc.Pop();
+
+			DrawRackExtendedSideView(dc, cs, displaySettings, selectedRack, backToBackRack, tieBeamConnectedRack, SideViewText);
+			dc.Pop();
 		}
 		/// <summary>
 		/// Draw rack front view in (0, 0) point.
@@ -1419,6 +1490,395 @@ namespace DrawingControl
 				_TryDrawSideRowGuard(dc, cs, displaySettings, rack, showHeight: !isHeightDisplayed);
 			}
 		}
+
+
+
+
+		public static void DrawRackExtendedSideView(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, 
+			Rack mainRack, Rack backRack, Rack tieBeamRack, 
+			FormattedText viewNameText)
+		{
+			Rack rack = mainRack;
+
+			if (dc == null)
+				return;
+			if (cs == null)
+				return;
+			if (displaySettings == null)
+				return;
+			if (mainRack == null)
+				return;
+
+			Point startGlobalPnt = new Point(0.0, 0.0);
+
+			// Unique brushes collection for current rack
+            RackDrawingBrushes brushes = new RackDrawingBrushes(displaySettings, rack.FillColor);
+
+			// Main part
+			//DrawRack(dc, cs, mainRack, brushes, startGlobalPnt);
+
+			//if (displaySettings.DisplayTextAndDimensions)
+			//{
+			//	// draw floor line
+			//	Point bottomLineStart_GlobalPoint = startGlobalPnt;
+			//	bottomLineStart_GlobalPoint.X -= 200;
+			//	//
+			//	Point bottomLineEnd_GlobalPoint = rightColumnEnd_GlobalPoint;
+			//	bottomLineEnd_GlobalPoint.X += 200;
+			//	bottomLineEnd_GlobalPoint.Y = bottomLineStart_GlobalPoint.Y + 10;
+			//	//
+			//	_DrawRectangle(dc, displaySettings.BottomLineBrush, displaySettings.BottomLinePen, bottomLineStart_GlobalPoint, bottomLineEnd_GlobalPoint, cs);
+
+			//	// draw view name
+			//	if (viewNameText != null)
+			//	{
+			//		Point SideViewTextCenter_GlobalPoint = bottomLineEnd_GlobalPoint;
+			//		SideViewTextCenter_GlobalPoint.X -= (bottomLineEnd_GlobalPoint.X - bottomLineStart_GlobalPoint.X) / 2;
+			//		//
+			//		Point SideViewTextCenter_ScreenPoint = cs.GetLocalPoint(SideViewTextCenter_GlobalPoint, defaultCameraScale, defaultCameraOffset);
+			//		// add more space for guards dimensions
+			//		if (rack.Accessories.UprightGuard || rack.Accessories.RowGuard)
+			//			SideViewTextCenter_ScreenPoint.Y += viewNameText.Height;
+			//		else
+			//			SideViewTextCenter_ScreenPoint.Y += viewNameText.Height / 2;
+			//		dc.DrawText(viewNameText, SideViewTextCenter_ScreenPoint);
+			//	}
+			//}
+
+		}
+
+		private static void DrawRack(DrawingContext dc, ICoordinateSystem cs, Rack rack, RackAdvancedDrawingSettings displaySettings, RackDrawingBrushes brushes, Point startGlobalPnt, bool showDimensions)
+        {
+			// camera scale and offset are used for calculate screen(control) point based on global drawing point
+			double defaultCameraScale = 1.0;
+			Vector defaultCameraOffset = new Vector(0.0, 0.0);
+
+			double rackDepth = rack.Depth;
+			double rackHeight = rack.Length_Z;
+
+			// calculate columns points, but draw it later - columns should overlay pallets
+			Point leftColumnStart_GlobalPnt = startGlobalPnt;
+			leftColumnStart_GlobalPnt.X += rack.PalletOverhangValue;
+			//
+			Point leftColumnEnd_GlobalPoint = leftColumnStart_GlobalPnt;
+			leftColumnEnd_GlobalPoint.X += rack.Column.Depth;
+			leftColumnEnd_GlobalPoint.Y -= rackHeight;
+			//
+			Point rightColumnEnd_GlobalPoint = leftColumnStart_GlobalPnt;
+			rightColumnEnd_GlobalPoint.X += rackDepth;
+			//
+			Point rightColumnStart_GlobalPoint = rightColumnEnd_GlobalPoint;
+			rightColumnStart_GlobalPoint.X -= rack.Column.Depth;
+			rightColumnStart_GlobalPoint.Y -= rackHeight;
+
+			// draw levels
+			double LevelOffset_Y = 0;
+			if (rack.IsUnderpassAvailable)
+				LevelOffset_Y = rack.Underpass;
+			else if (rack.IsMaterialOnGround)
+				LevelOffset_Y = 0;
+			else
+			{
+				double firstLevelOffset = Rack.sFirstLevelOffset;
+				if (rack.Levels != null)
+				{
+					RackLevel firstLevel = rack.Levels.FirstOrDefault(level => level != null && level.Index == 1);
+					if (firstLevel != null && firstLevel.Beam != null)
+						firstLevelOffset -= firstLevel.Beam.Height;
+				}
+				LevelOffset_Y = Utils.GetWholeNumber(firstLevelOffset);
+			}
+			//
+			if (rack.Levels != null)
+			{
+				//
+				Point _ZeroLevel_LeftGlobalPoint = leftColumnEnd_GlobalPoint;
+				_ZeroLevel_LeftGlobalPoint.Y = leftColumnStart_GlobalPnt.Y;
+				Point _ZeroLevel_RightGlobalPoint = rightColumnStart_GlobalPoint;
+				_ZeroLevel_RightGlobalPoint.Y = leftColumnStart_GlobalPnt.Y;
+				//
+				foreach (RackLevel level in rack.Levels)
+				{
+					if (level == null)
+						continue;
+
+					int _beamHeight = 0;
+					if (level.Beam != null)
+						_beamHeight = Utils.GetWholeNumber(level.Beam.Height);
+
+					// level shelf
+					Point LevelStart_GlobalPoint = _ZeroLevel_LeftGlobalPoint;
+					LevelStart_GlobalPoint.Y -= LevelOffset_Y;
+					//
+					Point LevelEnd_GlobalPoint = _ZeroLevel_RightGlobalPoint;
+					if (level.Index != 0)
+					{
+						LevelEnd_GlobalPoint.Y -= LevelOffset_Y + _beamHeight;
+						// dont draw level shelf at the side view
+						//dc.DrawRectangle(m_LevelShelfFillBrush, m_LevelShelfBorderPen, new Rect(LevelStart_ScreenPoint, LevelEnd_ScreenPoint));
+					}
+
+					// draw "Decking plate" at the side view if it has along length value.
+					if (level.Accessories != null && level.Accessories.IsDeckPlateAvailable && level.Accessories.DeckPlateType == eDeckPlateType.eAlongLength)
+					{
+						Point deckingPlateStartGlobalPnt = LevelEnd_GlobalPoint;
+						deckingPlateStartGlobalPnt.X = LevelStart_GlobalPoint.X;
+						deckingPlateStartGlobalPnt.Y += (_beamHeight / 2) / 2;
+						Point deckingPlateEndGlobalPnt = deckingPlateStartGlobalPnt;
+						deckingPlateEndGlobalPnt.X = LevelEnd_GlobalPoint.X;
+
+						Point deckingPlateStartScreenPnt = cs.GetLocalPoint(deckingPlateStartGlobalPnt, defaultCameraScale, defaultCameraOffset);
+						Point deckingPlateEndScreenPnt = cs.GetLocalPoint(deckingPlateEndGlobalPnt, defaultCameraScale, defaultCameraOffset);
+
+						double deckPlateLineThickness = cs.GetHeightInPixels(_beamHeight / 3, 1.0);
+						Pen deckingPlatePen = new Pen(displaySettings.DeckingPlateBrush, deckPlateLineThickness);
+						deckingPlatePen.DashStyle = DashStyles.Dash;
+
+						dc.DrawLine(deckingPlatePen, deckingPlateStartScreenPnt, deckingPlateEndScreenPnt);
+					}
+
+					bool bAddPalletRiser = false;
+					if (level.Accessories != null && level.Accessories.ForkEntryBar)
+						bAddPalletRiser = true;
+
+					//
+					if (rack.ShowPallet)
+					{
+						// draw pallets
+						if (level.Pallets != null && level.Pallets.Count > 0)
+						{
+							// draw from the last pallet to the first
+							for (int iPalletIndex = level.Pallets.Count - 1; iPalletIndex >= 0; --iPalletIndex)
+							{
+								Pallet pallet = level.Pallets[iPalletIndex];
+								if (pallet == null)
+									continue;
+
+								// draw pallet
+								Point PalletCenter_GlobalPoint = LevelStart_GlobalPoint;
+								PalletCenter_GlobalPoint.Y = LevelEnd_GlobalPoint.Y;
+								if (bAddPalletRiser)
+									PalletCenter_GlobalPoint.Y -= Rack.PALLET_RISER_HEIGHT;
+								PalletCenter_GlobalPoint.X += (LevelEnd_GlobalPoint.X - LevelStart_GlobalPoint.X) / 2;
+								//
+								Point PalletStart_GlobalPoint = PalletCenter_GlobalPoint;
+								PalletStart_GlobalPoint.X -= pallet.Width / 2;
+								//
+								Point PalletEnd_GlobalPoint = PalletCenter_GlobalPoint;
+								PalletEnd_GlobalPoint.X += pallet.Width / 2;
+								PalletEnd_GlobalPoint.Y -= pallet.Height;
+								//
+								_DrawRectangle(dc, brushes.PalletFillBrush, brushes.PalletBorderPen, PalletStart_GlobalPoint, PalletEnd_GlobalPoint, cs);
+
+								// draw pallet riser
+								if (bAddPalletRiser)
+								{
+									Point RiserStart_GlobalPoint = PalletStart_GlobalPoint;
+									RiserStart_GlobalPoint.X = leftColumnStart_GlobalPnt.X;
+									//
+									Point RiserEnd_GlobalPoint = RiserStart_GlobalPoint;
+									RiserEnd_GlobalPoint.X = rightColumnEnd_GlobalPoint.X;
+									RiserEnd_GlobalPoint.Y += Rack.PALLET_RISER_HEIGHT;
+									//
+									_DrawRectangle(dc, brushes.PalletRiserFillBrush, brushes.PalletRiserBorderPen, RiserStart_GlobalPoint, RiserEnd_GlobalPoint, cs);
+								}
+							}
+						}
+					}
+
+					if (level.Index != 0)
+						LevelOffset_Y += _beamHeight;
+					LevelOffset_Y += level.LevelHeight;
+				}
+			}
+
+			double dimensionsLinesOffset = cs.GetWidthInPixels(rack.PalletOverhangValue, 1.0);
+
+			// draw bracing lines
+			if (rack.Bracing != eColumnBracingType.eUndefined)
+			{
+				double heightOffset = Rack.sBracingLinesBottomOffset;
+				Vector heightDirection = new Vector(0, -1);
+				Point startPoint = new Point(leftColumnEnd_GlobalPoint.X, leftColumnStart_GlobalPnt.Y);
+				Point endPoint = new Point(rightColumnStart_GlobalPoint.X, leftColumnStart_GlobalPnt.Y);
+				// draw horizontal bracing
+				Point lineStart_GlobalPoint = startPoint + heightOffset * heightDirection;
+				Point lineEnd_GlobalPoint = endPoint + heightOffset * heightDirection;
+				_DrawBracingLine(dc, cs, lineStart_GlobalPoint, lineEnd_GlobalPoint, brushes.BracingLineBorderPen);
+
+				// draw X bracings
+				if (rack.Bracing == eColumnBracingType.eXBracing || rack.Bracing == eColumnBracingType.eXBracingWithStiffener)
+				{
+					int xBracingsCount = rack.X_Bracings_Count;
+					if (xBracingsCount > 0)
+					{
+						heightOffset += Rack.sXBracingVerticalOffset;
+
+						for (int i = 1; i <= xBracingsCount; ++i)
+						{
+							Point xBracingStartPnt = startPoint + heightOffset * heightDirection;
+							Point xBracingEndPnt = endPoint + (heightOffset + Rack.sBracingVerticalStep) * heightDirection;
+							_DrawBracingLine(dc, cs, xBracingStartPnt, xBracingEndPnt, brushes.BracingLineBorderPen);
+
+							double xBracingStartPnt_Y = xBracingStartPnt.Y;
+							xBracingStartPnt.Y = xBracingEndPnt.Y;
+							xBracingEndPnt.Y = xBracingStartPnt_Y;
+							_DrawBracingLine(dc, cs, xBracingStartPnt, xBracingEndPnt, brushes.BracingLineBorderPen);
+
+							heightOffset += Rack.sBracingVerticalStep;
+						}
+
+						heightOffset += Rack.sXBracingVerticalOffset;
+
+						// draw horizontal bracing
+						lineStart_GlobalPoint = startPoint + heightOffset * heightDirection;
+						lineEnd_GlobalPoint = endPoint + heightOffset * heightDirection;
+						_DrawBracingLine(dc, cs, lineStart_GlobalPoint, lineEnd_GlobalPoint, brushes.BracingLineBorderPen);
+					}
+				}
+
+				// draw normal bracings
+				double rightFrameHeight = rack.Length_Z;
+				if (rack.TieBeamFrame.HasFlag(eTieBeamFrame.eEndFrame))
+					rightFrameHeight = rack.FrameHeight;
+				//
+				int iTotalLines = (int)Math.Floor((Utils.GetWholeNumber(rightFrameHeight) - heightOffset - Rack.sTopHorizontalBracingOffset) / Rack.sBracingVerticalStep);
+				for (int i = 1; i <= iTotalLines; ++i)
+				{
+					//
+					if (i % 2 != 0)
+					{
+						lineStart_GlobalPoint = startPoint + heightOffset * heightDirection;
+						lineEnd_GlobalPoint = endPoint + (heightOffset + Rack.sBracingVerticalStep) * heightDirection;
+					}
+					else
+					{
+						lineStart_GlobalPoint = endPoint + heightOffset * heightDirection;
+						lineEnd_GlobalPoint = startPoint + (heightOffset + Rack.sBracingVerticalStep) * heightDirection;
+					}
+
+					//
+					_DrawBracingLine(dc, cs, lineStart_GlobalPoint, lineEnd_GlobalPoint, brushes.BracingLineBorderPen);
+
+					// draw horizontal lines
+					if (i == iTotalLines)
+					{
+						Point vertLineEnd_GlobalPoint = lineEnd_GlobalPoint;
+						if (i % 2 != 0)
+							vertLineEnd_GlobalPoint.X = leftColumnEnd_GlobalPoint.X;
+						else
+							vertLineEnd_GlobalPoint.X = rightColumnStart_GlobalPoint.X;
+						_DrawBracingLine(dc, cs, lineEnd_GlobalPoint, vertLineEnd_GlobalPoint, brushes.BracingLineBorderPen);
+					}
+
+					heightOffset += Rack.sBracingVerticalStep;
+				}
+
+				// if there is more than sTopHorizontalBracingMinDistance then show additional line
+				if (iTotalLines > 0)
+				{
+					double topHeightRemainder = rightFrameHeight - heightOffset;
+					if (Utils.FGE(topHeightRemainder, Rack.sTopHorizontalBracingMinDistance))
+					{
+						Point vertLine_StartPoint = leftColumnEnd_GlobalPoint;
+						vertLine_StartPoint.Y = leftColumnStart_GlobalPnt.Y - (rightFrameHeight - Rack.sTopHorizontalBracingOffset);
+						Point vertLine_EndPoint = rightColumnStart_GlobalPoint;
+						vertLine_EndPoint.Y = vertLine_StartPoint.Y;
+						_DrawBracingLine(dc, cs, vertLine_StartPoint, vertLine_EndPoint, brushes.BracingLineBorderPen);
+					}
+				}
+
+				if (showDimensions)
+				{
+					// draw bracing dimensions only once
+					// draw bracing vertical step
+					Point dimGlobalPnt_01 = startPoint + Rack.sBracingLinesBottomOffset * heightDirection;
+					dimGlobalPnt_01.X = rightColumnEnd_GlobalPoint.X;
+					if (rack.Bracing == eColumnBracingType.eXBracing || rack.Bracing == eColumnBracingType.eXBracingWithStiffener)
+						dimGlobalPnt_01 += Rack.sXBracingVerticalOffset * heightDirection;
+					//
+					Point dimGlobalPnt_02 = dimGlobalPnt_01;
+					dimGlobalPnt_02 += Rack.sBracingVerticalStep * heightDirection;
+					_DrawDimension(dc, dimGlobalPnt_01, dimGlobalPnt_02, Rack.sBracingVerticalStep.ToString(), dimensionsLinesOffset + displaySettings.MinDimensionsLinesOffset, displaySettings.DimensionsTextSize, displaySettings.PerpDimLinesOffsetInPixels, eDimensionPlacement.eRight, cs, dimensionBrush: displaySettings.DimensionsBrush);
+
+					// draw X bracing height
+					if (eColumnBracingType.eXBracing == rack.Bracing || eColumnBracingType.eXBracingWithStiffener == rack.Bracing)
+					{
+						dimGlobalPnt_01 = rightColumnStart_GlobalPoint;
+						dimGlobalPnt_01.Y = rightColumnEnd_GlobalPoint.Y;
+						dimGlobalPnt_02 = dimGlobalPnt_01;
+						dimGlobalPnt_02 += rack.X_Bracing_Height * heightDirection;
+						_DrawDimension(dc, dimGlobalPnt_01, dimGlobalPnt_02, rack.X_Bracing_Height.ToString(), dimensionsLinesOffset + 3 * displaySettings.MinDimensionsLinesOffset, displaySettings.DimensionsTextSize, displaySettings.PerpDimLinesOffsetInPixels, eDimensionPlacement.eRight, cs, dimensionBrush: displaySettings.DimensionsBrush);
+					}
+				}
+			}
+
+			// draw columns
+			_DrawRectangle(dc, brushes.ColumnFillBrush, brushes.ColumnBorderPen, leftColumnStart_GlobalPnt, leftColumnEnd_GlobalPoint, cs);
+			_DrawRectangle(dc, brushes.ColumnFillBrush, brushes.ColumnBorderPen, rightColumnStart_GlobalPoint, rightColumnEnd_GlobalPoint, cs);
+
+			// draw tie beam frame, it is equal to max material height + 500
+			if (rack.TieBeamFrame.HasFlag(eTieBeamFrame.eEndFrame))
+			{
+				// left column
+				Point leftFrameStart_GlobalPoint = leftColumnStart_GlobalPnt;
+				leftFrameStart_GlobalPoint.Y = leftColumnEnd_GlobalPoint.Y;
+				Point leftFrameEnd_GlobalPoint = leftFrameStart_GlobalPoint;
+				leftFrameEnd_GlobalPoint.X = leftColumnEnd_GlobalPoint.X;
+				leftFrameEnd_GlobalPoint.Y -= rack.FrameHeight - rackHeight;
+				//
+				_DrawRectangle(dc, brushes.ColumnFillBrush, brushes.ColumnBorderPen, leftFrameStart_GlobalPoint, leftFrameEnd_GlobalPoint, cs);
+
+				// right column
+				Point rightFrameStart_GlobalPoint = rightColumnStart_GlobalPoint;
+				rightFrameStart_GlobalPoint.Y = leftFrameStart_GlobalPoint.Y;
+				Point rightFrameEnd_GlobalPoint = leftFrameEnd_GlobalPoint;
+				rightFrameEnd_GlobalPoint.X = rightColumnEnd_GlobalPoint.X;
+				//
+				_DrawRectangle(dc, brushes.ColumnFillBrush, brushes.ColumnBorderPen, rightFrameStart_GlobalPoint, rightFrameEnd_GlobalPoint, cs);
+			}
+
+			if (showDimensions)
+			{
+				//double supportLinesOffset = cs.GetHeightInPixels(scale * (Math.Max(Math.Abs(rack.MaterialHeight - rack.FrameHeight), Math.Abs(rack.Length_Z - rack.FrameHeight))), 1.0);
+				double supportLinesOffset = cs.GetHeightInPixels(Math.Max(Math.Abs(rack.MaterialHeight - rack.FrameHeight), Math.Abs(rack.Length_Z - rack.FrameHeight)), 1.0);
+				// draw rack width dimension
+				string strRackWidth = rack.Depth.ToString();
+				Point dimensionGlobalPnt_01 = leftColumnStart_GlobalPnt;
+				dimensionGlobalPnt_01.Y = leftColumnEnd_GlobalPoint.Y;
+				Point dimensionGlobalPnt_02 = dimensionGlobalPnt_01;
+				dimensionGlobalPnt_02.X = rightColumnEnd_GlobalPoint.X;
+
+				_DrawDimension(dc, dimensionGlobalPnt_01, dimensionGlobalPnt_02, strRackWidth, 
+					supportLinesOffset + displaySettings.MinDimensionsLinesOffset, 
+					displaySettings.DimensionsTextSize, 
+					displaySettings.PerpDimLinesOffsetInPixels, 
+					eDimensionPlacement.eTop, cs, 
+					dimensionBrush: displaySettings.DimensionsBrush);
+
+				//// draw column width dimension
+				//string strColumnWidth = rack.Column.Depth.ToString();
+				//dimensionGlobalPnt_02 = leftColumnStart_GlobalPnt;
+				//dimensionGlobalPnt_02.X = leftColumnEnd_GlobalPoint.X;
+				//_DrawDimension(dc, leftColumnStart_GlobalPnt, dimensionGlobalPnt_02, strColumnWidth, displaySettings.MinDimensionsLinesOffset / 2, displaySettings.DimensionsTextSize, displaySettings.PerpDimLinesOffsetInPixels, eDimensionPlacement.eBot, cs);
+			}
+
+			bool isHeightDisplayed = false;
+
+			if (rack.Accessories.UprightGuard)
+			{
+				_TryDrawSideColumnGuard(dc, cs, displaySettings, rack, out isHeightDisplayed);
+			}
+
+			if (rack.Accessories.RowGuard)
+			{
+				_TryDrawSideRowGuard(dc, cs, displaySettings, rack, showHeight: !isHeightDisplayed);
+			}
+		}
+		 
+
+
+
 
 		private static void _TryDrawFrontRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack, bool isHeightDisplayed)
 		{
