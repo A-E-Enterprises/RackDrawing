@@ -1623,7 +1623,7 @@ namespace DrawingControl
 						}
 						else
 						{
-							if (Utils.FEQ(candidateRack.TopLeft_GlobalPoint.X, currentRack.TopLeft_GlobalPoint.X))
+							if (Utils.FEQ(currentRack.TopLeft_GlobalPoint.Y, candidateRack.TopLeft_GlobalPoint.Y))
 							{
 								if (backToBackRack == null)
 								{
@@ -1633,7 +1633,7 @@ namespace DrawingControl
 									{
 										racksConnectionXPoint = currentRack.TopLeft_GlobalPoint.X - currentRack.PalletOverhangValue - candidateRack.PalletOverhangValue - backToBackRacksStandartOffset;
 
-										if (Utils.FEQ(racksConnectionXPoint, candidateRack.TopRight_GlobalPoint.Y))
+										if (Utils.FEQ(racksConnectionXPoint, candidateRack.TopRight_GlobalPoint.X))
 										{
 											backToBackRack = candidateRack;
 											break;
@@ -1641,9 +1641,9 @@ namespace DrawingControl
 									}
 									else
 									{
-										racksConnectionXPoint = currentRack.TopRight_GlobalPoint.Y + currentRack.PalletOverhangValue + candidateRack.PalletOverhangValue + backToBackRacksStandartOffset;
+										racksConnectionXPoint = currentRack.TopRight_GlobalPoint.X + currentRack.PalletOverhangValue + candidateRack.PalletOverhangValue + backToBackRacksStandartOffset;
 
-										if (Utils.FEQ(racksConnectionXPoint, candidateRack.TopLeft_GlobalPoint.Y))
+										if (Utils.FEQ(racksConnectionXPoint, candidateRack.TopLeft_GlobalPoint.X))
 										{
 											backToBackRack = candidateRack;
 											break;
@@ -1767,7 +1767,7 @@ namespace DrawingControl
 						{
 							if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
 							{
-								if (candidateRack.BottomRight_GlobalPoint == tieBeamContainsRack.BottomLeft_GlobalPoint)
+								if (candidateRack.BottomRight_GlobalPoint == connectedTieBeam.BottomLeft_GlobalPoint)
 								{
 									tieBeamContainsRack = candidateRack;
 									break;
@@ -1775,7 +1775,7 @@ namespace DrawingControl
 							}
 							else if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
 							{
-								if (candidateRack.BottomLeft_GlobalPoint == tieBeamContainsRack.BottomRight_GlobalPoint)
+								if (candidateRack.BottomLeft_GlobalPoint == connectedTieBeam.BottomRight_GlobalPoint)
 								{
 									tieBeamContainsRack = candidateRack;
 									break;
