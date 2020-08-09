@@ -2382,6 +2382,11 @@ namespace DrawingControl
 		// vertical(horizontal) distance between them.
 		//public static double sSameRotaionRakcs_MinimumGlobalDistance = 200;
 
+		/// <summary>
+		///	Height of back to back racks connector
+		/// </summary>
+		public const int BackToBackRackConnectorHeight = 200;
+
 		public static UInt32 sDefaultDistanceBetweenPallet = 100;
 
 		public static UInt32 sDistanceBetweenPalletAndLevel = 100;
