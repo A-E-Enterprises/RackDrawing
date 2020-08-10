@@ -243,6 +243,16 @@ namespace DrawingControl
 		public static string GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB = "Guided Type Pallet Support With PSB";
 		public static string GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB = "Guided Type Pallet Support With Stopper and With PSB";
 
+		public static string DECKING_PANEL_6BP_SHELVING_SHORT = "DP 6BP (Shelving application)";
+		public static string DECKING_PANEL_6BP_PALLET_SHORT = "DP 6BP (Pallet application)";
+		public static string DECKING_PANEL_4BP_SHORT = "DP 4BP";
+		public static string PALLET_STOPPER_SHORT = "Pallet Stopper";
+		public static string FORK_ENTRY_BAR_SHORT = "Fork Entry Bar";
+		public static string PALLET_SUPPORT_BAR_SHORT = "Pallet Support Bar(PSB)";
+		public static string GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_SHORT = "GTPS With Stopper";
+		public static string GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB_SHORT = "GTPS With PSB";
+		public static string GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB_SHORT = "GTPS + Stopper and PSB";
+
 		public RackLevelAccessories(RackLevel owner)
 		{
 			m_Owner = owner;
@@ -1275,6 +1285,47 @@ namespace DrawingControl
 		#endregion
 
 		#region Public functions
+
+		public string[] GetAccessoriesDescription()
+		{
+			List<string> accessories = new List<string>();
+
+			if (Accessories != null)
+			{
+				if (this.Accessories.IsDeckPlateAvailable)
+				{
+					if (eDeckPlateType.eAlongDepth_UDL == this.Accessories.DeckPlateType)
+						accessories.Add(RackLevelAccessories.DECKING_PANEL_6BP_SHELVING_SHORT);
+					else if (eDeckPlateType.eAlongDepth_PalletSupport == this.Accessories.DeckPlateType)
+						accessories.Add(RackLevelAccessories.DECKING_PANEL_6BP_PALLET_SHORT);
+					else if (eDeckPlateType.eAlongLength == this.Accessories.DeckPlateType)
+						accessories.Add(RackLevelAccessories.DECKING_PANEL_4BP_SHORT);
+				}
+
+				if (this.Accessories.PalletStopper)
+					accessories.Add(RackLevelAccessories.PALLET_STOPPER_SHORT);
+
+				if (this.Accessories.ForkEntryBar)
+					accessories.Add(RackLevelAccessories.FORK_ENTRY_BAR_SHORT);
+
+				if (this.Accessories.PalletSupportBar)
+					accessories.Add(RackLevelAccessories.PALLET_SUPPORT_BAR_SHORT);
+
+				if (this.Accessories.GuidedTypePalletSupport)
+				{
+					if (this.Accessories.GuidedTypePalletSupport_WithPSB && this.Accessories.GuidedTypePalletSupport_WithStopper)
+						accessories.Add(RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB_SHORT);
+					else if (this.Accessories.GuidedTypePalletSupport_WithPSB)
+						accessories.Add(RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB_SHORT);
+					else if (this.Accessories.GuidedTypePalletSupport_WithStopper)
+						accessories.Add(RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_SHORT);
+					else
+						accessories.Add(RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB_SHORT);
+				}
+			}
+
+			return accessories.ToArray();
+		}
 
 		//=============================================================================
 		public void Set_PalletsAreEqual(bool bPalletsAreEqual)

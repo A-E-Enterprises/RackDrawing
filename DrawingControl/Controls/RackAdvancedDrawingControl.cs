@@ -899,19 +899,25 @@ namespace DrawingControl
 
 					if (displaySettings.DisplayTextAndDimensions)
 					{
+						string[] accessoriesList = null;
+
 						// print level index
 						string strLevelName = "Level ";
 						strLevelName += level.DisplayName;
 						// Display beam name for each level except ground if beams are different.
 						// Otherwise display beam name at the first(not ground) level.
-						bool bDisplayBeamName = false;//(bAreBeamsDifferent && level.Index != 0) || (!bAreBeamsDifferent && level.Index == 1);
+						bool bDisplayBeamName = (rack.AreLevelsTheSame && level.Index == rack.Levels.Last().Index) || (!rack.AreLevelsTheSame && level.Index != 0);
 						if (bDisplayBeamName)
 						{
 							if (level.Beam == null || level.Beam.Beam == null)
 								strLevelName += "\n(Undefined beam)";
 							else
-								strLevelName += "\n(" + level.Beam.Beam.Name + ")";
+								strLevelName += " (" + level.Beam.Beam.Name + ")";
+
+                            if (level.Accessories != null)
+								accessoriesList = level.GetAccessoriesDescription();
 						}
+
 						FormattedText LevelNameText = new FormattedText(strLevelName, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, m_TextTypeFace, displaySettings.LevelTextSize, displaySettings.TextBrush);
 						if (bDisplayBeamName)
 							LevelNameText.TextAlignment = TextAlignment.Right;
@@ -929,6 +935,23 @@ namespace DrawingControl
 						LevelNameCenter_ScreenPoint.Y -= LevelNameText.Height;
 						//
 						dc.DrawText(LevelNameText, LevelNameCenter_ScreenPoint);
+
+						if (accessoriesList != null && accessoriesList.Length > 0)
+                        {
+							string levelAccessoriesText = string.Join(" | ", accessoriesList.OrderByDescending(x => x.Length));
+
+							FormattedText levelAccesoriesFormattedText = new FormattedText(levelAccessoriesText, CultureInfo.CurrentCulture, 
+								FlowDirection.LeftToRight, m_TextTypeFace, displaySettings.LevelTextSize * 0.8, displaySettings.TextBrush);
+
+							levelAccesoriesFormattedText.MaxTextWidth = 300;
+                            levelAccesoriesFormattedText.MaxTextHeight = level.LevelHeight;
+
+							// place accesories list under name
+							LevelNameCenter_ScreenPoint.X -= levelAccesoriesFormattedText.Width;
+                            LevelNameCenter_ScreenPoint.Y += LevelNameText.Extent;
+
+                            dc.DrawText(levelAccesoriesFormattedText, LevelNameCenter_ScreenPoint);
+						}
 
 						// Draw level dimension from the top of current beam to the top of the next level beam.
 						// Dont draw level dimension for the last level;
@@ -1647,6 +1670,25 @@ namespace DrawingControl
 				}
 			}
 
+            if (mainRack.StiffenersHeight > 0)
+            {
+				FormattedText fmtedText = new FormattedText(
+					"Stiffener", 
+					CultureInfo.CurrentCulture, 
+					FlowDirection.LeftToRight,
+					m_TextTypeFace,
+					displaySettings.DimensionsTextSize,
+					displaySettings.DimensionsBrush);
+
+				Point stiffenerTextPoint = new Point(mainRackOffsetX, -mainRack.X_Bracing_Height);
+
+				stiffenerTextPoint = cs.GetLocalPoint(stiffenerTextPoint, defaultCameraScale, defaultCameraOffset);
+				stiffenerTextPoint.X -= fmtedText.Width;
+				stiffenerTextPoint.Y -= fmtedText.Height;
+
+				dc.DrawText(fmtedText, stiffenerTextPoint);
+            }
+
 			if (displaySettings.DisplayTextAndDimensions)
 			{                
 				// draw floor line
@@ -2025,12 +2067,12 @@ namespace DrawingControl
 
             if (rack.Accessories.UprightGuard)
             {
-                _TryDrawSideColumnGuard(dc, cs, drawStartPoint, displaySettings, rack, showDimensions, out isHeightDisplayed);
+                _TryDrawSideColumnGuard(dc, cs, drawStartPoint, displaySettings, rack, false/*showDimensions*/, out isHeightDisplayed);
             }
 
             if (rack.Accessories.RowGuard)
             {
-                _TryDrawSideRowGuard(dc, cs, drawStartPoint, displaySettings, rack, showDimensions, showHeight: !isHeightDisplayed);
+                _TryDrawSideRowGuard(dc, cs, drawStartPoint, displaySettings, rack, false/*showDimensions*/, showHeight: !isHeightDisplayed);
             }
         }
 		
