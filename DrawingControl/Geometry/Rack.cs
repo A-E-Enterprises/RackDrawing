@@ -2385,7 +2385,7 @@ namespace DrawingControl
 		/// <summary>
 		///	Height of back to back racks connector
 		/// </summary>
-		public const int BackToBackRackConnectorHeight = 200;
+		public const int BackToBackRackConnectorHeight = 30;
 
 		public static UInt32 sDefaultDistanceBetweenPallet = 100;
 

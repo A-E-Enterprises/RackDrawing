@@ -1613,9 +1613,11 @@ namespace DrawingControl
 				}
 			}
 
+			// Draw rows connectors
             if (backRack != null)
             {
-				Pen rackConnectorPen = new Pen(new SolidColorBrush(Colors.Red), 2.0);
+				Brush rackConnectorBrush = new SolidColorBrush(Colors.Red);
+				Pen rackConnectorPen = new Pen(rackConnectorBrush, 2.0);
 
 				//Rack.BackToBackRackConnectorHeight
 				Point startConnectorPoint = new Point();
@@ -1641,7 +1643,7 @@ namespace DrawingControl
 					startConnectorPoint.Y = -i;
 					endConnectorPoint.Y = startConnectorPoint.Y - Rack.BackToBackRackConnectorHeight;
 
-					_DrawRectangle(dc, null, rackConnectorPen, startConnectorPoint, endConnectorPoint, cs);
+					_DrawRectangle(dc, rackConnectorBrush, rackConnectorPen, startConnectorPoint, endConnectorPoint, cs);
 				}
 			}
 
