@@ -19,7 +19,7 @@ namespace DrawingControl
 
 		public const double GuardColumnHeight = 400;
 		public const double GuardColumnForwardOffset = 125;
-		public const double GuardColumnInnerAngleOffset = 20;
+		public const double GuardColumnInnerAngleOffset = 25;
 		public static double GuardColumnInnerHeight => (GuardColumnHeight - GuardColumnInnerAngleOffset);
 		public static double GuardColumnTopDepth => (GuardColumnDepth - GuardColumnInnerAngleOffset);
 	}
@@ -1487,7 +1487,7 @@ namespace DrawingControl
 
 			if (rack.Accessories.RowGuard)
 			{
-				_TryDrawSideRowGuard(dc, cs, displaySettings, rack, displaySettings.DisplayTextAndDimensions, showHeight: !isHeightDisplayed);
+				_TryDrawSideRowGuard(dc, cs, startGlobalPnt, displaySettings, rack, displaySettings.DisplayTextAndDimensions, showHeight: !isHeightDisplayed);
 			}
 		}
 
@@ -1655,10 +1655,10 @@ namespace DrawingControl
                     //
                     Point SideViewTextCenter_ScreenPoint = cs.GetLocalPoint(SideViewTextCenter_GlobalPoint, defaultCameraScale, defaultCameraOffset);
                     // add more space for guards dimensions
-                    //if (rack.Accessories.UprightGuard || rack.Accessories.RowGuard)
-                    //    SideViewTextCenter_ScreenPoint.Y += viewNameText.Height;
-                    //else
-                    //    SideViewTextCenter_ScreenPoint.Y += viewNameText.Height / 2;
+                    if (mainRack.Accessories.UprightGuard || mainRack.Accessories.RowGuard)
+                        SideViewTextCenter_ScreenPoint.Y += viewNameText.Height;
+                    else
+                        SideViewTextCenter_ScreenPoint.Y += viewNameText.Height / 2;
                     dc.DrawText(viewNameText, SideViewTextCenter_ScreenPoint);
                 }
             }
@@ -2010,17 +2010,17 @@ namespace DrawingControl
 
             bool isHeightDisplayed = false;
 
-            //if (rack.Accessories.UprightGuard)
-            //{
-            //    _TryDrawSideColumnGuard(dc, cs, drawStartPoint, displaySettings, rack, showDimensions, out isHeightDisplayed);
-            //}
+            if (rack.Accessories.UprightGuard)
+            {
+                _TryDrawSideColumnGuard(dc, cs, drawStartPoint, displaySettings, rack, showDimensions, out isHeightDisplayed);
+            }
 
-            //if (rack.Accessories.RowGuard)
-            //{
-            //    _TryDrawSideRowGuard(dc, cs, displaySettings, rack, showDimensions, showHeight: !isHeightDisplayed);
-            //}
+            if (rack.Accessories.RowGuard)
+            {
+                _TryDrawSideRowGuard(dc, cs, drawStartPoint, displaySettings, rack, showDimensions, showHeight: !isHeightDisplayed);
+            }
         }
-		 
+		
 
 
 
@@ -2336,7 +2336,7 @@ namespace DrawingControl
 			isHeightDisplayed = isHeightFitLeft || isHeightFitRight;
 		}
 
-		private static void _TryDrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, RackAdvancedDrawingSettings displaySettings, Rack rack,
+		private static void _TryDrawSideRowGuard(DrawingContext dc, ICoordinateSystem cs, Point startPoint, RackAdvancedDrawingSettings displaySettings, Rack rack,
 			bool showTextAndDimensions, bool showHeight = false)
 		{
 			if (rack.ConectedAisleSpaceDirections == ConectedAisleSpaceDirection.NONE && !rack.IsUnderpassAvailable)
@@ -2361,7 +2361,7 @@ namespace DrawingControl
 			Brush rackGuardMainFillBrush = GetStripesBrush(rackGuardFillColor, rackGuardAltFillColor);
 			Pen borderPen = new Pen(new SolidColorBrush(rackGuardFillColor), 1.0);
 
-			Point start = new Point(rack.PalletOverhangValue + GuardRowParameters.GuardRowRackOffset, 0);
+			Point start = new Point(startPoint.X + rack.PalletOverhangValue + GuardRowParameters.GuardRowRackOffset, 0);
 
 			bool isRowGuardsVisible = false;
 
@@ -2440,10 +2440,9 @@ namespace DrawingControl
 
 			List<Point> path = new List<Point>();
 
-			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
+			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
 				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)))
 			{
-
 				step = new Point(startPoint.X + rack.PalletOverhangValue - GuardColumnParameters.GuardColumnForwardOffset, 0);
 				path.Add(step);
 				dimensionStart = step;
@@ -2517,12 +2516,10 @@ namespace DrawingControl
 
 			path.Clear();
 
-			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+			if ((rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
 				|| (!rack.IsHorizontal && rack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)))
 			{
-				double rackLength = rack.Depth;
-
-				step = new Point(startPoint.X + rack.PalletOverhangValue + rackLength + GuardColumnParameters.GuardColumnForwardOffset, 0);
+				step = new Point(startPoint.X + rack.PalletOverhangValue + rack.Depth + GuardColumnParameters.GuardColumnForwardOffset, 0);
 				path.Add(step);
 				dimensionStart = step;
 				dimensionHieght = new Point(dimensionStart.X, dimensionStart.Y);
