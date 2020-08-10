@@ -797,7 +797,56 @@ namespace RackDrawingApp
 		private static int m_SheetElevationsOffsetInPixels = 150;
 		// max side of result images, take the max side for A3 sheet.
 		public static int maxImageSize = 4200;
-		public static double exportFontSize = 45;
+
+		/// <summary>
+		/// Contains exporting font size ratio to drawing image size
+		/// </summary>
+		private class ExportFontSizeDependencies
+        {
+			private class FontSizeDependency
+            {
+                public int ImageWidth { get; private set; }
+                public int ImageHeight { get; private set; }
+                public double FontSize { get; private set; }
+
+				public FontSizeDependency(int imageWidth, int imageHeight, double fontSize)
+                {
+					ImageWidth = imageWidth;
+					ImageHeight = imageHeight;
+					FontSize = fontSize;
+
+				}
+            }
+
+			public static double _defaultExportFontSize = 45;
+
+			private static List<FontSizeDependency> _widthToSizeDependencies = new List<FontSizeDependency> {
+				new FontSizeDependency(30000, 20000, 45),
+				new FontSizeDependency(70000, 55000, 35),
+				new FontSizeDependency(200000, 100000, 25)
+			};
+
+			/// <summary>
+			/// Get exporting font size based on drawing image size
+			/// </summary>
+			/// <param name="imageWidth">Drawing image width (X-axis)</param>
+			/// <param name="imageHeight">Drawing image height (Y-axis)</param>
+			public static double GetFontSize(int imageWidth, int imageHeight)
+            {
+				double lastFitWidth = _defaultExportFontSize;
+
+				foreach (FontSizeDependency dependency in _widthToSizeDependencies)
+                {
+					if (imageWidth < dependency.ImageWidth || imageHeight < dependency.ImageHeight)
+						break;
+
+					lastFitWidth = dependency.FontSize;
+				}
+
+				return lastFitWidth;
+            }
+        }
+
 		/// <summary>
 		/// Create sheet visual, which contains all sheet geometry.
 		/// </summary>
@@ -815,6 +864,8 @@ namespace RackDrawingApp
 			bool bIncludeSheetElevationsPictures,
 			double minUnitsPerPixel = 0.0)
 		{
+			double exportFontSize = ExportFontSizeDependencies.GetFontSize(imageLength, imageHeight);
+
 			if (sheet == null)
 				return null;
 
@@ -1555,6 +1606,8 @@ namespace RackDrawingApp
 			if (Utils.FLE(biggestRackHeight, 0.0))
 				return null;
 
+			double exportFontSize = ExportFontSizeDependencies.GetFontSize(imageLength, imageHeight);
+
 			//
 			GC.Collect();
 			GC.WaitForPendingFinalizers();
@@ -2159,6 +2212,7 @@ namespace RackDrawingApp
 				// draw background
 				dc.DrawRectangle(new SolidColorBrush(Colors.White), null, new Rect(new System.Windows.Point(0.0, 0.0), new System.Windows.Point(imageLength, imageHeight)));
 
+				double exportFontSize = ExportFontSizeDependencies.GetFontSize(imageLength, imageHeight);
 				RackAdvancedDrawingSettings drawingSettings = new RackAdvancedDrawingSettings(
 					exportFontSize,
 					1.2 * exportFontSize,
