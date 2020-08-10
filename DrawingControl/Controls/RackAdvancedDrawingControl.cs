@@ -1569,8 +1569,12 @@ namespace DrawingControl
 				lastDrawn = toDraw;
 			}
 
+			// Draw tie beam
             if (tieBeamRack != null)
             {
+				Pen tieBeamPen = new Pen(new SolidColorBrush(Colors.Gray), 2.0);
+				tieBeamPen.DashStyle = new DashStyle(new double[] { 3, 3 }, 0);
+
 				Point firstTieBeamPoint = default(Point);
 				Point secondTieBeamPoint = default(Point);
 
@@ -1585,8 +1589,15 @@ namespace DrawingControl
 					secondTieBeamPoint = new Point(tieBeamRackOffsetX, -(tieBeamRack.FrameHeight));
 				}
 
-				Pen tieBeamPen = new Pen(new SolidColorBrush(Colors.Gray), 2.0);
-				tieBeamPen.DashStyle = new DashStyle(new double[] { 5, 5 }, 0);
+				// pull tie beam down by 100mm
+				firstTieBeamPoint.Y += 100;
+				secondTieBeamPoint.Y += 100;
+
+				_DrawBracingLine(dc, cs, firstTieBeamPoint, secondTieBeamPoint, tieBeamPen);
+
+				// second tie beam line
+				firstTieBeamPoint.Y += 50;
+				secondTieBeamPoint.Y += 50;
 
 				_DrawBracingLine(dc, cs, firstTieBeamPoint, secondTieBeamPoint, tieBeamPen);
 
