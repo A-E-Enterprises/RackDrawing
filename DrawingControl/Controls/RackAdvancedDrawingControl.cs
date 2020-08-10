@@ -1609,7 +1609,7 @@ namespace DrawingControl
                 else
                 {
 					firstTieBeamPoint = new Point(mainRackOffsetX + mainRack.Depth + mainRack.PalletOverhangValue, -(tieBeamRack.FrameHeight));
-					secondTieBeamPoint = new Point(tieBeamRackOffsetX, -(tieBeamRack.FrameHeight));
+					secondTieBeamPoint = new Point(tieBeamRackOffsetX + tieBeamRack.PalletOverhangValue, -(tieBeamRack.FrameHeight));
 				}
 
 				// pull tie beam down by 100mm
