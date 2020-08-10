@@ -1682,8 +1682,16 @@ namespace DrawingControl
 
 				Point stiffenerTextPoint = new Point(mainRackOffsetX, -mainRack.X_Bracing_Height);
 
+				if (mainRackOffsetX < tieBeamRackOffsetX)
+				{
+					stiffenerTextPoint.X += mainRack.Depth + (2 * mainRack.PalletOverhangValue);
+				}
+				else
+				{
+					stiffenerTextPoint.X -= fmtedText.Width;
+				}
+
 				stiffenerTextPoint = cs.GetLocalPoint(stiffenerTextPoint, defaultCameraScale, defaultCameraOffset);
-				stiffenerTextPoint.X -= fmtedText.Width;
 				stiffenerTextPoint.Y -= fmtedText.Height;
 
 				dc.DrawText(fmtedText, stiffenerTextPoint);
