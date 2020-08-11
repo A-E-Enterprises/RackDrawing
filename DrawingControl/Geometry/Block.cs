@@ -47,14 +47,14 @@ namespace DrawingControl
 			_OnSizeChanged();
 		}
 
-		#region Properties
+        #region Properties
 
-		#endregion
+        #endregion
 
-		#region Functions
+        #region Functions
 
-		//=============================================================================
-		protected override GeometryState _GetOriginalState()
+        //=============================================================================
+        protected override GeometryState _GetOriginalState()
 		{
 			return new Block_State(this);
 		}
@@ -124,11 +124,19 @@ namespace DrawingControl
 		//=============================================================================
 		private void _OnSizeChanged()
 		{
+			_UpdateName();
+		}
+
+		private void _UpdateName()
+		{
 			m_strText = Name;
 			m_strText += "\n(";
 			m_strText += m_Length_X.ToString(".");
 			m_strText += " x ";
 			m_strText += m_Length_Y.ToString("0.");
+			m_strText += ")";
+			m_strText += "\n(";
+			m_strText += $"{Math.Round((m_Length_X * m_Length_Y) / 1000000, 2)}m²";
 			m_strText += ")";
 		}
 
@@ -166,6 +174,8 @@ namespace DrawingControl
 			}
 			else
 				++DrawingDocument._sBiggerMajorNumber;
+
+			_UpdateName();
 		}
 		//=============================================================================
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
