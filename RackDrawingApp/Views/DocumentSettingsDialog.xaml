@@ -343,7 +343,24 @@
 						</GridViewColumn.CellTemplate>
 					</GridViewColumn>
 
-					<!--
+                    <!--
+					PALLET TO PALLET WIDTH
+					-->
+                    <GridViewColumn
+						Header="Pallet to pallet width(mm)"
+						>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox
+									Text="{Binding PalletToPalletWidth,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"
+                                    IsEnabled="False"
+									>
+                                </TextBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!--
 					CROSS AISLE WIDTH
 					-->
 					<GridViewColumn

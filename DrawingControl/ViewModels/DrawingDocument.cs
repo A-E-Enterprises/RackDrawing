@@ -2851,12 +2851,12 @@ namespace DrawingControl
 		// Initialize m_MHEConfigurationsList.
 		private void _InitMHEConfigurationsList()
 		{
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, true, "Forklift", 4200, 2000, 100, 1000, 5500, 2700));
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Stacker", 2700, 2000, 100, 1000, 5500, 2700));
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Articulated forklift", 2400, 3000, 500, 1000, 10600, 4800));
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Reach truck", 3200, 2000, 100, 1000, 9000, 3900));
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Pallet truck", 3000, 2800, 1800, 1000, 2500, 2000));
-			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Tow tractor", 2000, 1800, 850, 1500, 6200, 5300));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, true, "Forklift", 4200, 2000, 100, 1000, 5500, 2700, RacksPalletsOverhangValue));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Stacker", 2700, 2000, 100, 1000, 5500, 2700, RacksPalletsOverhangValue));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Articulated forklift", 2400, 3000, 500, 1000, 10600, 4800, RacksPalletsOverhangValue));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Reach truck", 3200, 2000, 100, 1000, 9000, 3900, RacksPalletsOverhangValue));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Pallet truck", 3000, 2800, 1800, 1000, 2500, 2000, RacksPalletsOverhangValue));
+			m_MHEConfigurationsColl.Add(new MHEConfiguration(this, false, "Tow tractor", 2000, 1800, 850, 1500, 6200, 5300, RacksPalletsOverhangValue));
 		}
 
 		//=============================================================================

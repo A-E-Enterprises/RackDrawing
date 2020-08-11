@@ -88,7 +88,11 @@ namespace RackDrawingApp
 			set
 			{
 				if (Utils.FGT(value, 0.0) && Utils.FNE(value, m_RacksPalletsOverhangValue))
+                {
 					m_RacksPalletsOverhangValue = value;
+					RefreshPalleteToPalleteWidth();
+				}
+
 				NotifyPropertyChanged(() => RacksPalletsOverhangValue);
 			}
 		}
@@ -225,5 +229,13 @@ namespace RackDrawingApp
 		//=============================================================================
 		private ICommand m_RestorePalletConfigCommand = new Command_RestorePalletConfiguration();
 		public ICommand RestorePalletConfigCommand { get { return m_RestorePalletConfigCommand; } }
+
+		private void RefreshPalleteToPalleteWidth()
+        {
+            foreach (MHEConfiguration config in MHEConfigurationsCollection)
+            {
+				config.PalletOverhangValue = this.RacksPalletsOverhangValue;
+			}
+        }
 	}
 }

@@ -147,6 +147,9 @@ namespace DrawingControl
 					if (mheConfigClone == null)
 						continue;
 
+					if (mheConfigClone.PalletOverhangValue != racksPalletsOverhangValue)
+						mheConfigClone.PalletOverhangValue = racksPalletsOverhangValue;
+
 					this.MHEConfigsList.Add(mheConfigClone);
 				}
 			}

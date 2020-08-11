@@ -22,7 +22,8 @@ namespace DrawingControl
 			double endAisleWidth,
 			double capacity,
 			double maxLoadingHeight,
-			double overallHeightLowered
+			double overallHeightLowered,
+			double palletOverhangValue
 			)
 		{
 			m_Document = document;
@@ -34,6 +35,7 @@ namespace DrawingControl
 			m_Capacity = capacity;
 			m_MaxLoadingHeight = maxLoadingHeight;
 			m_OverallHeightLowered = overallHeightLowered;
+			PalletOverhangValue = palletOverhangValue;
 		}
 		public MHEConfiguration(MHEConfiguration mheConfig)
 		{
@@ -48,19 +50,20 @@ namespace DrawingControl
 				this.m_Capacity = mheConfig.m_Capacity;
 				this.m_MaxLoadingHeight = mheConfig.m_MaxLoadingHeight;
 				this.m_OverallHeightLowered = mheConfig.m_OverallHeightLowered;
+				this.PalletOverhangValue = mheConfig.PalletOverhangValue;
 			}
 		}
 
 
 		#region Properties
 
-		//=============================================================================
-		/// <summary>
-		/// Document-owner.
-		/// Only one MHE configuration can be enabled, so need access to MHE config collection for disable other configurations.
-		/// DONT serialize\deserialize this field, otherwise it will be infinitive loop.
-		/// </summary>
-		private DrawingDocument m_Document = null;
+        //=============================================================================
+        /// <summary>
+        /// Document-owner.
+        /// Only one MHE configuration can be enabled, so need access to MHE config collection for disable other configurations.
+        /// DONT serialize\deserialize this field, otherwise it will be infinitive loop.
+        /// </summary>
+        private DrawingDocument m_Document = null;
 		public DrawingDocument Document
 		{
 			get { return m_Document; }
@@ -131,9 +134,35 @@ namespace DrawingControl
 			get { return m_PickingAisleWidth; }
 			set
 			{
-				if(Utils.FGT(value, m_CrossAisleWidth) && value != m_PickingAisleWidth)
-					m_PickingAisleWidth = value;
+				//Condition 'Picking aisle width > cross aisle width' removed
+				//if (Utils.FGT(value, m_CrossAisleWidth) && value != m_PickingAisleWidth)
+				m_PickingAisleWidth = value;
 				NotifyPropertyChanged(() => PickingAisleWidth);
+				NotifyPropertyChanged(() => PalletToPalletWidth);
+			}
+		}
+
+		/// <summary>
+		/// Get width between two pallets based on picking aisle width and pallet overhang value
+		/// </summary>
+        public double PalletToPalletWidth
+		{
+            get { return PickingAisleWidth - (2 * PalletOverhangValue); }
+        }
+
+		private double m_PalletOverhangValue = 0.0;
+		/// <summary>
+		/// Currently selected pallet overhang value
+		/// </summary>
+		public double PalletOverhangValue
+		{
+			get { return m_PalletOverhangValue; }
+			set
+			{
+				m_PalletOverhangValue = value;
+
+				NotifyPropertyChanged(() => PalletOverhangValue);
+				NotifyPropertyChanged(() => PalletToPalletWidth);
 			}
 		}
 
