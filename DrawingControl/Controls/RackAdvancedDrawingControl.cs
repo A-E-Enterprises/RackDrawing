@@ -1593,10 +1593,15 @@ namespace DrawingControl
 			}
 
 			// Draw tie beam
-            if (tieBeamRack != null)
+			if (tieBeamRack != null)
             {
-				Pen tieBeamPen = new Pen(new SolidColorBrush(Colors.Gray), 2.0);
-				tieBeamPen.DashStyle = new DashStyle(new double[] { 3, 3 }, 0);
+
+				Color tieBeamColor = Colors.Gray;
+				if (CurrentGeometryColorsTheme.CurrentTheme != null)
+					CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eFill_TieBeam, out tieBeamColor);
+
+                Brush penBrush = new SolidColorBrush(tieBeamColor);
+				Pen tieBeamPen = new Pen(penBrush, 2.0);
 
 				Point firstTieBeamPoint = default(Point);
 				Point secondTieBeamPoint = default(Point);
@@ -1626,7 +1631,9 @@ namespace DrawingControl
 
                 if (displaySettings.DisplayTextAndDimensions)
                 {
-					_DrawDimension(dc, firstTieBeamPoint, secondTieBeamPoint,
+					_DrawDimension(dc, 
+						new Point(firstTieBeamPoint.X, -(tieBeamRack.FrameHeight)),
+						new Point(secondTieBeamPoint.X, -(tieBeamRack.FrameHeight)),
 						$"{secondTieBeamPoint.X - firstTieBeamPoint.X}",
 						displaySettings.MinDimensionsLinesOffset,
 						displaySettings.DimensionsTextSize,
