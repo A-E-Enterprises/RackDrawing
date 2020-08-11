@@ -818,12 +818,12 @@ namespace RackDrawingApp
 				}
             }
 
-			public static double _defaultExportFontSize = 45;
+			public static double _defaultExportFontSize = 10;
 
 			private static List<FontSizeDependency> _widthToSizeDependencies = new List<FontSizeDependency> {
-				new FontSizeDependency(30000, 20000, 45),
-				new FontSizeDependency(70000, 55000, 35),
-				new FontSizeDependency(200000, 100000, 25)
+				new FontSizeDependency(30000, 20000, 35),
+				new FontSizeDependency(70000, 55000, 15),
+				new FontSizeDependency(200000, 100000, 5)
 			};
 
 			/// <summary>
