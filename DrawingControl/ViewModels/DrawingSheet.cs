@@ -3455,6 +3455,15 @@ namespace DrawingControl
 			}
 		}
 
+		public void RefreshGeometriesRoofHeight()
+        {
+            foreach (BaseRectangleGeometry geom in Rectangles)
+            {
+				geom.CalcRoofHeight();
+				geom.UpdateProperties();
+			}
+        }
+
 		//=============================================================================
 		/// <summary>
 		/// Check rack's column size and bracing. It depends on the level weight and neighboring racks level weight.
@@ -5098,9 +5107,10 @@ namespace DrawingControl
 
 			// Search collisions of aisle spaces with racks for row and column guards directions
 			CheckAisleSpacesAndRacksCollisions();
+			RefreshGeometriesRoofHeight();
 
 			//
-			foreach(BaseRectangleGeometry geom in NonInitSelectedGeometryList)
+			foreach (BaseRectangleGeometry geom in NonInitSelectedGeometryList)
 			{
 				if (geom == null)
 					continue;

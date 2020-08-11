@@ -165,8 +165,9 @@ namespace DrawingControl
 		public int MinLength_Z { get; private set; }
 		public int MaxLength_Z { get; private set; }
 		public int StepLength_Z { get; private set; }
-		//
-		public string Text { get; private set; }
+        public double RoofHeight { get; private set; }
+        //
+        public string Text { get; private set; }
 		public string Name { get; private set; }
 		public bool IsHorizontal { get; private set; }
 		//
@@ -227,6 +228,8 @@ namespace DrawingControl
 		//
 		private double m_MarginX = 0.0;
 		private double m_MarginY = 0.0;
+		
+		private double m_RoofHeight = 0.0;
 
 		//
 		protected DrawingSheet m_Sheet = null;
@@ -242,6 +245,7 @@ namespace DrawingControl
 		public static string PROP_DIMENSION_X = "Dimension X";
 		public static string PROP_DIMENSION_Y = "Dimension Y";
 		public static string PROP_DIMENSION_Z = "Dimension Z";
+		public static string PROP_ROOF_HEIGHT = "Roof height";
 		public static string PROP_NAME = "Name";
 
 		public BaseRectangleGeometry(DrawingSheet _sheet)
@@ -567,7 +571,17 @@ namespace DrawingControl
 		}
 
 		//=============================================================================
-		public Point TopLeft_GlobalPoint
+		public double RoofHeight
+		{
+			get { return m_RoofHeight; }
+			set
+			{
+				m_RoofHeight = value;
+			}
+		}
+
+        //=============================================================================
+        public Point TopLeft_GlobalPoint
 		{
 			get { return m_TopLeft_GlobalPoint; }
 			set
@@ -927,6 +941,8 @@ namespace DrawingControl
 				return m_Length_Z;
 			else if (PROP_NAME == strPropSysName)
 				return m_strRectangleName;
+			else if (PROP_ROOF_HEIGHT == strPropSysName)
+				return m_RoofHeight;
 
 			return null;
 		}
@@ -1213,6 +1229,15 @@ namespace DrawingControl
 
 			return bRes;
 		}
+
+		//=============================================================================
+		public void CalcRoofHeight()
+        {
+			if (m_Sheet == null)
+				return;
+
+			RoofHeight = Math.Round(m_Sheet.SelectedRoof.CalculateMaxHeightForGeometry(this), 2);
+        }
 
 		//=============================================================================
 		public bool _CalculateNotOverlapPosition(
@@ -1581,6 +1606,8 @@ namespace DrawingControl
 				m_Properties.Add(new GeometryProperty(this, PROP_DIMENSION_X, "Depth", true, "Size"));
 			}
 			m_Properties.Add(new GeometryProperty(this, PROP_DIMENSION_Z, "Height", _Is_HeightProperty_ReadOnly, true, "Size"));
+
+			m_Properties.Add(new GeometryProperty(this, PROP_ROOF_HEIGHT, "Roof Height", true, true, "Size"));
 		}
 
 		//=============================================================================
@@ -1700,6 +1727,8 @@ namespace DrawingControl
 			//
 			m_Length_X = Convert.ToInt32(Math.Truncate(m_Length_X));
 			m_Length_Y = Convert.ToInt32(Math.Truncate(m_Length_Y));
+
+			CalcRoofHeight();
 		}
 
 		//=============================================================================
@@ -2294,6 +2323,7 @@ namespace DrawingControl
 					m_MinLength_Y = (double)info.GetValue("Min_GlobalWidth", typeof(double));
 					m_MaxLength_Y = (double)info.GetValue("Max_GlobalWidth", typeof(double));
 					m_StepLength_Y = (double)info.GetValue("StepLength_Y", typeof(double));
+
 					//
 					m_Length_Z = (int)info.GetValue("Length_Z", typeof(int));
 					m_MinLength_Z = (int)info.GetValue("Min_GlobalHeight", typeof(int));
