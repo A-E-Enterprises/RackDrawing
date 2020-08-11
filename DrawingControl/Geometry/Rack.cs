@@ -5352,16 +5352,7 @@ namespace DrawingControl
 		{
 			// name
 			int index = m_iSizeIndex + 1;
-			string strName = RackUtils.GetAlphabetRackIndex(index);
-
-			strName += "(";
-			if (IsFirstInRowColumn)
-				strName += "M";
-			else
-				strName += "A";
-			strName += ")";
-
-			Text = strName;
+			Text = RackUtils.GetAlphabetRackIndex(index);
 		}
 
 		//=============================================================================
