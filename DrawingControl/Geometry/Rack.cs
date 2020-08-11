@@ -3875,7 +3875,7 @@ namespace DrawingControl
 			SolidColorBrush rackDotsBrush = new SolidColorBrush(rackDotsColor);
 			Pen circleBorderPen = new Pen(m_CircleBorderBrush, 1.0);
 			// dots should have fixed size in pixels
-			double rDotRadius = 0.2 * displaySettings.TextFontSize; //50 * (LengthInPixels / m_Length_X);
+			double rDotRadius = 0.1 * displaySettings.TextFontSize; //50 * (LengthInPixels / m_Length_X);
 			dc.DrawEllipse(rackDotsBrush, circleBorderPen, firstCirclePoint, rDotRadius, rDotRadius);
 			dc.DrawEllipse(rackDotsBrush, circleBorderPen, secondCirclePoint, rDotRadius, rDotRadius);
 
