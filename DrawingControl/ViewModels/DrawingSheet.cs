@@ -1746,40 +1746,32 @@ namespace DrawingControl
 
 						if (candidateRack.IsHorizontal)
 						{
-							if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP))
+							if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.TOP)
+								&& candidateRack.BottomRight_GlobalPoint == connectedTieBeam.TopRight_GlobalPoint)
 							{
-                                if (candidateRack.BottomRight_GlobalPoint == connectedTieBeam.TopRight_GlobalPoint)
-                                {
-									tieBeamContainsRack = candidateRack;
-									break;
-								}
+								tieBeamContainsRack = candidateRack;
+								break;
                             }
-                            else if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM))
+                            if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.BOTTOM)
+								&& candidateRack.TopRight_GlobalPoint == connectedTieBeam.BottomRight_GlobalPoint)
                             {
-								if (candidateRack.TopRight_GlobalPoint == connectedTieBeam.BottomRight_GlobalPoint)
-								{
-									tieBeamContainsRack = candidateRack;
-									break;
-								}
+								tieBeamContainsRack = candidateRack;
+								break;
 							}
 						}
 						else
 						{
-							if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT))
+							if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.LEFT)
+								&& candidateRack.BottomRight_GlobalPoint == connectedTieBeam.BottomLeft_GlobalPoint)
 							{
-								if (candidateRack.BottomRight_GlobalPoint == connectedTieBeam.BottomLeft_GlobalPoint)
-								{
-									tieBeamContainsRack = candidateRack;
-									break;
-								}
+								tieBeamContainsRack = candidateRack;
+								break;
 							}
-							else if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT))
+							if (currentRack.ConectedAisleSpaceDirections.HasFlag(ConectedAisleSpaceDirection.RIGHT)
+								&& candidateRack.BottomLeft_GlobalPoint == connectedTieBeam.BottomRight_GlobalPoint)
 							{
-								if (candidateRack.BottomLeft_GlobalPoint == connectedTieBeam.BottomRight_GlobalPoint)
-								{
-									tieBeamContainsRack = candidateRack;
-									break;
-								}
+								tieBeamContainsRack = candidateRack;
+								break;
 							}
 						}
 					}
