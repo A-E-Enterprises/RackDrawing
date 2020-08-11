@@ -198,6 +198,7 @@ namespace DrawingControl
 
 		//
 		protected string m_strText = string.Empty;
+		protected string m_strDisplayText = string.Empty;
 		//
 		protected string m_strRectangleName = string.Empty;
 		// true - horizontal rectnagle, it means that Length is Distance_X
@@ -553,6 +554,23 @@ namespace DrawingControl
 			}
 		}
 
+		public string DisplayText
+		{
+			get
+			{
+				ResolveDisplayText();
+				return m_strDisplayText;
+			}
+			set
+			{
+				string strNewValue = string.Empty;
+				if (!string.IsNullOrEmpty(value))
+					strNewValue = value;
+
+				m_strDisplayText = strNewValue;
+			}
+		}
+
 		//=============================================================================
 		public string Name
 		{
@@ -836,7 +854,7 @@ namespace DrawingControl
 				FontFamily textFontFamily = new FontFamily("Arial");
 				Typeface textTypeFace = new Typeface(textFontFamily, FontStyles.Normal, displaySettings.TextWeight, FontStretches.Normal);
 
-				FormattedText formattedText = new FormattedText(Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, textTypeFace, displaySettings.TextFontSize, br);
+				FormattedText formattedText = new FormattedText(DisplayText, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, textTypeFace, displaySettings.TextFontSize, br);
 				formattedText.MaxTextWidth = TextWidth;
 				formattedText.MaxTextHeight = TextHeight;
 				formattedText.TextAlignment = TextAlignment.Center;
@@ -1584,6 +1602,16 @@ namespace DrawingControl
 		#endregion
 
 		#region Private and Protected functions
+
+		//=============================================================================
+		protected virtual void ResolveDisplayText()
+		{
+			if (!string.IsNullOrEmpty(m_strText))
+				m_strDisplayText = m_strText;
+
+			else if (!string.IsNullOrEmpty(m_strRectangleName))
+				m_strDisplayText = m_strRectangleName;
+		}
 
 		//=============================================================================
 		protected virtual void _InitProperties()

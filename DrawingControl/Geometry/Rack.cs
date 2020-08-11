@@ -2531,6 +2531,9 @@ namespace DrawingControl
 		public static string PROP_RACK_LEVEL = "RackLevel";
 		public static char PROP_RACK_LEVEL_DELIMITER = '_';
 
+		private const string FIRST_RACK_NAME_SUFFIX = "(M)";
+		private const string RACK_NAME_SUFFIX = "(A)";
+
 		//
 		private Brush m_CircleBorderBrush = Brushes.Black;
 
@@ -3688,12 +3691,25 @@ namespace DrawingControl
 			}
 		}
 
-		#endregion
+        #endregion
 
-		#region Overrides
+        #region Overrides
 
-		//=============================================================================
-		protected override GeometryState _GetOriginalState()
+        //=============================================================================
+        protected override void ResolveDisplayText()
+        {
+            base.ResolveDisplayText();
+
+            if (!string.IsNullOrEmpty(m_strText))
+            {
+				m_strDisplayText = IsFirstInRowColumn 
+					? m_strText.Replace(FIRST_RACK_NAME_SUFFIX, string.Empty) 
+					: m_strText.Replace(RACK_NAME_SUFFIX, string.Empty);
+			}
+        }
+
+        //=============================================================================
+        protected override GeometryState _GetOriginalState()
 		{
 			return new Rack_State(this);
 		}
@@ -5352,7 +5368,9 @@ namespace DrawingControl
 		{
 			// name
 			int index = m_iSizeIndex + 1;
-			Text = RackUtils.GetAlphabetRackIndex(index);
+
+			Text = RackUtils.GetAlphabetRackIndex(index) + (IsFirstInRowColumn ? FIRST_RACK_NAME_SUFFIX : RACK_NAME_SUFFIX);
+			DisplayText = RackUtils.GetAlphabetRackIndex(index);
 		}
 
 		//=============================================================================
