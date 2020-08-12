@@ -464,9 +464,9 @@ namespace RackDrawingApp
 				if (m_Document.Rack_Accessories.RowGuard)
 				{
 					if (m_Document.Rack_Accessories.IsHeavyDutyEnabled)
-						AccessoriesVisualization.Add(new AccessoryVisualPresentation("Heavy Duty Row Guard", "/DrawingFactoryApp;component/Properties/Accessories/RackAccessory_RowGuard.png"));
+						AccessoriesVisualization.Add(new AccessoryVisualPresentation("Heavy Duty Row Guard", "/DrawingFactoryApp;component/Properties/Accessories/RackAccessory_RowGuard_HeavyDuty.png"));
 					else
-						AccessoriesVisualization.Add(new AccessoryVisualPresentation("Row Guard", "/DrawingFactoryApp;component/Properties/Accessories/RackAccessory_RowGuard_HeavyDuty.png"));
+						AccessoriesVisualization.Add(new AccessoryVisualPresentation("Row Guard", "/DrawingFactoryApp;component/Properties/Accessories/RackAccessory_RowGuard.png"));
 				}
 				if (m_Document.Rack_Accessories.Signages)
 					AccessoriesVisualization.Add(new AccessoryVisualPresentation("Signages", "/DrawingFactoryApp;component/Properties/Accessories/RackAccessory_Signages.png"));

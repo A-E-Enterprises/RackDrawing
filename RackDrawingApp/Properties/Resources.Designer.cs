@@ -323,6 +323,16 @@ namespace RackDrawingApp.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap RackAccessory_RowGuard_HeavyDuty {
+            get {
+                object obj = ResourceManager.GetObject("RackAccessory_RowGuard_HeavyDuty", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap RackAccessory_Signages {
             get {
                 object obj = ResourceManager.GetObject("RackAccessory_Signages", resourceCulture);

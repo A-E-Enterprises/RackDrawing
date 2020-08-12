@@ -408,6 +408,9 @@
     <Resource Include="Properties\Accessories\RackAccessory_Signages.png" />
     <Resource Include="Properties\Accessories\RackAccessory_UprightGuard.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Properties\Accessories\RackAccessory_RowGuard_HeavyDuty.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
