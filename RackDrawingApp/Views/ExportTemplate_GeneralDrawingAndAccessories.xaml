@@ -25,14 +25,14 @@
             ItemsSource="{Binding AccessoriesVisualization, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderThickness="1" BorderBrush="DarkGray">
+                    <Border BorderThickness="1" BorderBrush="DarkGray" MaxWidth="300">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <Image Grid.Row="0" Source="/Resources/Accessories/UprightGuard.png" />
-                            <TextBlock Grid.Row="1" Text="{Binding Name}"/>
+                            <Image Grid.Row="0" Source="{Binding ImageSource}" />
+                            <TextBlock Grid.Row="1" TextWrapping="Wrap" Text="{Binding Name}"/>
                         </Grid>
                     </Border>
                 </DataTemplate>

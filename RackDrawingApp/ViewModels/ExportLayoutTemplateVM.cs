@@ -456,28 +456,26 @@ namespace RackDrawingApp
 
 		public void ParseVisualAccessories()
 		{
-			//TODO: add images for every accessory
-
 			// Rack Accessories
 			if (m_Document != null && m_Document.Rack_Accessories != null)
 			{
 				if (m_Document.Rack_Accessories.UprightGuard)
-					AccessoriesVisualization.Add(new AccessoryVisualPresentation("Upright Guard", "Resources//Accessories//UprightGuard.png"));
+					AccessoriesVisualization.Add(new AccessoryVisualPresentation("Upright Guard", "/DrawingFactoryApp;component/Properties/Accessories/RackAccessory_UprightGuard.png"));
 				if (m_Document.Rack_Accessories.RowGuard)
 				{
 					if (m_Document.Rack_Accessories.IsHeavyDutyEnabled)
-						AccessoriesVisualization.Add(new AccessoryVisualPresentation("Heavy Duty Row Guard", "Resources//Accessories//UprightGuard.png"));
+						AccessoriesVisualization.Add(new AccessoryVisualPresentation("Heavy Duty Row Guard", "/DrawingFactoryApp;component/Properties/Accessories/RackAccessory_RowGuard.png"));
 					else
-						AccessoriesVisualization.Add(new AccessoryVisualPresentation("Row Guard", "Resources//Accessories//UprightGuard.png"));
+						AccessoriesVisualization.Add(new AccessoryVisualPresentation("Row Guard", "/DrawingFactoryApp;component/Properties/Accessories/RackAccessory_RowGuard_HeavyDuty.png"));
 				}
 				if (m_Document.Rack_Accessories.Signages)
-					AccessoriesVisualization.Add(new AccessoryVisualPresentation("Signages", "Resources//Accessories//UprightGuard.png"));
+					AccessoriesVisualization.Add(new AccessoryVisualPresentation("Signages", "/DrawingFactoryApp;component/Properties/Accessories/RackAccessory_Signages.png"));
 				if (m_Document.Rack_Accessories.IsMeshCladdingEnabled)
-					AccessoriesVisualization.Add(new AccessoryVisualPresentation("Mesh Cladding", "Resources//Accessories//UprightGuard.png"));
+					AccessoriesVisualization.Add(new AccessoryVisualPresentation("Mesh Cladding", "/DrawingFactoryApp;component/Properties/Accessories/RackAccessory_MeshCladding.png"));
 			}
 
-			if (m_Sheet != null && m_Sheet.TieBeamsList != null && m_Sheet.TieBeamsList.Count > 0)
-				AccessoriesVisualization.Add(new AccessoryVisualPresentation("Tie Beams", "Resources//Accessories//UprightGuard.png"));
+			//if (m_Sheet != null && m_Sheet.TieBeamsList != null && m_Sheet.TieBeamsList.Count > 0)
+			//	AccessoriesVisualization.Add(new AccessoryVisualPresentation("Tie Beams", "/DrawingFactoryApp;component/Properties/Accessories/.png"));
 
 			List<Tuple<string, string>> usedAccessories = new List<Tuple<string, string>>();
 
@@ -502,21 +500,21 @@ namespace RackDrawingApp
                         {
                             if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.DECKING_PANEL_6BP_SHELVING))
                             {
-								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.DECKING_PANEL_6BP_SHELVING, "Resources//Accessories//UprightGuard.png"));
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.DECKING_PANEL_6BP_SHELVING, "/DrawingFactoryApp;component/Properties/Accessories/LevelAccessory_DeckingPanel_6bpShelving.png"));
 							}
 						}
 						else if (eDeckPlateType.eAlongDepth_PalletSupport == level.Accessories.DeckPlateType)
                         {
 							if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.DECKING_PANEL_6BP_PALLET))
 							{
-								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.DECKING_PANEL_6BP_PALLET, "Resources//Accessories//UprightGuard.png"));
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.DECKING_PANEL_6BP_PALLET, "/DrawingFactoryApp;component/Properties/Accessories/LevelAccessory_DeckingPanel_6bpPallete.png"));
 							}
 						}
 						else if (eDeckPlateType.eAlongLength == level.Accessories.DeckPlateType)
 						{
 							if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.DECKING_PANEL_4BP))
 							{
-								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.DECKING_PANEL_4BP, "Resources//Accessories//UprightGuard.png"));
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.DECKING_PANEL_4BP, "/DrawingFactoryApp;component/Properties/Accessories/LevelAccessory_DeckingPanel_4bp.png"));
 							}
 						}
 					}
@@ -525,21 +523,21 @@ namespace RackDrawingApp
 					{
 						if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.PALLET_STOPPER))
 						{
-							usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.PALLET_STOPPER, "Resources//Accessories//UprightGuard.png"));
+							usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.PALLET_STOPPER, "/DrawingFactoryApp;component/Properties/Accessories/LevelAccessory_PalletStopper.png"));
 						}
 					}
 					if (level.Accessories.ForkEntryBar)
 					{
 						if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.FORK_ENTRY_BAR))
 						{
-							usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.FORK_ENTRY_BAR, "Resources//Accessories//UprightGuard.png"));
+							usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.FORK_ENTRY_BAR, "/DrawingFactoryApp;component/Properties/Accessories/LevelAccessory_ForkEntryBar.png"));
 						}
 					}
 					if (level.Accessories.PalletSupportBar)
 					{
 						if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.PALLET_SUPPORT_BAR))
 						{
-							usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.PALLET_SUPPORT_BAR, "Resources//Accessories//UprightGuard.png"));
+							usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.PALLET_SUPPORT_BAR, "/DrawingFactoryApp;component/Properties/Accessories/LevelAccessory_PSB.png"));
 						}
 					}
 					if (level.Accessories.GuidedTypePalletSupport)
@@ -548,21 +546,21 @@ namespace RackDrawingApp
 						{
 							if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER))
 							{
-								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER, "Resources//Accessories//UprightGuard.png"));
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER, "/DrawingFactoryApp;component/Properties/Accessories/LevelAccessory_GSTP_Stopper.png"));
 							}
 						}
 						else if (level.Accessories.GuidedTypePalletSupport_WithPSB)
 						{
 							if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB))
 							{
-								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB, "Resources//Accessories//UprightGuard.png"));
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_PSB, "/DrawingFactoryApp;component/Properties/Accessories/LevelAccessory_GSTP_PSB.png"));
 							}
 						}
 						else if (level.Accessories.GuidedTypePalletSupport_WithStopper)
 						{
 							if (usedAccessories.All(x => x.Item1 != DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB))
 							{
-								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB, "Resources//Accessories//UprightGuard.png"));
+								usedAccessories.Add(new Tuple<string, string>(DrawingControl.RackLevelAccessories.GUIDED_TYPE_PALLET_SUPPORT_WITH_STOPPER_AND_PSB, "/DrawingFactoryApp;component/Properties/Accessories/LevelAccessory_GSTP_StopperAndPSB.png"));
 							}
 						}
 					}
@@ -572,6 +570,7 @@ namespace RackDrawingApp
 				}
 			}
 
+			// Map found to Visual collection
             foreach (var accessory in usedAccessories)
             {
 				AccessoriesVisualization.Add(new AccessoryVisualPresentation(accessory.Item1, accessory.Item2));
@@ -587,7 +586,7 @@ namespace RackDrawingApp
         public AccessoryVisualPresentation(string name, string path)
         {
 			Name = name;
-			ImageSource = new BitmapImage(new Uri($"{path}", UriKind.Relative));
+			ImageSource = new BitmapImage(new Uri($"{path}", UriKind.RelativeOrAbsolute));
 		}
 
     }

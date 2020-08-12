@@ -393,7 +393,20 @@
     <Resource Include="Properties\PDF_RightColumnBottomPicture.TIF" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Accessories\UprightGuard.png" />
+    <Resource Include="Properties\Accessories\LevelAccessory_DeckingPanel_4bp.png" />
+    <Resource Include="Properties\Accessories\LevelAccessory_DeckingPanel_6bpPallete.png" />
+    <Resource Include="Properties\Accessories\LevelAccessory_DeckingPanel_6bpShelving.png" />
+    <Resource Include="Properties\Accessories\LevelAccessory_ForkEntryBar.png" />
+    <Resource Include="Properties\Accessories\LevelAccessory_GSTP.png" />
+    <Resource Include="Properties\Accessories\LevelAccessory_GSTP_PSB.png" />
+    <Resource Include="Properties\Accessories\LevelAccessory_GSTP_Stopper.png" />
+    <Resource Include="Properties\Accessories\LevelAccessory_GSTP_StopperAndPSB.png" />
+    <Resource Include="Properties\Accessories\LevelAccessory_PalletStopper.png" />
+    <Resource Include="Properties\Accessories\LevelAccessory_PSB.png" />
+    <Resource Include="Properties\Accessories\RackAccessory_MeshCladding.png" />
+    <Resource Include="Properties\Accessories\RackAccessory_RowGuard.png" />
+    <Resource Include="Properties\Accessories\RackAccessory_Signages.png" />
+    <Resource Include="Properties\Accessories\RackAccessory_UprightGuard.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

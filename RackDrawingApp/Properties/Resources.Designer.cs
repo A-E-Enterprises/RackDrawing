@@ -19,7 +19,7 @@ namespace RackDrawingApp.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -151,6 +151,106 @@ namespace RackDrawingApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LevelAccessory_DeckingPanel_4bp {
+            get {
+                object obj = ResourceManager.GetObject("LevelAccessory_DeckingPanel_4bp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LevelAccessory_DeckingPanel_6bpPallete {
+            get {
+                object obj = ResourceManager.GetObject("LevelAccessory_DeckingPanel_6bpPallete", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LevelAccessory_DeckingPanel_6bpShelving {
+            get {
+                object obj = ResourceManager.GetObject("LevelAccessory_DeckingPanel_6bpShelving", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LevelAccessory_ForkEntryBar {
+            get {
+                object obj = ResourceManager.GetObject("LevelAccessory_ForkEntryBar", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LevelAccessory_GSTP {
+            get {
+                object obj = ResourceManager.GetObject("LevelAccessory_GSTP", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LevelAccessory_GSTP_PSB {
+            get {
+                object obj = ResourceManager.GetObject("LevelAccessory_GSTP_PSB", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LevelAccessory_GSTP_Stopper {
+            get {
+                object obj = ResourceManager.GetObject("LevelAccessory_GSTP_Stopper", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LevelAccessory_GSTP_StopperAndPSB {
+            get {
+                object obj = ResourceManager.GetObject("LevelAccessory_GSTP_StopperAndPSB", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LevelAccessory_PalletStopper {
+            get {
+                object obj = ResourceManager.GetObject("LevelAccessory_PalletStopper", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LevelAccessory_PSB {
+            get {
+                object obj = ResourceManager.GetObject("LevelAccessory_PSB", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon logo_1 {
@@ -196,6 +296,46 @@ namespace RackDrawingApp.Properties {
         internal static System.Drawing.Bitmap PDF_RightColumnHeaderPicture {
             get {
                 object obj = ResourceManager.GetObject("PDF_RightColumnHeaderPicture", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap RackAccessory_MeshCladding {
+            get {
+                object obj = ResourceManager.GetObject("RackAccessory_MeshCladding", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap RackAccessory_RowGuard {
+            get {
+                object obj = ResourceManager.GetObject("RackAccessory_RowGuard", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap RackAccessory_Signages {
+            get {
+                object obj = ResourceManager.GetObject("RackAccessory_Signages", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap RackAccessory_UprightGuard {
+            get {
+                object obj = ResourceManager.GetObject("RackAccessory_UprightGuard", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

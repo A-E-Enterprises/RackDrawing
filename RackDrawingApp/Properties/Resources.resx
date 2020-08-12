@@ -169,4 +169,46 @@
   <data name="PDF_RightColumnBottomPicture" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>PDF_RightColumnBottomPicture.TIF;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="LevelAccessory_DeckingPanel_4bp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\levelaccessory_deckingpanel_4bp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LevelAccessory_DeckingPanel_6bpPallete" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\levelaccessory_deckingpanel_6bppallete.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LevelAccessory_DeckingPanel_6bpShelving" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\levelaccessory_deckingpanel_6bpshelving.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LevelAccessory_ForkEntryBar" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\levelaccessory_forkentrybar.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LevelAccessory_GSTP" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\levelaccessory_gstp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LevelAccessory_GSTP_PSB" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\levelaccessory_gstp_psb.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LevelAccessory_GSTP_Stopper" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\levelaccessory_gstp_stopper.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LevelAccessory_GSTP_StopperAndPSB" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\levelaccessory_gstp_stopperandpsb.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LevelAccessory_PalletStopper" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\levelaccessory_palletstopper.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LevelAccessory_PSB" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\levelaccessory_psb.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RackAccessory_MeshCladding" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\rackaccessory_meshcladding.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RackAccessory_RowGuard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\rackaccessory_rowguard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RackAccessory_Signages" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\rackaccessory_signages.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RackAccessory_UprightGuard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>accessories\rackaccessory_uprightguard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
