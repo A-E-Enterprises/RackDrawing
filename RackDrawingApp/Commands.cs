@@ -517,6 +517,7 @@ namespace RackDrawingApp
 
 		//=============================================================================
 		protected override void _Execute(object parameter)
+		
 		{
 			MainWindow_ViewModel vm = parameter as MainWindow_ViewModel;
 			if (vm == null)
@@ -717,12 +718,12 @@ namespace RackDrawingApp
 						continue;
 
 					// create image
-					DrawingVisual rackVisual = CreateRackAdvancedPropsVisual(rack, vm.DrawingControl.WatermarkImage, maxImageSize, maxImageSize);
+					DrawingVisual rackVisual = CreateRackAdvancedPropsVisual(rack, vm.DrawingControl.WatermarkImage, maxImageSize, maxImageHeight);
 					if (rackVisual == null)
 						continue;
 					// rack.Text contains text that displayed over rack in the sheet layout
 					string strImagePath = Path.Combine(strFolder, strDocNameWithoutExtensions + "_" + rack.Text + ".jpeg");
-					_ExportDrawingVisual(rackVisual, strImagePath, maxImageSize, maxImageSize);
+					_ExportDrawingVisual(rackVisual, strImagePath, maxImageSize, maxImageHeight);
 				}
 			}
 			catch { }
@@ -797,6 +798,7 @@ namespace RackDrawingApp
 		private static int m_SheetElevationsOffsetInPixels = 150;
 		// max side of result images, take the max side for A3 sheet.
 		public static int maxImageSize = 4200;
+		public static int maxImageHeight = 3000;
 
 		/// <summary>
 		/// Contains exporting font size ratio to drawing image size
@@ -2210,7 +2212,7 @@ namespace RackDrawingApp
 			using (DrawingContext dc = visual.RenderOpen())
 			{
 				// draw background
-				dc.DrawRectangle(new SolidColorBrush(Colors.White), null, new Rect(new System.Windows.Point(0.0, 0.0), new System.Windows.Point(imageLength, imageHeight)));
+				dc.DrawRectangle(new SolidColorBrush(Colors.AliceBlue), null, new Rect(new System.Windows.Point(0.0, 0.0), new System.Windows.Point(imageLength, imageHeight)));
 
 				double exportFontSize = ExportFontSizeDependencies.GetFontSize((UInt32)imageLength, (UInt32)imageHeight);
 				RackAdvancedDrawingSettings drawingSettings = new RackAdvancedDrawingSettings(

@@ -487,6 +487,9 @@ namespace DrawingControl
 			if (displaySettings == null)
 				displaySettings = RackAdvancedDrawingSettings.GetDefaultSettings();
 
+			Rack backToBackRack = rackForDraw.Sheet.GetBackToBackRack(rackForDraw);
+			Rack tieBeamConnectedRack = rackForDraw.Sheet.GetTieBeamConnectedRack(rackForDraw); ;
+
 			FormattedText FrontViewText;
 			FormattedText SideViewText;
 			double rackLength;
@@ -495,6 +498,8 @@ namespace DrawingControl
 			double MaxRackHeight;
 			if (!RackAdvancedPropertiesControl._GetSizes(
 				selectedRack,
+				backToBackRack,
+				tieBeamConnectedRack,
 				displaySettings,
 				out drawingSize,
 				out FrontViewText,
@@ -586,7 +591,12 @@ namespace DrawingControl
 
 			// FRONT VIEW
 			Vector frontViewOffsetInPixels = baseOffsetInPixels;
-			frontViewOffsetInPixels.Y -= viewNameTextHeight_Pixels + viewNameTextHeight_Pixels / 2;
+			frontViewOffsetInPixels.Y -= viewNameTextHeight_Pixels;
+			if (rackForDraw.Accessories.UprightGuard || rackForDraw.Accessories.RowGuard)
+				frontViewOffsetInPixels.Y -= viewNameTextHeight_Pixels;
+			else
+				frontViewOffsetInPixels.Y -= viewNameTextHeight_Pixels / 2;
+
 			// Add space for beam text and level height dimension
 			frontViewOffsetInPixels.X += rBeamTextMaxSizeInPixels;// + spaceForDimInPixels;
 			//
@@ -596,10 +606,6 @@ namespace DrawingControl
 
 			// SIDE VIEW
 			Vector sideViewOffsetInPixels = frontViewOffsetInPixels;
-
-			Rack backToBackRack = rackForDraw.Sheet.GetBackToBackRack(rackForDraw);
-			Rack tieBeamConnectedRack = rackForDraw.Sheet.GetTieBeamConnectedRack(rackForDraw); ;
-
 			
 			// Add space for front view, height dimensions and space between views
 			sideViewOffsetInPixels.X += cs.GetWidthInPixels(rackLength, 1.0) + 4.9 * displaySettings.MinDimensionsLinesOffset + distanceBetweenViewsInPixels;
@@ -633,7 +639,6 @@ namespace DrawingControl
 			double rackDepth = rack.Depth;
 			double rackHeight = rack.Length_Z;
 
-			double guardsDimensionsAdditionalLeftOffset = 0;
 			double guardsDimensionsAdditionalRightOffset = 0;
 			if (rack.Accessories.UprightGuard || rack.Accessories.RowGuard)
 			{
@@ -879,9 +884,9 @@ namespace DrawingControl
 						if (bDisplayBeamName)
 						{
 							if (level.Beam == null || level.Beam.Beam == null)
-								strLevelName += "\n(Undefined beam)";
+								strLevelName += " (Undefined beam)";
 							else
-								strLevelName += "\n(" + level.Beam.Beam.Name + ")";
+								strLevelName += " (" + level.Beam.Beam.Name + ")";
 
                             if (level.Accessories != null)
 								accessoriesList = level.GetAccessoriesDescription();
@@ -912,11 +917,11 @@ namespace DrawingControl
 							FormattedText levelAccesoriesFormattedText = new FormattedText(levelAccessoriesText, CultureInfo.CurrentCulture, 
 								FlowDirection.LeftToRight, m_TextTypeFace, displaySettings.LevelTextSize * 0.8, displaySettings.TextBrush);
 
-							levelAccesoriesFormattedText.MaxTextWidth = cs.GetGlobalWidth(300, defaultCameraScale);
+							levelAccesoriesFormattedText.MaxTextWidth = LevelNameText.Width;
                             levelAccesoriesFormattedText.MaxTextHeight = level.LevelHeight;
 
-							// place accesories list under name
-							LevelNameCenter_ScreenPoint.X -= levelAccesoriesFormattedText.Width;
+                            // place accesories list under name
+                            LevelNameCenter_ScreenPoint.X -= levelAccesoriesFormattedText.Width;
                             LevelNameCenter_ScreenPoint.Y += LevelNameText.Extent;
 
                             dc.DrawText(levelAccesoriesFormattedText, LevelNameCenter_ScreenPoint);
@@ -3290,6 +3295,8 @@ namespace DrawingControl
 		/// </summary>
 		public static bool _GetSizes(
 			Rack rackForDraw,
+			Rack backToBackRackToDraw,
+			Rack tieBeamRackForDraw,
 			RackAdvancedDrawingSettings drawingSettings,
 			//
 			out Size drawingSize,
@@ -3325,8 +3332,42 @@ namespace DrawingControl
 			rackLength = rackForDraw.Length;
 			rackWidth = rackForDraw.Depth;
 
-			//
 			double _ViewsTotalLength = rackLength + rackWidth;
+
+			// include back to back rack if exist
+            if (backToBackRackToDraw != null)
+            {
+				_ViewsTotalLength += backToBackRackToDraw.Depth;
+			}
+
+			// include tie beam connected rack if exist 
+			// and add aisle space width between racks
+			if (tieBeamRackForDraw != null)
+            {
+				double aisleSpaceWidth = 0;
+
+				if (rackForDraw.IsHorizontal)
+				{
+					aisleSpaceWidth = Math.Abs(tieBeamRackForDraw.BottomLeft_GlobalPoint.Y - rackForDraw.BottomLeft_GlobalPoint.Y);
+
+                    if (tieBeamRackForDraw.Center_GlobalPoint.Y < rackForDraw.Center_GlobalPoint.Y)
+						aisleSpaceWidth -= tieBeamRackForDraw.Depth;
+                    else
+						aisleSpaceWidth -= tieBeamRackForDraw.Depth;
+				}
+				else
+				{
+					aisleSpaceWidth = Math.Abs(tieBeamRackForDraw.BottomLeft_GlobalPoint.X - rackForDraw.BottomLeft_GlobalPoint.X);
+
+					if (tieBeamRackForDraw.Center_GlobalPoint.X < rackForDraw.Center_GlobalPoint.X)
+						aisleSpaceWidth -= tieBeamRackForDraw.Depth;
+					else
+						aisleSpaceWidth -= tieBeamRackForDraw.Depth;
+				}
+
+				_ViewsTotalLength += tieBeamRackForDraw.Depth + aisleSpaceWidth;
+			}
+
 			//_FrontViewCenterOffset_X = rackLength / 2;
 			//_SideViewCenterOffset_X = _ViewsTotalLength - rackWidth / 2;
 			// Dont use ClearAvailableHeight, because if it has 12000 value and rack height is 4000
