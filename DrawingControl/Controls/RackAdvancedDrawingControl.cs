@@ -1577,7 +1577,7 @@ namespace DrawingControl
 
 				// if last rack is back to back need to swap dimensions position to left
 				if (!showDimensionsLeft)
-					showDimensionsLeft = lastDrawn != null && lastDrawn != backRack;
+					showDimensionsLeft = (lastDrawn == null && toDraw == mainRack) || (lastDrawn != null && lastDrawn != backRack);
 
 				if (toDraw == tieBeamRack)
 					tieBeamRackOffsetX = drawingGlobalPnt.X;
@@ -1683,30 +1683,6 @@ namespace DrawingControl
 					_DrawRectangle(dc, rackConnectorBrush, rackConnectorPen, startConnectorPoint, endConnectorPoint, cs);
 				}
 			}
-
-            if (mainRack.StiffenersHeight > 0)
-            {
-				FormattedText fmtedText = new FormattedText(
-					"Stiffener", 
-					CultureInfo.CurrentCulture, 
-					FlowDirection.LeftToRight,
-					m_TextTypeFace,
-					displaySettings.DimensionsTextSize,
-					displaySettings.DimensionsBrush);
-
-				Point stiffenerTextPoint = new Point(mainRackOffsetX, -mainRack.X_Bracing_Height);
-
-				if (mainRackOffsetX < tieBeamRackOffsetX)
-					stiffenerTextPoint.X += mainRack.Depth + (2 * mainRack.PalletOverhangValue);
-	
-				stiffenerTextPoint = cs.GetLocalPoint(stiffenerTextPoint, defaultCameraScale, defaultCameraOffset);
-				stiffenerTextPoint.Y -= fmtedText.Height;
-
-				if (mainRackOffsetX > tieBeamRackOffsetX)
-					stiffenerTextPoint.X -= fmtedText.Width;
-
-				dc.DrawText(fmtedText, stiffenerTextPoint);
-            }
 
 			if (displaySettings.DisplayTextAndDimensions)
 			{                
@@ -2082,7 +2058,31 @@ namespace DrawingControl
 				//_DrawDimension(dc, leftColumnStart_GlobalPnt, dimensionGlobalPnt_02, strColumnWidth, displaySettings.MinDimensionsLinesOffset / 2, displaySettings.DimensionsTextSize, displaySettings.PerpDimLinesOffsetInPixels, eDimensionPlacement.eBot, cs);
 			}
 
-            bool isHeightDisplayed = false;
+			if (showDimensions && rack.StiffenersHeight > 0)
+			{
+				FormattedText fmtedText = new FormattedText(
+					"Stiffener",
+					CultureInfo.CurrentCulture,
+					FlowDirection.LeftToRight,
+					m_TextTypeFace,
+					displaySettings.DimensionsTextSize,
+					displaySettings.DimensionsBrush);
+
+				Point stiffenerTextPoint = new Point(drawStartPoint.X, -rack.X_Bracing_Height);
+
+                if (!showDimensionsLeft)
+					stiffenerTextPoint.X += rack.Depth + (2 * rack.PalletOverhangValue);
+
+                stiffenerTextPoint = cs.GetLocalPoint(stiffenerTextPoint, defaultCameraScale, defaultCameraOffset);
+				stiffenerTextPoint.Y -= fmtedText.Height;
+
+				if (showDimensionsLeft)
+					stiffenerTextPoint.X -= fmtedText.Width;
+
+				dc.DrawText(fmtedText, stiffenerTextPoint);
+			}
+
+			bool isHeightDisplayed = false;
 
             if (rack.Accessories.UprightGuard)
             {
