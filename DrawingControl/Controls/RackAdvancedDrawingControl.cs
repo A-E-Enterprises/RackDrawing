@@ -1646,10 +1646,17 @@ namespace DrawingControl
 			// Draw rows connectors
             if (backRack != null)
             {
-				Brush rackConnectorBrush = new SolidColorBrush(Colors.Red);
+				Color connectorColor = Colors.Red;
+				if (CurrentGeometryColorsTheme.CurrentTheme != null)
+				{
+					Color color;
+					if (CurrentGeometryColorsTheme.CurrentTheme.GetGeometryColor(eColorType.eRackRowConnectorColorDefault, out color))
+						connectorColor = color;
+				}
+
+				Brush rackConnectorBrush = new SolidColorBrush(connectorColor);
 				Pen rackConnectorPen = new Pen(rackConnectorBrush, 2.0);
 
-				//Rack.BackToBackRackConnectorHeight
 				Point startConnectorPoint = new Point();
 				Point endConnectorPoint = new Point();
 

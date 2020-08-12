@@ -662,6 +662,8 @@ namespace AppColorTheme
 
 			m_ColorTypeToLocalNameDict.Add(eColorType.eRackGuardMainColorDefault, "Rack Guard Elevetion Main Color");
 			m_ColorTypeToLocalNameDict.Add(eColorType.eRackGuardAltColorDefault, "Rack Guard Elevetion Secondary Color");
+
+			m_ColorTypeToLocalNameDict.Add(eColorType.eRackRowConnectorColorDefault, "Rack rpwss connector color");
 			//
 			// DESCRIPTION
 			//
@@ -737,6 +739,8 @@ namespace AppColorTheme
 
 			m_ColorTypeToDescriptionDict.Add(eColorType.eRackGuardMainColorDefault, "Rack Guard Main Color To Visualize Guards Elevation");
 			m_ColorTypeToDescriptionDict.Add(eColorType.eRackGuardAltColorDefault, "Rack Guard Secondary Color To Visualize Guards Elevation");
+			
+			m_ColorTypeToDescriptionDict.Add(eColorType.eRackRowConnectorColorDefault, "Back to back racks connector color");
 
 			m_AreDictInitialized = true;
 		}

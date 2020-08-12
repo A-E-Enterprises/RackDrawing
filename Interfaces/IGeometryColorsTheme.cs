@@ -181,6 +181,10 @@ namespace AppColorTheme
 		/// Rack guard visualization additional color to draw front and side view
 		/// </summary>
 		eRackGuardAltColorDefault,
+		/// <summary>
+		/// Back to back racks connector color
+		/// </summary>
+		eRackRowConnectorColorDefault,
 
 	}
 

@@ -80,6 +80,8 @@ namespace AppColorTheme
 			SetGeometryColor(eColorType.eRackRowGuardDefault, Colors.Orange);
 			SetGeometryColor(eColorType.eRackGuardMainColorDefault, Colors.Black);
 			SetGeometryColor(eColorType.eRackGuardAltColorDefault, Colors.Yellow);
+
+			SetGeometryColor(eColorType.eRackRowConnectorColorDefault, Colors.Red);
 		}
 	}
 }
