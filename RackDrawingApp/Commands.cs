@@ -805,11 +805,11 @@ namespace RackDrawingApp
         {
 			private class FontSizeDependency
             {
-                public int ImageWidth { get; private set; }
-                public int ImageHeight { get; private set; }
+                public UInt32 ImageWidth { get; private set; }
+                public UInt32 ImageHeight { get; private set; }
                 public double FontSize { get; private set; }
 
-				public FontSizeDependency(int imageWidth, int imageHeight, double fontSize)
+				public FontSizeDependency(UInt32 imageWidth, UInt32 imageHeight, double fontSize)
                 {
 					ImageWidth = imageWidth;
 					ImageHeight = imageHeight;
@@ -831,7 +831,7 @@ namespace RackDrawingApp
 			/// </summary>
 			/// <param name="imageWidth">Drawing image width (X-axis)</param>
 			/// <param name="imageHeight">Drawing image height (Y-axis)</param>
-			public static double GetFontSize(int imageWidth, int imageHeight)
+			public static double GetFontSize(UInt32 imageWidth, UInt32 imageHeight)
             {
 				double lastFitWidth = _defaultExportFontSize;
 
@@ -864,7 +864,7 @@ namespace RackDrawingApp
 			bool bIncludeSheetElevationsPictures,
 			double minUnitsPerPixel = 0.0)
 		{
-			double exportFontSize = ExportFontSizeDependencies.GetFontSize(imageLength, imageHeight);
+			double exportFontSize = ExportFontSizeDependencies.GetFontSize(sheet.Length, sheet.Width);
 
 			if (sheet == null)
 				return null;
@@ -1606,7 +1606,7 @@ namespace RackDrawingApp
 			if (Utils.FLE(biggestRackHeight, 0.0))
 				return null;
 
-			double exportFontSize = ExportFontSizeDependencies.GetFontSize(imageLength, imageHeight);
+			double exportFontSize = ExportFontSizeDependencies.GetFontSize(sheet.Length, sheet.Width);
 
 			//
 			GC.Collect();
@@ -2212,7 +2212,7 @@ namespace RackDrawingApp
 				// draw background
 				dc.DrawRectangle(new SolidColorBrush(Colors.White), null, new Rect(new System.Windows.Point(0.0, 0.0), new System.Windows.Point(imageLength, imageHeight)));
 
-				double exportFontSize = ExportFontSizeDependencies.GetFontSize(imageLength, imageHeight);
+				double exportFontSize = ExportFontSizeDependencies.GetFontSize((UInt32)imageLength, (UInt32)imageHeight);
 				RackAdvancedDrawingSettings drawingSettings = new RackAdvancedDrawingSettings(
 					exportFontSize,
 					1.2 * exportFontSize,
