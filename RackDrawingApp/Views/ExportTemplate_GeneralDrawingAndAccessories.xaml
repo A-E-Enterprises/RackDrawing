@@ -19,17 +19,17 @@
 
         <ItemsControl
             Grid.Row="1"
-            MaxHeight="200"
+            MaxHeight="300"
             HorizontalAlignment="Left"
 		    VerticalAlignment="Center"
             ItemsSource="{Binding AccessoriesVisualization, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderThickness="1" BorderBrush="DarkGray" MaxWidth="300">
-                        <Grid>
+                    <Border BorderThickness="1" HorizontalAlignment="Center" BorderBrush="DarkGray" MaxWidth="250">
+                        <Grid Margin="2">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition MinHeight="80" Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Image Grid.Row="0" Source="{Binding ImageSource}" />
                             <TextBlock Grid.Row="1" TextWrapping="Wrap" Text="{Binding Name}"/>
@@ -39,7 +39,7 @@
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"/>
+                    <StackPanel Orientation="Horizontal"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>
