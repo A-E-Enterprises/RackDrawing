@@ -825,7 +825,7 @@ namespace RackDrawingApp
 			private static List<FontSizeDependency> _widthToSizeDependencies = new List<FontSizeDependency> {
 				new FontSizeDependency(30000, 20000, 35),
 				new FontSizeDependency(70000, 55000, 15),
-				new FontSizeDependency(200000, 100000, 5)
+				new FontSizeDependency(200000, 100000, 10)
 			};
 
 			/// <summary>
@@ -840,7 +840,10 @@ namespace RackDrawingApp
 				foreach (FontSizeDependency dependency in _widthToSizeDependencies)
                 {
 					if (imageWidth < dependency.ImageWidth || imageHeight < dependency.ImageHeight)
+					{
+						lastFitWidth = dependency.FontSize;
 						break;
+					}
 
 					lastFitWidth = dependency.FontSize;
 				}
@@ -2655,21 +2658,21 @@ namespace RackDrawingApp
 						++iSheetNumber;
 					}
 
-					// check racks for export
-					foreach (BaseRectangleGeometry geom in sheet.Rectangles)
-					{
-						if (geom == null)
-							continue;
+                    // check racks for export
+                    foreach (BaseRectangleGeometry geom in sheet.Rectangles)
+                    {
+                        if (geom == null)
+                            continue;
 
-						Rack rackGeom = geom as Rack;
-						if (rackGeom == null)
-							continue;
+                        Rack rackGeom = geom as Rack;
+                        if (rackGeom == null)
+                            continue;
 
-						Rack foundRack = racksList.Find(r => r.SizeIndex == rackGeom.SizeIndex && r.IsFirstInRowColumn == rackGeom.IsFirstInRowColumn);
-						if (foundRack == null)
-							racksList.Add(rackGeom);
-					}
-				}
+                        Rack foundRack = racksList.Find(r => r.SizeIndex == rackGeom.SizeIndex && r.IsFirstInRowColumn == rackGeom.IsFirstInRowColumn);
+                        if (foundRack == null)
+                            racksList.Add(rackGeom);
+                    }
+                }
 
 				// sort racks list
 				Command_ExportImages.RackComparer rc = new Command_ExportImages.RackComparer();
