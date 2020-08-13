@@ -2690,50 +2690,69 @@ namespace RackDrawingApp
 
 				if (curDoc.IsPrintAllRackElevationsInSinglePage)
 				{
-					double scaledImageSizeDetailed = Command_ExportImages.maxImageSize / 2.5;
+					char accessoriesDivider = '\n';
+
+					double scaledImageSizeDetailed = Command_ExportImages.maxImageSize / 3.9;
+					double scaledImageHeightDetailed = Command_ExportImages.maxImageHeight / 2.2;
+
 					int scaledImageSize = (int)Math.Ceiling(scaledImageSizeDetailed);
+					int scaledImageHeight = (int)Math.Ceiling(scaledImageHeightDetailed);
 
 					drawingSettings = new RackAdvancedDrawingSettings(
-						(1.5 * 40.0) / 2.5,
-						(1.5 * 48.0) / 2.5,
-						(1.5 * 60.0) / 2.5,
-						(1.5 * 40.0) / 2.5,
-						(1.5 * 60.0) / 2.5,
-						(1.5 * 10.0) / 2.5,
-						(1.5 * 5.0) / 2.5,
+						(1.5 * 40.0) / 3.0,
+						(1.5 * 48.0) / 3.0,
+						(1.5 * 60.0) / 3.0,
+						(1.5 * 40.0) / 3.0,
+						(1.5 * 60.0) / 3.0,
+						(1.5 * 10.0) / 3.0,
+						(1.5 * 5.0) / 3.0,
 						true,
 						false
 						);
 
 					for (int i = 0; i < racksList.Count; i++)
                     {
-						Rack secondRack = null;
-						DrawingVisual secondRackVisual = null;
+						List<DrawingVisual> rackVisualList = new List<DrawingVisual>();
+						string currentPageHeader = string.Empty;
 
-						Rack rack = racksList[i];
+						string rackAccessories = string.Empty;
+						string headerTemplate = string.Empty;
 
-						if (rack == null)
-							continue;
+						for (int index = i; index < racksList.Count; index++)
+						{
+							i = index;
 
-						// create 2000x2000 image
-						DrawingVisual rackVisual = _CreateRackAdvancedPropsVisual(rack, null, scaledImageSize, scaledImageSize, drawingSettings);
-						if (rackVisual == null)
-							continue;
+							Rack rack = racksList[i];
+							if (rack == null)
+								continue;
 
-						i++;
-                        if (i < racksList.Count)
-                        {
-							secondRack = racksList[i];
+							DrawingVisual rackVisual = _CreateRackAdvancedPropsVisual(rack, null, scaledImageSize, scaledImageSize, drawingSettings);
+							if (rackVisual == null)
+								continue;
 
-							if (secondRack != null)
-								secondRackVisual = _CreateRackAdvancedPropsVisual(secondRack, null, scaledImageSize, scaledImageSize, drawingSettings);
+							currentPageHeader += rack.Text + "-";
+							rackAccessories += GetRackLevelAccessories(rack) + accessoriesDivider;
+
+							rackVisualList.Add(rackVisual);
+
+							if (rackVisualList.Count == 6)
+								break;
 						}
 
-						string firstRackAccessories = GetRackLevelAccessories(rack);
+						// remove repeated accessories
+						if (!string.IsNullOrEmpty(rackAccessories))
+                        {
+							List<string> uniqueAccessories = new List<string>();
+                            string[] accesories = rackAccessories.Split(accessoriesDivider);
 
-						string secondRackAccessories = secondRackVisual != null 
-							? GetRackLevelAccessories(secondRack) 
-							: string.Empty;
+                            foreach (var item in accesories)
+                            {
+                                if (!string.IsNullOrEmpty(item) && !uniqueAccessories.Contains(item))
+									uniqueAccessories.Add(item);
+							}
+
+							rackAccessories = string.Join(accessoriesDivider.ToString(), uniqueAccessories);
+						}
 
 						PdfPage newPage = pdfDoc.AddPage();
 
@@ -2747,33 +2766,17 @@ namespace RackDrawingApp
 						templateVM.DisplayNotes = false;
 						templateVM.DisplayRackAccessories = false;
 						templateVM.DisplayRackLevelAccessories = true;
-						
-						templateVM.ImageHeaderText = secondRackVisual != null 
-							? $"{rack.Text} - {secondRack.Text}" 
-							: rack.Text;
 
-						templateVM.RackLevelAccessories = $"{secondRackAccessories}\n\n{secondRackAccessories}";
-
-						if (secondRackVisual != null)
-						{
-							templateVM.ImageSources = new List<ImageSource>();
-
-							templateVM.ImageSources.Add(
-								Command_ExportImages._GetBmpFromVisual(rackVisual, scaledImageSize, scaledImageSize));
-
-							templateVM.ImageSources.Add(
-								Command_ExportImages._GetBmpFromVisual(secondRackVisual, scaledImageSize, scaledImageSize));
-                        }
-                        else
-                        {
-							templateVM.ImageSrc = Command_ExportImages._GetBmpFromVisual(rackVisual, Command_ExportImages.maxImageSize, Command_ExportImages.maxImageSize);
-						}
+						templateVM.ImageSources = new List<ImageSource>();
+						templateVM.RackLevelAccessories = rackAccessories;
+						templateVM.ImageHeaderText = currentPageHeader.Trim('-');
 
 						ExportLayoutTemplate02_Sheet01 pdfExportTemplateControl = new ExportLayoutTemplate02_Sheet01(templateVM, vm.DrawingControl.WatermarkImage);
+						pdfExportTemplateControl.DrawingPart.Content = new ExportTemplate_MultipleRacksLayout();
 
-						if (secondRackVisual != null)
-						{
-							pdfExportTemplateControl.DrawingPart.Content = new ExportTemplate_MultipleRacksLayout();
+						foreach (DrawingVisual visual in rackVisualList)
+                        {
+							templateVM.ImageSources.Add(Command_ExportImages._GetBmpFromVisual(visual, scaledImageSize, scaledImageHeight));
 						}
 
 						_PrepareTemplateForExport(pdfExportTemplateControl);

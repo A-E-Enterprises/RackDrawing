@@ -8,14 +8,19 @@
         ItemsSource="{Binding ImageSources, Mode=OneWay}">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <Viewbox StretchDirection="DownOnly" Stretch="Uniform">
-                    <Image Source="{Binding}" Width="Auto" />
-                </Viewbox>
+                <StackPanel>
+                    <Viewbox StretchDirection="DownOnly" Stretch="Uniform">
+                        <Image Source="{Binding}" Width="Auto" />
+                    </Viewbox>
+                </StackPanel>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"/>
+                <WrapPanel Orientation="Horizontal"
+                           VerticalAlignment="Top"
+                           Width="3800"/>
+                <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Left"/>-->
             </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
     </ItemsControl>
