@@ -517,7 +517,6 @@ namespace RackDrawingApp
 
 		//=============================================================================
 		protected override void _Execute(object parameter)
-		
 		{
 			MainWindow_ViewModel vm = parameter as MainWindow_ViewModel;
 			if (vm == null)
@@ -2212,7 +2211,7 @@ namespace RackDrawingApp
 			using (DrawingContext dc = visual.RenderOpen())
 			{
 				// draw background
-				dc.DrawRectangle(new SolidColorBrush(Colors.AliceBlue), null, new Rect(new System.Windows.Point(0.0, 0.0), new System.Windows.Point(imageLength, imageHeight)));
+				dc.DrawRectangle(new SolidColorBrush(Colors.White), null, new Rect(new System.Windows.Point(0.0, 0.0), new System.Windows.Point(imageLength, imageHeight)));
 
 				double exportFontSize = ExportFontSizeDependencies.GetFontSize((UInt32)imageLength, (UInt32)imageHeight);
 				RackAdvancedDrawingSettings drawingSettings = new RackAdvancedDrawingSettings(
@@ -2690,24 +2689,25 @@ namespace RackDrawingApp
 
 				if (curDoc.IsPrintAllRackElevationsInSinglePage)
 				{
+					double scaleFactor = 3.9;
 					char accessoriesDivider = '\n';
 
-					double scaledImageSizeDetailed = Command_ExportImages.maxImageSize / 3.9;
+					double scaledImageSizeDetailed = Command_ExportImages.maxImageSize / scaleFactor;
 					double scaledImageHeightDetailed = Command_ExportImages.maxImageHeight / 2.2;
 
 					int scaledImageSize = (int)Math.Ceiling(scaledImageSizeDetailed);
 					int scaledImageHeight = (int)Math.Ceiling(scaledImageHeightDetailed);
 
 					drawingSettings = new RackAdvancedDrawingSettings(
-						(1.5 * 40.0) / 3.0,
-						(1.5 * 48.0) / 3.0,
-						(1.5 * 60.0) / 3.0,
-						(1.5 * 40.0) / 3.0,
-						(1.5 * 60.0) / 3.0,
-						(1.5 * 10.0) / 3.0,
-						(1.5 * 5.0) / 3.0,
-						true,
-						false
+						(1.5 * 40.0) / scaleFactor,// levelTextSize
+						(1.5 * 48.0) / scaleFactor,// levelLoadTextSize
+						(1.5 * 60.0) / scaleFactor,// viewTextSize
+						(1.5 * 40.0) / scaleFactor,// dimensionsTextSize
+						(1.5 * 60.0) / scaleFactor,// minDimensionsLinesOffset
+						(1.5 * 10.0) / scaleFactor,// perpDimLineOffsetInPixe
+						(1.5 * 5.0) / scaleFactor, // bracingLinesThickness
+						true,// displayTextAndDimensions
+						false// isItSheetElevationPicture
 						);
 
 					for (int i = 0; i < racksList.Count; i++)

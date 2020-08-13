@@ -523,7 +523,7 @@ namespace DrawingControl
 					if (level.Beam == null || level.Beam.Beam == null)
 						continue;
 
-					FormattedText beamFmtedText = new FormattedText(level.Beam.Beam.Name, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, m_TextTypeFace, displaySettings.LevelTextSize, displaySettings.TextBrush);
+					FormattedText beamFmtedText = new FormattedText($"Level X ({level.Beam.Beam.Name})", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, m_TextTypeFace, displaySettings.LevelTextSize, displaySettings.TextBrush);
 					if (Utils.FGT(beamFmtedText.Width, rBeamTextMaxSizeInPixels))
 						rBeamTextMaxSizeInPixels = beamFmtedText.Width;
 				}
