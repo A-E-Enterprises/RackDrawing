@@ -839,13 +839,10 @@ namespace RackDrawingApp
 
 				foreach (FontSizeDependency dependency in _widthToSizeDependencies)
                 {
-					if (imageWidth < dependency.ImageWidth || imageHeight < dependency.ImageHeight)
-					{
-						lastFitWidth = dependency.FontSize;
-						break;
-					}
-
 					lastFitWidth = dependency.FontSize;
+
+					if (imageWidth <= dependency.ImageWidth && imageHeight <= dependency.ImageHeight)
+						break;
 				}
 
 				return lastFitWidth;
