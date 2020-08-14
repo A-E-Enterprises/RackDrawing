@@ -1030,6 +1030,21 @@ namespace DrawingControl
 									string strPalletLoad = _pallet.Load.ToString();
 									strPalletLoad += " Kg";
 									FormattedText PalletLoadText = new FormattedText(strPalletLoad, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, m_TextTypeFace, displaySettings.LevelLoadTextSize, displaySettings.TextBrush);
+
+									// if text bigger than container we will scale text size to fit
+									Point localPalleteStart = cs.GetLocalPoint(PalletStart_GlobalPoint, defaultCameraScale, defaultCameraOffset);
+									Point localPalleteEnd = cs.GetLocalPoint(PalletEnd_GlobalPoint, defaultCameraScale, defaultCameraOffset);
+
+									double palleteWidth = Math.Abs(localPalleteEnd.X - localPalleteStart.X);
+                                    double textScalingFactor = 0.9;
+
+									// scale down until text fitting in rectangle
+									while (PalletLoadText.Width > palleteWidth)
+                                    {
+										PalletLoadText = new FormattedText(strPalletLoad, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, m_TextTypeFace, displaySettings.LevelLoadTextSize * textScalingFactor, displaySettings.TextBrush);
+										textScalingFactor -= 0.1;
+									}
+
 									Point PalletEnd_ScreenPoint = cs.GetLocalPoint(PalletEnd_GlobalPoint, defaultCameraScale, defaultCameraOffset);
 									Point PalletStart_ScreenPoint = cs.GetLocalPoint(PalletStart_GlobalPoint, defaultCameraScale, defaultCameraOffset);
 									PalletLoadText.MaxTextWidth = Math.Abs(PalletEnd_ScreenPoint.X - PalletStart_ScreenPoint.X);
