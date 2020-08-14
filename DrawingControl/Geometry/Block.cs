@@ -136,7 +136,7 @@ namespace DrawingControl
 			m_strText += m_Length_Y.ToString("0.");
 			m_strText += ")";
 			m_strText += "\n(";
-			m_strText += $"{Math.Round((m_Length_X * m_Length_Y) / 1000000, 2)}m²";
+			m_strText += $"{Math.Round((m_Length_X * m_Length_Y) / 1000000)}m²";
 			m_strText += ")";
 		}
 

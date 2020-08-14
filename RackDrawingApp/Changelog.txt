@@ -1,4 +1,16 @@
-﻿RackDrawingApp 1.407.042
+﻿RackDrawingApp 1.407.043
+[new] Added export text size selection based on drawing layout 
+[new] Show roof height in current position on geometry properties panel
+[new] Added images for every rack and level accessory and print actual to pdf
+[fixed] Fixed pdf exported dimensions overlapping
+[internal] Rack min H/D Ratio increased to 7 to indicate tie-beam requirement
+[internal] Improved UI elements (rack red dots smaller, show area for blocks)
+[internal] Added possibility to combine multiple advanced rack view drawing to single document page
+[internal] Added more rack detail to drawing in pdf and UI (level name, accessories)
+[internal] Extended rack advanced view to show for selected rack also back to back and tie-beam connected racks if exist
+[internal] In pdf export show only unique dimensions without repeats
+
+RackDrawingApp 1.407.042
 [fixed] Fixed guards dimensions overlapping
 [fixed] Fixed underpass row guard drawing
 [fixed] Fixed row guard side drawing

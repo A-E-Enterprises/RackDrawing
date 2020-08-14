@@ -737,7 +737,7 @@
                 VerticalAlignment="Center"
                 IsChecked="{Binding IsPrintAllRackElevationsInSinglePage}"
                 >
-                Fit racks with same index together
+                Fit multiple racks to one page
             </CheckBox>
             
             <!--
@@ -747,7 +747,7 @@
             
             <TextBlock 
                 Grid.Column="4"
-                Text="Printing Max Sheet Length"/>
+                Text="Max Sheet Length To Fit Elevations"/>
 
             <!--
             ROW 5
@@ -767,7 +767,7 @@
             
             <TextBlock 
                 Grid.Column="8"
-                Text="Pdf printing settings"/>
+                Text="Max Sheet Height To Fit Elevations"/>
 
             <!--
             ROW 9

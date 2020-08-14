@@ -47,7 +47,7 @@ namespace RackDrawingApp
 		/// <summary>
 		/// Application version, which is displayed in DEBUG mode only.
 		/// </summary>
-		public string ApplicationVersion { get { return "RackDrawingApp 1.407.042"; } }
+		public string ApplicationVersion { get { return "RackDrawingApp 1.407.043"; } }
 
 		//=============================================================================
 		public DialogHost DlgHost { get; set; }

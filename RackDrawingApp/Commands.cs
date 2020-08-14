@@ -1176,11 +1176,14 @@ namespace RackDrawingApp
 
 							Typeface textTypeFace = new Typeface(new System.Windows.Media.FontFamily("MaterialDesign"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
 							FormattedText dimText = new FormattedText(asGeom.Text, CultureInfo.CurrentCulture, System.Windows.FlowDirection.LeftToRight, 
-								textTypeFace, geomDisplaySettings.TextFontSize, System.Windows.Media.Brushes.Black);
+								textTypeFace, exportFontSize, System.Windows.Media.Brushes.Black);
+
+							double width = ics.GetGlobalWidth(dimText.Width, unitsPerCameraPixel);
+							double height = ics.GetGlobalHeight(dimText.Height, unitsPerCameraPixel);
 
 							Rect approximatedTextposition = new Rect(
-								ics.GetLocalPoint(new System.Windows.Point(asGeom.Center_GlobalPoint.X - dimText.Width, asGeom.Center_GlobalPoint.Y - dimText.Height), unitsPerCameraPixel, cameraOffset),
-								ics.GetLocalPoint(new System.Windows.Point(asGeom.Center_GlobalPoint.X + dimText.Width, asGeom.Center_GlobalPoint.Y + dimText.Height), unitsPerCameraPixel, cameraOffset)
+								ics.GetLocalPoint(new System.Windows.Point(asGeom.Center_GlobalPoint.X - width, asGeom.Center_GlobalPoint.Y - (height)), unitsPerCameraPixel, cameraOffset),
+								ics.GetLocalPoint(new System.Windows.Point(asGeom.Center_GlobalPoint.X + width, asGeom.Center_GlobalPoint.Y + (height)), unitsPerCameraPixel, cameraOffset)
 								);
 
 							textColisionlist.Add(approximatedTextposition);
@@ -1326,8 +1329,8 @@ namespace RackDrawingApp
 						// draw rack group length dimensions here
 						var first = rackGroup[0];
 						var last = rackGroup[rackGroup.Count - 1];
-						
-						double length = 0;
+
+                        double length = 0;
 						System.Windows.Point startPoint = new System.Windows.Point();
 						System.Windows.Point endPoint = new System.Windows.Point();
 
@@ -1398,8 +1401,6 @@ namespace RackDrawingApp
 								sheetDimOffset, ics.GetGlobalWidth(sheetDimOffset, unitsPerCameraPixel) + ics.GetGlobalWidth(geomDisplaySettings.TextFontSize / 4, unitsPerCameraPixel),
 								geomDisplaySettings.TextFontSize, geomDisplaySettings.TextFontSize / 4, RackAdvancedPropertiesControl.eDimensionPlacement.eRight, true));
 
-					//TODO: check overlapping
-					//double dimensionOffset = 2000.0;
 
 					foreach (var dimension in dimensions.Where(x => x.IsRackGroup))
 					{
@@ -1407,13 +1408,11 @@ namespace RackDrawingApp
 							ics.GetLocalPoint(dimension.TextColisionRect.TopLeft, unitsPerCameraPixel, cameraOffset),
 							ics.GetLocalPoint(dimension.TextColisionRect.BottomRight, unitsPerCameraPixel, cameraOffset));
 
-						//dc.DrawRectangle(new SolidColorBrush(Colors.Red), null, dimRect);
-
                         foreach (Rect text in textColisionlist)
                         {
 							if (dimension.IsRackGroup && text.IntersectsWith(dimRect))
 							{
-								dimension.DimensionTextColisionOffset = text.Width;
+								dimension.DimensionTextColisionOffset = ics.GetGlobalWidth(text.Width, unitsPerCameraPixel);
 							}
 						}
 
@@ -1428,20 +1427,14 @@ namespace RackDrawingApp
 
 							if (otherDimRect.IntersectsWith(dimRect))
 							{
-								dimension.DimensionTextColisionOffset += otherDimRect.Width;
+								dimension.DimensionTextColisionOffset += ics.GetGlobalWidth(otherDimRect.Width, unitsPerCameraPixel);
 							}
 						}
                     }
-					
+
 					// print dimensions
 					foreach (DimensionData dimension in dimensions)
                     {
-						//Rect dimRect = new Rect(
-						//	ics.GetLocalPoint(dimension.TextColisionRect.TopLeft, unitsPerCameraPixel, cameraOffset),
-						//	ics.GetLocalPoint(dimension.TextColisionRect.BottomRight, unitsPerCameraPixel, cameraOffset));
-
-						//dc.DrawRectangle(new SolidColorBrush(Colors.Red), null, dimRect);
-
 						RackAdvancedPropertiesControl._DrawDimension(
                             dc,
                             dimension.First,
