@@ -583,7 +583,7 @@ namespace RackDrawingApp
 			{
 				// list of rack with unique index
 				// need for export
-				List<Rack> racksList = new List<Rack>();
+				List<RackExportingModel> racksList = new List<RackExportingModel>();
 
 				// export sheets layout
 				foreach (DrawingSheet sheet in curDoc.Sheets)
@@ -691,38 +691,43 @@ namespace RackDrawingApp
 						_ExportDrawingVisual(sheetVisualWithSizes, strImagePath, imageLength, imageHeight);
 					}
 
-					// check racks for export
-					foreach (BaseRectangleGeometry geom in sheet.Rectangles)
-					{
-						if (geom == null)
-							continue;
+					IEnumerable<RackExportingModel> exportingData = sheet.GetRacksToExport();
+					racksList.AddRange(exportingData);
 
-						Rack rackGeom = geom as Rack;
-						if (rackGeom == null)
-							continue;
+					//foreach (BaseRectangleGeometry geom in sheet.Rectangles)
+					//{
+					//	if (geom == null)
+					//		continue;
 
-						Rack foundRack = racksList.Find(r => r.SizeIndex == rackGeom.SizeIndex && r.IsFirstInRowColumn == rackGeom.IsFirstInRowColumn);
-						if (foundRack == null)
-							racksList.Add(rackGeom);
-					}
+					//	Rack rackGeom = geom as Rack;
+					//	if (rackGeom == null)
+					//		continue;
+
+					//	Rack foundRack = racksList.Find(r => r.SizeIndex == rackGeom.SizeIndex && r.IsFirstInRowColumn == rackGeom.IsFirstInRowColumn);
+					//	if (foundRack == null)
+					//		racksList.Add(rackGeom);
+					//}
 				}
 
 				// sort racks list
-				RackComparer rc = new RackComparer();
+				RackExporitngComparer rc = new RackExporitngComparer();
 				racksList.Sort(rc);
 				// export rack advanced properties
-				foreach (Rack rack in racksList)
+				int exportedIndex = 1;
+				foreach (RackExportingModel rack in racksList)
 				{
 					if (rack == null)
 						continue;
 
 					// create image
-					DrawingVisual rackVisual = CreateRackAdvancedPropsVisual(rack, vm.DrawingControl.WatermarkImage, maxImageSize, maxImageHeight);
+					DrawingVisual rackVisual = CreateRackAdvancedPropsVisual(rack.ExportingRack, rack.BackToBackRack, rack.TieBeamConnectedRack, vm.DrawingControl.WatermarkImage, maxImageSize, maxImageHeight);
 					if (rackVisual == null)
 						continue;
 					// rack.Text contains text that displayed over rack in the sheet layout
-					string strImagePath = Path.Combine(strFolder, strDocNameWithoutExtensions + "_" + rack.Text + ".jpeg");
+					string strImagePath = Path.Combine(strFolder, strDocNameWithoutExtensions + "_" + rack.ExportingRack.Text + "_" + exportedIndex + ".jpeg");
 					_ExportDrawingVisual(rackVisual, strImagePath, maxImageSize, maxImageHeight);
+
+					exportedIndex++;
 				}
 			}
 			catch { }
@@ -2201,7 +2206,7 @@ namespace RackDrawingApp
 		/// <summary>
 		/// Creates rack advanced properties visual(front and side views)
 		/// </summary>
-		private static DrawingVisual CreateRackAdvancedPropsVisual(Rack rack, ImageSource watermarkImage, int imageLength, int imageHeight)
+		private static DrawingVisual CreateRackAdvancedPropsVisual(Rack rack, Rack backToBackRack, Rack tieBeamRack, ImageSource watermarkImage, int imageLength, int imageHeight)
 		{
 			if (rack == null)
 				return null;
@@ -2261,10 +2266,36 @@ namespace RackDrawingApp
 			}
 		}
 
-		/// <summary>
-		/// Order rectangles to avoid rack and aisle space overlapping
-		/// </summary>
-		public class RectanglesComparer : IComparer<BaseRectangleGeometry>
+        public class RackExporitngComparer : RackComparer, IComparer<RackExportingModel>
+        {
+			public int Compare(RackExportingModel x, RackExportingModel y)
+			{
+				return base.Compare(x.ExportingRack, y.ExportingRack);
+
+				//if (x.ExportingRack == null)
+				//	return -1;
+				//if (y.ExportingRack == null)
+				//	return 1;
+
+				//// compare index
+				//if (x.ExportingRack.SizeIndex != y.ExportingRack.SizeIndex)
+				//	return x.ExportingRack.SizeIndex - y.ExportingRack.SizeIndex;
+
+				//// index is equal
+				//// compare position in the row
+				//if (x.ExportingRack.IsFirstInRowColumn)
+				//	return -1;
+				//if (y.ExportingRack.IsFirstInRowColumn)
+				//	return 1;
+
+				//return 0;
+			}
+		}
+
+        /// <summary>
+        /// Order rectangles to avoid rack and aisle space overlapping
+        /// </summary>
+        public class RectanglesComparer : IComparer<BaseRectangleGeometry>
 		{
 			public int Compare(BaseRectangleGeometry x, BaseRectangleGeometry y)
 			{
@@ -2414,7 +2445,7 @@ namespace RackDrawingApp
 
 				// list of rack with unique index
 				// need for export
-				List<Rack> racksList = new List<Rack>();
+				List<RackExportingModel> racksList = new List<RackExportingModel>();
 
 				int iSheetNumber = 1;
 
@@ -2654,24 +2685,28 @@ namespace RackDrawingApp
 						++iSheetNumber;
 					}
 
-                    // check racks for export
-                    foreach (BaseRectangleGeometry geom in sheet.Rectangles)
-                    {
-                        if (geom == null)
-                            continue;
+                    IEnumerable<RackExportingModel> exportingData = sheet.GetRacksToExport();
 
-                        Rack rackGeom = geom as Rack;
-                        if (rackGeom == null)
-                            continue;
+                    racksList.AddRange(exportingData);
 
-                        Rack foundRack = racksList.Find(r => r.SizeIndex == rackGeom.SizeIndex && r.IsFirstInRowColumn == rackGeom.IsFirstInRowColumn);
-                        if (foundRack == null)
-                            racksList.Add(rackGeom);
-                    }
+                    //// check racks for export
+                    //foreach (BaseRectangleGeometry geom in sheet.Rectangles)
+                    //{
+                    //    if (geom == null)
+                    //        continue;
+
+                    //    Rack rackGeom = geom as Rack;
+                    //    if (rackGeom == null)
+                    //        continue;
+
+                    //    Rack foundRack = racksList.Find(r => r.SizeIndex == rackGeom.SizeIndex && r.IsFirstInRowColumn == rackGeom.IsFirstInRowColumn);
+                    //    if (foundRack == null)
+                    //        racksList.Add(rackGeom);
+                    //}
                 }
 
 				// sort racks list
-				Command_ExportImages.RackComparer rc = new Command_ExportImages.RackComparer();
+				Command_ExportImages.RackExporitngComparer rc = new Command_ExportImages.RackExporitngComparer();
 				racksList.Sort(rc);
 
 				// export rack advanced properties
@@ -2721,12 +2756,12 @@ namespace RackDrawingApp
 						for (int index = i; index < racksList.Count; index++)
 						{
 							i = index;
-
-							Rack rack = racksList[i];
+							RackExportingModel export = racksList[i];
+							Rack rack = export.ExportingRack;
 							if (rack == null)
 								continue;
 
-							DrawingVisual rackVisual = _CreateRackAdvancedPropsVisual(rack, null, scaledImageSize, scaledImageSize, drawingSettings);
+							DrawingVisual rackVisual = _CreateRackAdvancedPropsVisual(rack, export.BackToBackRack, export.TieBeamConnectedRack, null, scaledImageSize, scaledImageSize, drawingSettings);
 							if (rackVisual == null)
 								continue;
 
@@ -2794,13 +2829,16 @@ namespace RackDrawingApp
 				}
 				else
 				{
-					foreach (Rack rack in racksList)
+					foreach (RackExportingModel rackExporting in racksList)
 					{
-						if (rack == null)
+						if (rackExporting == null)
+							continue;
+
+						if (rackExporting.ExportingRack == null)
 							continue;
 
 						// create 2000x2000 image
-						DrawingVisual rackVisual = _CreateRackAdvancedPropsVisual(rack, null, Command_ExportImages.maxImageSize, Command_ExportImages.maxImageSize, drawingSettings);
+						DrawingVisual rackVisual = _CreateRackAdvancedPropsVisual(rackExporting.ExportingRack, rackExporting.BackToBackRack, rackExporting.TieBeamConnectedRack, null, Command_ExportImages.maxImageSize, Command_ExportImages.maxImageSize, drawingSettings);
 						if (rackVisual == null)
 							continue;
 
@@ -2811,7 +2849,7 @@ namespace RackDrawingApp
 						ExportLayoutTemplateVM templateVM = new ExportLayoutTemplateVM(curDoc, null);
 						templateVM.Date = DateTime.Now.Date.ToString("dd MMMM yyyy");
 						templateVM.PageNumber = iSheetNumber;
-						templateVM.ImageHeaderText = rack.Text;
+						templateVM.ImageHeaderText = rackExporting.ExportingRack.Text;
 						templateVM.DisplayRackStatistics = false;
 						templateVM.DisplayPalleteStatistics = false;
 						templateVM.DisplayMHEDetails = false;
@@ -2819,7 +2857,7 @@ namespace RackDrawingApp
 						templateVM.DisplayNotes = false;
 						templateVM.DisplayRackAccessories = false;
 						templateVM.DisplayRackLevelAccessories = true;
-						templateVM.RackLevelAccessories = GetRackLevelAccessories(rack);
+						templateVM.RackLevelAccessories = GetRackLevelAccessories(rackExporting.ExportingRack);
 						templateVM.ImageSrc = Command_ExportImages._GetBmpFromVisual(rackVisual, Command_ExportImages.maxImageSize, Command_ExportImages.maxImageSize);
 						//
 						System.Windows.Controls.UserControl pdfExportTemplateControl = new ExportLayoutTemplate02_Sheet01(templateVM, vm.DrawingControl.WatermarkImage);
@@ -2916,7 +2954,7 @@ namespace RackDrawingApp
 		}
 
 		//=============================================================================
-		private static DrawingVisual _CreateRackAdvancedPropsVisual(Rack rack, ImageSource watermarkImage, int imageLength, int imageHeight, RackAdvancedDrawingSettings drawingSettings)
+		private static DrawingVisual _CreateRackAdvancedPropsVisual(Rack rack, Rack backToBackRack, Rack tieBeamRack, ImageSource watermarkImage, int imageLength, int imageHeight, RackAdvancedDrawingSettings drawingSettings)
 		{
 			if (rack == null)
 				return null;

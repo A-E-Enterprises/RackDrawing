@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -14,6 +15,20 @@ using System.Windows.Threading;
 
 namespace DrawingControl
 {
+	public class RackExportingModel
+    {
+        public RackExportingModel(Rack exportingRack, Rack tieBeamConnectedRack, Rack backToBackRack)
+        {
+			ExportingRack = exportingRack;
+			TieBeamConnectedRack = tieBeamConnectedRack;
+			BackToBackRack = backToBackRack;
+		}
+
+        public Rack ExportingRack { get; private set; }
+        public Rack TieBeamConnectedRack { get; private set; }
+        public Rack BackToBackRack { get; private set; }
+    }
+
 	[Serializable]
 	public class DrawingSheet : BaseViewModel, ISerializable, IDeserializationCallback, IGeomDisplaySettings, IClonable
 	{
@@ -1780,6 +1795,104 @@ namespace DrawingControl
 
 			return tieBeamContainsRack;
 		}
+
+		public IEnumerable<RackExportingModel> GetRacksToExport()
+        {
+			List<RackExportingModel> results = new List<RackExportingModel>();
+
+            foreach (BaseRectangleGeometry geom in Rectangles)
+            {
+                if (geom == null)
+                    continue;
+
+                Rack rack = geom as Rack;
+                if (rack == null)
+                    continue;
+
+                IEnumerable<RackExportingModel> foundSets = results.Where(r => r.ExportingRack.SizeIndex == rack.SizeIndex && r.ExportingRack.IsFirstInRowColumn == rack.IsFirstInRowColumn);
+
+				Rack tbRack = GetTieBeamConnectedRack(rack);
+				Rack btbRack = GetBackToBackRack(rack);
+				RackExportingModel currentSet = new RackExportingModel(rack, tbRack, btbRack);
+
+				// just add new and go next
+				if (!foundSets.Any())
+                {
+					results.Add(currentSet);
+					continue;
+				}
+
+				bool canAdd = false;
+				bool alreadyExist = false;
+
+				for (int i = 0; i < foundSets.Count(); i++)
+                {
+					RackExportingModel foundSet = foundSets.ElementAt(i);
+
+					Rack ftbRack = foundSet.TieBeamConnectedRack;
+					Rack fbtbRack = foundSet.BackToBackRack;
+
+					string ftbRackStr = ftbRack?.Text;
+					string fbtbRackStr = fbtbRack?.Text;
+
+                    bool isBTBDifference = btbRack != fbtbRack && btbRack?.SizeIndex != fbtbRack?.SizeIndex && btbRack?.IsFirstInRowColumn != fbtbRack?.IsFirstInRowColumn;
+                    bool isTBDifference = tbRack != ftbRack && tbRack?.SizeIndex != ftbRack?.SizeIndex && tbRack?.IsFirstInRowColumn != ftbRack?.IsFirstInRowColumn;
+
+					// if exist same index rack with any dependency this will replace rack with no dependencies
+					if ((fbtbRack == null && ftbRack == null && (tbRack != null || btbRack != null))
+						||
+						(fbtbRack == null && btbRack != null && !isTBDifference)
+						||
+						(ftbRack == null && tbRack != null && !isBTBDifference)
+						)
+					{
+						int index = results.IndexOf(foundSet);
+						results.Remove(foundSet);
+                        if (!results.Contains(currentSet))
+                        {
+							results.Insert(index, currentSet);
+						}
+						canAdd = false;
+					}
+                    else if ((fbtbRack != null && ftbRack != null && (tbRack == null || btbRack == null))
+						||
+						((fbtbRack != null || ftbRack != null) && tbRack == null && btbRack == null)
+						)
+                    {
+						canAdd = false;
+						break;
+					}
+                    else if ((fbtbRack != null && btbRack != null && isTBDifference && isBTBDifference)
+						||
+						(ftbRack != null && tbRack != null && isTBDifference && isBTBDifference)
+						)
+                    {
+						results.Add(currentSet);
+						canAdd = false;
+					}
+					else if (isTBDifference && isBTBDifference)
+                    {
+						canAdd = true;
+                    }
+					else if (!isTBDifference && !isBTBDifference)
+					{
+						canAdd = false;
+						alreadyExist = true;
+						continue;
+					}
+
+					if (fbtbRack != null && ftbRack != null && tbRack != null && btbRack != null && btbRack.SizeIndex == fbtbRack.SizeIndex && tbRack.SizeIndex == ftbRack.SizeIndex)
+						continue;
+				}
+
+                if (canAdd && !alreadyExist)
+                {
+					results.Add(currentSet);
+				}
+			}
+
+            return results;
+        }
 
 		//=============================================================================
 		public void CreateColumnPattern(Column original, Point globalPoint, double DrawingWidth, double DrawingHeight)

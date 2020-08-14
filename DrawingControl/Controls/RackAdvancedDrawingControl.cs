@@ -469,6 +469,22 @@ namespace DrawingControl
 		/// </summary>
 		public static void sDraw(DrawingContext dc, Rack rackForDraw, Size imageSize, RackAdvancedDrawingSettings drawingSettings = null)
 		{
+			if (rackForDraw == null)
+				return;
+			if (rackForDraw.Column == null)
+				return;
+
+			Rack backToBackRack = rackForDraw.Sheet.GetBackToBackRack(rackForDraw);
+			Rack tieBeamConnectedRack = rackForDraw.Sheet.GetTieBeamConnectedRack(rackForDraw);
+
+			sDraw(dc, rackForDraw, backToBackRack, tieBeamConnectedRack, imageSize, drawingSettings);
+		}
+
+		/// <summary>
+		/// Draws advanced rack view on the DrawingContext
+		/// </summary>
+		public static void sDraw(DrawingContext dc, Rack rackForDraw, Rack backToBackRack, Rack tieBeamConnectedRack, Size imageSize, RackAdvancedDrawingSettings drawingSettings = null)
+		{
 			if (dc == null)
 				return;
 			if (imageSize == null)
@@ -486,9 +502,6 @@ namespace DrawingControl
 			RackAdvancedDrawingSettings displaySettings = drawingSettings;
 			if (displaySettings == null)
 				displaySettings = RackAdvancedDrawingSettings.GetDefaultSettings();
-
-			Rack backToBackRack = rackForDraw.Sheet.GetBackToBackRack(rackForDraw);
-			Rack tieBeamConnectedRack = rackForDraw.Sheet.GetTieBeamConnectedRack(rackForDraw); ;
 
 			FormattedText FrontViewText;
 			FormattedText SideViewText;
