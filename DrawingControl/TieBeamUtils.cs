@@ -25,6 +25,8 @@ namespace DrawingControl
 
 	public class TieBeamCalculationInfo
 	{
+
+
 		public TieBeamCalculationInfo()
 		{
 			this.OppositeRacksDict = new Dictionary<Rack, eTieBeamFrame>();
@@ -1289,6 +1291,9 @@ namespace DrawingControl
 
 	public static class TieBeamUtils
 	{
+		private const double TieBeamMinHDRatio = 7.0;
+		private const double TieBeamMaxHDRatio = 10.0;
+
 		public static List<TieBeamCalculationInfo> CalculateTieBeams(
 			AisleSpace aisleSpace,
 			eGeometryContactSide contactSide,
@@ -1457,10 +1462,10 @@ namespace DrawingControl
 			if (Utils.FLE(beamSpan, 0.0) || Utils.FLE(hdRatio, 0.0))
 				return eTieBeamPlacement.eNone;
 
-			if (Utils.FLE(hdRatio, 6.0))
+			if (Utils.FLE(hdRatio, TieBeamMinHDRatio))
 				return eTieBeamPlacement.eNone;
 
-			if (Utils.FGT(hdRatio, 6.0) && Utils.FLE(hdRatio, 10.0))
+			if (Utils.FGT(hdRatio, TieBeamMinHDRatio) && Utils.FLE(hdRatio, TieBeamMaxHDRatio))
 			{
 				if (Utils.FLE(beamSpan, 1800.0))
 					return eTieBeamPlacement.eFirst_Last_EveryThirdFrame;
